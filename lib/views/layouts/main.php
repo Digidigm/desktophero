@@ -33,7 +33,7 @@
         <link rel="stylesheet" href="/css/landio.css">
 
         
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="/vendor/jquery/jquery.min.js"></script>
         
 
         <link href="/css/style.css" rel="stylesheet">
