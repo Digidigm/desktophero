@@ -62,10 +62,10 @@ function readyFunction(){
 		}
 		
 		//add some nice lighting
-		hemi = new THREE.HemisphereLight( 0xff0090, 0xff0011 );
+		hemi = new THREE.HemisphereLight( 0xffffff, 0xffffff );
 		scene.add(hemi);
 		//add some fog
-		scene.fog = new THREE.Fog( 0xffff90, .01, 500 );
+		//scene.fog = new THREE.Fog( 0xffff90, .01, 500 );
   
 		/*adds spot light with starting parameters*/
 		spotLight = new THREE.SpotLight(0xffffff);
@@ -85,7 +85,7 @@ function readyFunction(){
 		
 		/*add loader call add model function*/
 		loader = new THREE.JSONLoader();
-		loader.load( '/test/models/human3.js', addModel );
+		loader.load( '/test/models/human5.js', addModel );
 		
 		/*adds controls to scene*/
 		datGUI = new dat.GUI();
@@ -219,17 +219,86 @@ function readyFunction(){
     	console.log(pose)
     	scene.traverse(function(child){
 			if (child instanceof THREE.SkinnedMesh){
-				for (var j = 0; j < child.skeleton.bones.length; j++){
-					var bone = child.skeleton.bones[j]
+				bones = child.skeleton.bones;
+				
+				for (var j = 0; j < bones.length; j++){
+					var bone = bones[j]
 					// Todo: Have the blender script store bones as <name>:<quat> entries in a dictionary to avoid this loop.
+					var red = 0
+					var green = 1
+					var blue = 2
+
 					for (var i = 0; i < pose.bones.length; i++){
 						if (bone.name == pose.bones[i].bone_name){
 							//bone.use_quaternion = false
-							bone.rotation.x = pose.bones[i].rotation[0];
-							bone.rotation.z = pose.bones[i].rotation[1];
-							bone.rotation.y = pose.bones[i].rotation[2];
-							console.log(bone.name + ": ")
-							console.log(bone.rotation)
+							bone.rotation.order = 'ZYX'; //'YZX' is close
+							
+							var up, right, forward
+							if (bone.name == "Bone" || 
+								bone.name == "Bone.001" || 
+								bone.name == "Bone.002" || 
+								bone.name == "Bone.003" || 
+								bone.name == "Bone.004"){
+								up = pose.bones[i].rotation[green];
+								right = pose.bones[i].rotation[red];
+								forward = pose.bones[i].rotation[blue];
+							} else if (bone.name == "Bone.005" || 
+										bone.name == "Bone.006" || 
+										bone.name == "Bone.007"){
+								bone.rotation.order = 'YXZ'
+								up = pose.bones[i].rotation[blue];
+								right = pose.bones[i].rotation[green];
+								forward = pose.bones[i].rotation[red];
+							} else if (bone.name == "Bone.008" || 
+										bone.name == "Bone.009" || 
+										bone.name == "Bone.010"){
+								bone.rotation.order = 'YXZ'
+								up = pose.bones[i].rotation[blue];
+								right = -pose.bones[i].rotation[green];
+								forward = -pose.bones[i].rotation[red];
+							} else if (bone.name == "Bone.011" || 
+										bone.name == "Bone.012"){
+								up = pose.bones[i].rotation[green];
+								right = pose.bones[i].rotation[red];
+								forward = pose.bones[i].rotation[blue];
+							} else if (bone.name == "Bone.013" || 
+								bone.name == "Bone.014" || 
+								bone.name == "Bone.015" || 
+								bone.name == "Bone.016"){
+								up = -pose.bones[i].rotation[green];
+								right = pose.bones[i].rotation[red];
+								forward = -pose.bones[i].rotation[blue] ;
+							} else if (bone.name == "Bone.017" || 
+								bone.name == "Bone.018" || 
+								bone.name == "Bone.019" || 
+								bone.name == "Bone.020"){
+								up = pose.bones[i].rotation[blue];
+								right = -pose.bones[i].rotation[red];
+								forward = -pose.bones[i].rotation[green] ;
+							} else {
+								up = 0;
+								right = 0;
+								forward = 0;
+							}
+
+							/*console.log(up)
+							console.log(right)
+							console.log(forward)*/
+							bone.rotation.x = right;
+							bone.rotation.z = forward;
+							bone.rotation.y = up;
+							
+
+							if (bone.name == "Bone.005"){
+								console.log(pose.bones[i].rotation[0])
+								console.log(pose.bones[i].rotation[1])
+								console.log(pose.bones[i].rotation[2])
+								console.log(bone.rotation.x)
+								console.log(bone.rotation.y)
+								console.log(bone.rotation.z)
+							}
+							/*console.log(bone.name + ": ")
+							console.log(bone.rotation)*/
 							break;
 						}
 					}
@@ -240,7 +309,7 @@ function readyFunction(){
 
     function getTestPose(){
     	return JSON.parse(
-    	'{"pose_name":"test", "bones":[{"bone_name":"Bone", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.001", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.002", "rotation":[-0.5083176493644714, -7.493918019463308e-08, 1.9757736779979496e-08]}, {"bone_name":"Bone.003", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.004", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.005", "rotation":[-0.9150259494781494, 0.002966922940686345, 0.0014784401282668114]}, {"bone_name":"Bone.006", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.007", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.008", "rotation":[0.7294250130653381, 0.009277179837226868, -0.0034510577097535133]}, {"bone_name":"Bone.009", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.010", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.011", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.012", "rotation":[0.01626760885119438, 0.05825895443558693, -0.5444480776786804]}, {"bone_name":"Bone.013", "rotation":[-0.6977340579032898, 8.785066540895059e-08, 2.7404389868479484e-08]}, {"bone_name":"Bone.014", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.017", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.018", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.015", "rotation":[0.0057446835562586784, 0.02356870286166668, -0.478135347366333]}, {"bone_name":"Bone.016", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.019", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.020", "rotation":[0.0, 0.0, 0.0]}]}'
+			'{"pose_name":"test", "bones":[{"bone_name":"Bone", "rotation":[1.9226702451705933, -0.0009313142509199679, -0.00016556473565287888]}, {"bone_name":"Bone.001", "rotation":[-0.37607342004776, 3.263347925219762e-11, 4.386852686666387e-11]}, {"bone_name":"Bone.002", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.003", "rotation":[-0.44932135939598083, 2.8409503916027035e-11, 4.034667738794795e-11]}, {"bone_name":"Bone.004", "rotation":[-0.3708282709121704, 2.349996933159737e-11, 3.403754361697153e-11]}, {"bone_name":"Bone.005", "rotation":[-0.9046810269355774, 0.5459235906600952, -0.16327519714832306]}, {"bone_name":"Bone.006", "rotation":[0.5804301500320435, -0.40707725286483765, -1.7907335758209229]}, {"bone_name":"Bone.007", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.008", "rotation":[0.6201788783073425, -0.2529982328414917, 1.0996545553207397]}, {"bone_name":"Bone.009", "rotation":[0.24127955734729767, -0.029807748273015022, 0.24250195920467377]}, {"bone_name":"Bone.010", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.011", "rotation":[-0.1982637196779251, -0.004233112558722496, -0.007679996080696583]}, {"bone_name":"Bone.012", "rotation":[-0.33867502212524414, -0.008108455687761307, -0.012540679425001144]}, {"bone_name":"Bone.013", "rotation":[-0.844447672367096, 2.7732916407785524e-08, 5.5748877514361084e-08]}, {"bone_name":"Bone.014", "rotation":[1.4505610466003418, -3.0599167644140834e-09, -2.529922049632205e-09]}, {"bone_name":"Bone.017", "rotation":[-0.5336959958076477, 1.2534094651073246e-08, 4.6006285003841185e-08]}, {"bone_name":"Bone.018", "rotation":[-0.2973347008228302, -4.172669154645092e-11, -6.836009536215215e-11]}, {"bone_name":"Bone.015", "rotation":[-0.25183165073394775, 3.6357050703372806e-09, 2.058188286468976e-08]}, {"bone_name":"Bone.016", "rotation":[0.27862924337387085, 2.974542834266458e-09, 4.510152529224598e-10]}, {"bone_name":"Bone.019", "rotation":[-0.28812694549560547, -4.07844247263256e-09, -2.794934417238437e-08]}, {"bone_name":"Bone.020", "rotation":[0.0, 0.0, 0.0]}]}' //replace
     	);
     }
 }
