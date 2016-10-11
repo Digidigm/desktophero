@@ -12,6 +12,7 @@ function readyFunction(){
 	function init(){
 		/*creates empty scene object and renderer*/
 		scene = new THREE.Scene();
+		window.scene = scene
 		camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, 500);
 		renderer = new THREE.WebGLRenderer({antialias:true});
 		

@@ -130,7 +130,7 @@ THREE.STLExporter.prototype = {
 };
 
 // Use FileSaver.js 'saveAs' function to save the string
-function saveSTL( scene, name ){  
+window.saveSTL = function( scene, name ){  
   var exporter = new THREE.STLExporter();
   var stlString = exporter.parse( scene );
   
