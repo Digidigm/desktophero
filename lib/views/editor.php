@@ -13,6 +13,7 @@
 <script src="/vendor/threejs/external/stats.min.js"></script>
 <script src="/vendor/threejs/external/STLExporter.js"></script>
 <script src="/js/3ddemo.js"></script>
+<script src="/js/stuff.js"></script>
 
 
 <style type="text/css">

@@ -7,6 +7,9 @@ function readyFunction(){
 	var spotLight, hemi;
 	var SCREEN_WIDTH, SCREEN_HEIGHT;
 	var loader, model;
+
+	var bone_groups = {};
+	var skeleton_helpers = [];
 	
 
 	function init(){
@@ -25,9 +28,9 @@ function readyFunction(){
 		controls = new THREE.OrbitControls( camera, renderer.domElement );
 		controls.addEventListener( 'change', render );
 					
-		camera.position.x = 200;
-		camera.position.y = 200;
-		camera.position.z = 200;    
+		camera.position.x = 0;
+		camera.position.y = 0;
+		camera.position.z = 6;
 		camera.lookAt(scene.position);
 
 		/*datGUI controls object*/
@@ -87,6 +90,9 @@ function readyFunction(){
 		/*add loader call add model function*/
 		loader = new THREE.JSONLoader();
 		loader.load( '/test/models/human5.js', addModel );
+		//loader.load('/test/models/recred.js', add_bone_group.bind(null, 't1'));
+		//loader.load('/test/models/recblue.js', add_bone_group.bind(null, 't2'));
+		loader.load('/test/models/head.js', add_bone_group.bind(null, 'head'));
 		
 		/*adds controls to scene*/
 		datGUI = new dat.GUI();
@@ -95,10 +101,10 @@ function readyFunction(){
 		datGUI.add(guiControls, "scene");
 		var cfolder = datGUI.addFolder('Controls');
 		
-		cfolder.add(guiControls, 'Bone_0',-3.14, 3.14);     
+		cfolder.add(guiControls, 'Bone_0',-3.14, 3.14);
 		cfolder.add(guiControls, 'Bone_1',-3.14, 3.14);
-		cfolder.add(guiControls, 'Bone_2',-3.14, 3.14);      
-		cfolder.add(guiControls, 'Bone_3',-3.14, 3.14);         
+		cfolder.add(guiControls, 'Bone_2',-3.14, 3.14);
+		cfolder.add(guiControls, 'Bone_3',-3.14, 3.14);
 		
 
 		
@@ -170,11 +176,46 @@ function readyFunction(){
 			
 			scene.add(set[i]);
 			helpset[i] = new THREE.SkeletonHelper(set[i]);
-			//scene.add(helpset[i]);
+			scene.add(helpset[i]);
 		   
-		}        
+		}
 
 	}
+
+	function add_bone_group(name, geometry, materials){
+		// Get skeleton out of geometry.
+		var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+		var skeleton = mesh.skeleton;
+
+		// Construct new bone group with skeleton.
+		bone_group = new BoneGroup(name, skeleton);
+		bone_groups[name] = bone_group;
+		window.bone_groups = bone_groups;
+		
+
+
+
+		/*materials[0].skinning = true;
+
+		var scale = 15;
+		
+		mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+		mesh.position.set(0,10,0);
+		mesh.scale.set(scale, scale, scale);
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+		
+		scene.add(mesh);
+
+		skeletonHelper = new THREE.SkeletonHelper(mesh);
+		scene.add(skeletonHelper);*/
+
+		//bone_group = new BoneGroup(name, mesh)
+		//bone_groups[name] = bone_group
+		//window.bone_groups = bone_groups
+	}
+
+
 		
 	function render() { 
 		spotLight.position.x = guiControls.lightX;
@@ -198,9 +239,9 @@ function readyFunction(){
 	
 	function animate(){
 		requestAnimationFrame(animate);
-    render();
-    stats.update();
-    renderer.render(scene, camera);
+	    render();
+	    stats.update();
+	    renderer.render(scene, camera);
     }
     
     init();
@@ -312,6 +353,21 @@ function readyFunction(){
     	return JSON.parse(
 			'{"pose_name":"test", "bones":[{"bone_name":"Bone", "rotation":[1.9226702451705933, -0.0009313142509199679, -0.00016556473565287888]}, {"bone_name":"Bone.001", "rotation":[-0.37607342004776, 3.263347925219762e-11, 4.386852686666387e-11]}, {"bone_name":"Bone.002", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.003", "rotation":[-0.44932135939598083, 2.8409503916027035e-11, 4.034667738794795e-11]}, {"bone_name":"Bone.004", "rotation":[-0.3708282709121704, 2.349996933159737e-11, 3.403754361697153e-11]}, {"bone_name":"Bone.005", "rotation":[-0.9046810269355774, 0.5459235906600952, -0.16327519714832306]}, {"bone_name":"Bone.006", "rotation":[0.5804301500320435, -0.40707725286483765, -1.7907335758209229]}, {"bone_name":"Bone.007", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.008", "rotation":[0.6201788783073425, -0.2529982328414917, 1.0996545553207397]}, {"bone_name":"Bone.009", "rotation":[0.24127955734729767, -0.029807748273015022, 0.24250195920467377]}, {"bone_name":"Bone.010", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.011", "rotation":[-0.1982637196779251, -0.004233112558722496, -0.007679996080696583]}, {"bone_name":"Bone.012", "rotation":[-0.33867502212524414, -0.008108455687761307, -0.012540679425001144]}, {"bone_name":"Bone.013", "rotation":[-0.844447672367096, 2.7732916407785524e-08, 5.5748877514361084e-08]}, {"bone_name":"Bone.014", "rotation":[1.4505610466003418, -3.0599167644140834e-09, -2.529922049632205e-09]}, {"bone_name":"Bone.017", "rotation":[-0.5336959958076477, 1.2534094651073246e-08, 4.6006285003841185e-08]}, {"bone_name":"Bone.018", "rotation":[-0.2973347008228302, -4.172669154645092e-11, -6.836009536215215e-11]}, {"bone_name":"Bone.015", "rotation":[-0.25183165073394775, 3.6357050703372806e-09, 2.058188286468976e-08]}, {"bone_name":"Bone.016", "rotation":[0.27862924337387085, 2.974542834266458e-09, 4.510152529224598e-10]}, {"bone_name":"Bone.019", "rotation":[-0.28812694549560547, -4.07844247263256e-09, -2.794934417238437e-08]}, {"bone_name":"Bone.020", "rotation":[0.0, 0.0, 0.0]}]}' //replace
     	);
+    }
+
+    window.go = function (){
+    	head_group = bone_groups["head"]
+
+    	loader.load('/test/models/head.js', head_group.add_mesh.bind(head_group, "head", add_mesh_to_scene));
+    	loader.load('/test/models/hat.js', head_group.add_mesh.bind(head_group, "hat", add_mesh_to_scene));
+
+    }
+
+    var add_mesh_to_scene = function (mesh){
+    	scene.add(mesh);
+    	skeleton_helper = new THREE.SkeletonHelper(mesh);
+    	skeleton_helpers.push(skeleton_helper);
+		//scene.add(skeleton_helper);
     }
 }
 
