@@ -16,7 +16,7 @@ function readyFunction(){
 		/*creates empty scene object and renderer*/
 		scene = new THREE.Scene();
 		window.scene = scene
-		camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, 500);
+		camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .001, 500);
 		renderer = new THREE.WebGLRenderer({antialias:true});
 		
 		renderer.setClearColor(0x333300);
@@ -51,7 +51,7 @@ function readyFunction(){
 			this.distance = 373;
 			this.angle = 1.6;
 			this.exponent = 38;
-			this.shadowCameraNear = 34;
+			this.shadowCameraNear = .001;
 			this.shadowCameraFar = 2635;
 			this.shadowCameraFov = 68;
 			this.shadowCameraVisible=false;
@@ -89,10 +89,16 @@ function readyFunction(){
 		
 		/*add loader call add model function*/
 		loader = new THREE.JSONLoader();
-		loader.load( '/test/models/human5.js', addModel );
-		//loader.load('/test/models/recred.js', add_bone_group.bind(null, 't1'));
-		//loader.load('/test/models/recblue.js', add_bone_group.bind(null, 't2'));
+
 		loader.load('/test/models/head.js', add_bone_group.bind(null, 'head'));
+		loader.load('/test/models/torso.js', add_bone_group.bind(null, 'torso'));
+		loader.load('/test/models/neck.js', add_bone_group.bind(null, 'neck'));
+		loader.load('/test/models/left arm.js', add_bone_group.bind(null, 'left arm'));
+		loader.load('/test/models/right arm.js', add_bone_group.bind(null, 'right arm'));
+		loader.load('/test/models/handheld.js', add_bone_group.bind(null, 'right handheld'));
+
+		setTimeout(add_initial_meshes, 300);
+		setTimeout(attach_bone_groups, 600);
 		
 		/*adds controls to scene*/
 		datGUI = new dat.GUI();
@@ -174,9 +180,9 @@ function readyFunction(){
 			set[i].castShadow = true;
 			set[i].receiveShadow = true;
 			
-			scene.add(set[i]);
+			//scene.add(set[i]);
 			helpset[i] = new THREE.SkeletonHelper(set[i]);
-			scene.add(helpset[i]);
+			//scene.add(helpset[i]);
 		   
 		}
 
@@ -222,6 +228,12 @@ function readyFunction(){
 		spotLight.position.y = guiControls.lightY;
 		spotLight.position.z = guiControls.lightZ;
 
+
+		for (var key in bone_groups) {
+		    var bone_group = bone_groups[key];
+		    bone_group.update();
+		}
+
 		scene.traverse(function(child){
 			if (child instanceof THREE.SkinnedMesh){
 				
@@ -243,9 +255,6 @@ function readyFunction(){
 	    stats.update();
 	    renderer.render(scene, camera);
     }
-    
-    init();
-    animate();
     
     
     $(window).resize(function(){
@@ -353,22 +362,81 @@ function readyFunction(){
     	return JSON.parse(
 			'{"pose_name":"test", "bones":[{"bone_name":"Bone", "rotation":[1.9226702451705933, -0.0009313142509199679, -0.00016556473565287888]}, {"bone_name":"Bone.001", "rotation":[-0.37607342004776, 3.263347925219762e-11, 4.386852686666387e-11]}, {"bone_name":"Bone.002", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.003", "rotation":[-0.44932135939598083, 2.8409503916027035e-11, 4.034667738794795e-11]}, {"bone_name":"Bone.004", "rotation":[-0.3708282709121704, 2.349996933159737e-11, 3.403754361697153e-11]}, {"bone_name":"Bone.005", "rotation":[-0.9046810269355774, 0.5459235906600952, -0.16327519714832306]}, {"bone_name":"Bone.006", "rotation":[0.5804301500320435, -0.40707725286483765, -1.7907335758209229]}, {"bone_name":"Bone.007", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.008", "rotation":[0.6201788783073425, -0.2529982328414917, 1.0996545553207397]}, {"bone_name":"Bone.009", "rotation":[0.24127955734729767, -0.029807748273015022, 0.24250195920467377]}, {"bone_name":"Bone.010", "rotation":[0.0, 0.0, 0.0]}, {"bone_name":"Bone.011", "rotation":[-0.1982637196779251, -0.004233112558722496, -0.007679996080696583]}, {"bone_name":"Bone.012", "rotation":[-0.33867502212524414, -0.008108455687761307, -0.012540679425001144]}, {"bone_name":"Bone.013", "rotation":[-0.844447672367096, 2.7732916407785524e-08, 5.5748877514361084e-08]}, {"bone_name":"Bone.014", "rotation":[1.4505610466003418, -3.0599167644140834e-09, -2.529922049632205e-09]}, {"bone_name":"Bone.017", "rotation":[-0.5336959958076477, 1.2534094651073246e-08, 4.6006285003841185e-08]}, {"bone_name":"Bone.018", "rotation":[-0.2973347008228302, -4.172669154645092e-11, -6.836009536215215e-11]}, {"bone_name":"Bone.015", "rotation":[-0.25183165073394775, 3.6357050703372806e-09, 2.058188286468976e-08]}, {"bone_name":"Bone.016", "rotation":[0.27862924337387085, 2.974542834266458e-09, 4.510152529224598e-10]}, {"bone_name":"Bone.019", "rotation":[-0.28812694549560547, -4.07844247263256e-09, -2.794934417238437e-08]}, {"bone_name":"Bone.020", "rotation":[0.0, 0.0, 0.0]}]}' //replace
     	);
+    };
+
+    window.add_initial_meshes = function(){
+    	head = bone_groups["head"]
+    	neck = bone_groups["neck"]
+    	torso = bone_groups["torso"]
+    	left_arm = bone_groups["left arm"]
+    	right_arm = bone_groups["right arm"]
+    	right_handheld = bone_groups["right handheld"]
+
+    	loader.load('/test/models/head.js', head.add_mesh.bind(head, "head", add_mesh_to_scene));
+    	loader.load('/test/models/hat.js', head.add_mesh.bind(head, "hat", add_mesh_to_scene));
+
+		loader.load('/test/models/neck.js', neck.add_mesh.bind(neck, "neck", add_mesh_to_scene));
+
+    	loader.load('/test/models/torso.js', torso.add_mesh.bind(torso, "torso", add_mesh_to_scene));
+
+    	loader.load('/test/models/left arm.js', left_arm.add_mesh.bind(left_arm, "left arm", add_mesh_to_scene));
+
+    	loader.load('/test/models/right arm.js', right_arm.add_mesh.bind(right_arm, "right arm", add_mesh_to_scene));
+
+    	loader.load('/test/models/handheld.js', right_handheld.add_mesh.bind(right_handheld, "right handheld", add_mesh_to_scene));
+    }
+
+    window.attach_bone_groups = function(){
+    	bone_groups["neck"].attach_to_bone(bone_groups["torso"].attach_points["#neck"]);
+    	bone_groups["left arm"].attach_to_bone(bone_groups["torso"].attach_points["#left arm"]);
+    	bone_groups["right arm"].attach_to_bone(bone_groups["torso"].attach_points["#right arm"]);
+
+    	bone_groups["head"].attach_to_bone(bone_groups["neck"].attach_points["#top"]);
+
+    	bone_groups["right handheld"].attach_to_bone(bone_groups["left arm"].attach_points["#hand"]);
+    }
+
+    window.go2 = function(){
+    	bone_groups["neck"].attach_to_bone(bone_groups["torso"].attach_points["#neck"]);
+    	bone_groups["left arm"].attach_to_bone(bone_groups["torso"].attach_points["#left arm"]);
+    	bone_groups["right arm"].attach_to_bone(bone_groups["torso"].attach_points["#right arm"]);
+
+    	bone_groups["head"].attach_to_bone(bone_groups["neck"].attach_points["#top"]);
+
+    	bone_groups["right handheld"].attach_to_bone(bone_groups["left arm"].attach_points["#hand"]);
     }
 
     window.go = function (){
-    	head_group = bone_groups["head"]
+    	head = bone_groups["head"]
+    	neck = bone_groups["neck"]
+    	torso = bone_groups["torso"]
+    	left_arm = bone_groups["left arm"]
+    	right_arm = bone_groups["right arm"]
+    	right_handheld = bone_groups["right handheld"]
 
-    	loader.load('/test/models/head.js', head_group.add_mesh.bind(head_group, "head", add_mesh_to_scene));
-    	loader.load('/test/models/hat.js', head_group.add_mesh.bind(head_group, "hat", add_mesh_to_scene));
+    	loader.load('/test/models/head.js', head.add_mesh.bind(head, "head", add_mesh_to_scene));
+    	loader.load('/test/models/hat.js', head.add_mesh.bind(head, "hat", add_mesh_to_scene));
 
-    }
+		loader.load('/test/models/neck.js', neck.add_mesh.bind(neck, "neck", add_mesh_to_scene));
+
+    	loader.load('/test/models/torso.js', torso.add_mesh.bind(torso, "torso", add_mesh_to_scene));
+
+    	loader.load('/test/models/left arm.js', left_arm.add_mesh.bind(left_arm, "left arm", add_mesh_to_scene));
+
+    	loader.load('/test/models/right arm.js', right_arm.add_mesh.bind(right_arm, "right arm", add_mesh_to_scene));
+
+    	loader.load('/test/models/handheld.js', right_handheld.add_mesh.bind(right_handheld, "right handheld", add_mesh_to_scene));
+    };
 
     var add_mesh_to_scene = function (mesh){
     	scene.add(mesh);
     	skeleton_helper = new THREE.SkeletonHelper(mesh);
     	skeleton_helpers.push(skeleton_helper);
 		//scene.add(skeleton_helper);
-    }
+    };
+
+    init();
+    animate();
 }
 
 $(document).ready(readyFunction);
