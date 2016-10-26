@@ -1,5 +1,9 @@
 function readyFunction(){
 
+	var world = new SceneModel(
+		view = new SceneView(world);
+	}
+
 	/*global variables*/
 	var scene, camera, renderer;
 	var controls, guiControls, datGUI;

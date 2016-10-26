@@ -12,8 +12,12 @@
 <script src='/vendor/threejs/external/dat.gui.min.js'></script>
 <script src="/vendor/threejs/external/stats.min.js"></script>
 <script src="/vendor/threejs/external/STLExporter.js"></script>
-<script src="/js/3ddemo.js"></script>
+<!-- <script src="/js/3ddemo.js"></script> -->
 <script src="/js/stuff.js"></script>
+
+<script src="/js/SceneModel.js"></script>
+<script src="/js/SceneView.js"></script>
+<script src="/js/Editor.js"></script>
 
 
 <style type="text/css">
