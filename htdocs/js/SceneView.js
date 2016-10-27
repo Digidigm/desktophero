@@ -1,21 +1,24 @@
 function SceneView(model){
 	this.model = model;
 
-	var scene, camera, renderer;
-	var guiControls;
+	this.scene = undefined;
+	this.camera = undefined;
+	this.renderer = undefined;
+	this.guiControls = undefined;
 
-	var spotLight, hemi;
-	var SCREEN_WIDTH, SCREEN_HEIGHT;
+	this.hemi = undefined;
+	this.SCREEN_WIDTH = undefined;
+	this.SCREEN_HEIGHT = undefined;
 
-	var loader;
+	this.loader = undefined;
 
 	this.addModelListeners();
 }
 
 SceneView.prototype = {
 	init: function(){
-		scene = new THREE.Scene();
-		camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .001, 500);
+		this.scene = new THREE.Scene();
+		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .001, 500);
 		this.renderer = new THREE.WebGLRenderer({antialias:true});
 		
 		this.renderer.setClearColor(0x000033);
@@ -23,25 +26,26 @@ SceneView.prototype = {
 		this.renderer.shadowMapEnabled= true;
 		this.renderer.shadowMapSoft = true;
 		
-		controls = new THREE.OrbitControls(camera, this.renderer.domElement);
-		controls.addEventListener('change', this.render);
+		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+		this.controls.addEventListener('change', this.render);
 					
-		camera.position.x = 0;
-		camera.position.y = 0;
-		camera.position.z = 6;
-		camera.lookAt(scene.position);
+		this.camera.position.x = 0;
+		this.camera.position.y = 0;
+		this.camera.position.z = 6;
+		this.camera.lookAt(this.scene.position);
 
-		hemi = new THREE.HemisphereLight(0xffffff, 0xffffff);
-		scene.add(hemi);
+		this.hemi = new THREE.HemisphereLight(0xffffff, 0xffffff);
+		this.scene.add(this.hemi);
 	},
 
 	render: function(){
-
+		
 	},
 
 	animate: function(){
+		requestAnimationFrame(this.animate.bind(this));
 	    this.render();
-	    this.renderer.render(scene, camera);
+	    this.renderer.render(this.scene, this.camera);
 	},
 
 	resize: function(innerWidth, innerHeight){
@@ -53,14 +57,14 @@ SceneView.prototype = {
 	},
 
 	addModelListeners: function(){
-		this.model.boneGroups.itemAddedEvent.addListener(this.onBoneGroupAdded);
-		this.model.boneGroups.itemRemovedEvent.addListener(this.onBoneGroupRemoved);
+		this.model.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
+		this.model.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
 	},
 
 	onBoneGroupAdded: function(model, boneGroupName){
 		console.log("Bone group added!");
 		var boneGroup = model.boneGroups.get(boneGroupName);
-		boneGroup.meshes.itemAddedEvent.addListener(this.onMeshAdded);
+		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 
 	},
 
@@ -70,5 +74,6 @@ SceneView.prototype = {
 
 	onMeshAdded: function(boneGroup, meshName){
 		console.log("Mesh " + meshName + " added to bone group " + boneGroup.name + ".");
+		this.scene.add(boneGroup.meshes.get(meshName));
 	}
 };

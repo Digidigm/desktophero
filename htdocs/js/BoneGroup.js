@@ -15,7 +15,7 @@ function BoneGroup(name, skeleton){
 }
 
 BoneGroup.prototype = {
-	addMesh: function (meshName, callback, geometry,  materials){
+	addMesh: function (meshName, geometry,  materials){
 		console.log('Adding mesh "' + meshName + '" bone group "' + this.name + '".');
 
 		// For each bone, assign same bone weights as in original mesh, to this skeleton.
@@ -63,8 +63,6 @@ BoneGroup.prototype = {
 		this.meshes.put(meshName, mesh);
 
 		this.tmp = mesh;
-		
-		callback(mesh);
 	},
 
 	attachToBone: function(parentBone){

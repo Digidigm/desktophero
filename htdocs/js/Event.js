@@ -4,8 +4,8 @@ function Event(sender){
 }
 
 Event.prototype = {
-	addListener: function (listener){
-		this.listeners.push(listener);
+	addListener: function (source, listener){
+		this.listeners.push(listener.bind(source));
 	},
 	notify: function (args){
 		for (var i = 0; i < this.listeners.length; i += 1){
