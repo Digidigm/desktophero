@@ -1,12 +1,14 @@
 function init(){
 
-	var world = new SceneModel();
-	var view = new SceneView(world);
+	window.model = new SceneModel();
+	window.view = new SceneView(window.model);
 
-	view.init();
-	view.animate();
+	window.view.init();
+	window.view.animate();
 
-	$("#editor").append(view.renderer.domElement);
+	window.model.initCharacter();
+
+	$("#editor").append(window.view.renderer.domElement);
 }
 
 $(document).ready(init);

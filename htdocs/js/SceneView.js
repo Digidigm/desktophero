@@ -1,4 +1,6 @@
-function SceneView(world){
+function SceneView(model){
+	this.model = model;
+
 	var scene, camera, renderer;
 	var guiControls;
 
@@ -6,6 +8,8 @@ function SceneView(world){
 	var SCREEN_WIDTH, SCREEN_HEIGHT;
 
 	var loader;
+
+	this.addModelListeners();
 }
 
 SceneView.prototype = {
@@ -29,8 +33,6 @@ SceneView.prototype = {
 
 		hemi = new THREE.HemisphereLight(0xffffff, 0xffffff);
 		scene.add(hemi);
-		
-		loader = new THREE.JSONLoader();
 	},
 
 	render: function(){
@@ -48,5 +50,25 @@ SceneView.prototype = {
         this.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+	},
+
+	addModelListeners: function(){
+		this.model.boneGroups.itemAddedEvent.addListener(this.onBoneGroupAdded);
+		this.model.boneGroups.itemRemovedEvent.addListener(this.onBoneGroupRemoved);
+	},
+
+	onBoneGroupAdded: function(model, boneGroupName){
+		console.log("Bone group added!");
+		var boneGroup = model.boneGroups.get(boneGroupName);
+		boneGroup.meshes.itemAddedEvent.addListener(this.onMeshAdded);
+
+	},
+
+	onBoneGroupRemoved: function(model, boneGroupName){
+		console.log("Bone group removed!");
+	},
+
+	onMeshAdded: function(boneGroup, meshName){
+		console.log("Mesh " + meshName + " added to bone group " + boneGroup.name + ".");
 	}
 };
