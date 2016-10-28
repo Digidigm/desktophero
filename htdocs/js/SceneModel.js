@@ -133,13 +133,13 @@ SceneModel.prototype = {
 		var handheld = self.boneGroups.get("handheld");
 
 		neck.attachToBone(torso.attachPoints["#neck"]);
-    	leftArm.attachToBone(torso.attachPoints["#left arm"]);
-    	rightArm.attachToBone(torso.attachPoints["#right arm"]);
-    	head.attachToBone(neck.attachPoints["#top"]);
-    	handheld.attachToBone(leftArm.attachPoints["#hand"]);
+		leftArm.attachToBone(torso.attachPoints["#left arm"]);
+		rightArm.attachToBone(torso.attachPoints["#right arm"]);
+		head.attachToBone(neck.attachPoints["#top"]);
+		handheld.attachToBone(leftArm.attachPoints["#hand"]);
 
-    	// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
-    	torso.skeleton.bones[0].position.y = 0;
+		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
+		torso.skeleton.bones[0].position.y = 0;
 	},
 
 	addBoneGroup: function(name, geometry, materials){
@@ -160,6 +160,9 @@ SceneModel.prototype = {
 			);
 
 		return promise;
-	}
+	}, 
 
+	getCurrentPose: function(){
+		return Pose.createPoseString(this.boneGroups);
+	},
 }

@@ -39,7 +39,7 @@ SceneView.prototype = {
 	},
 
 	render: function(){
-		
+
 	},
 
 	animate: function(){
