@@ -72,6 +72,7 @@ BoneGroup.prototype = {
 
 	update: function(){
 		if (this.parentBone != 0){
+			console.log("hi");
 			this.skeleton.bones[0].position.setFromMatrixPosition(this.parentBone.matrixWorld);
 
 			//bones2[0].position.x = this.parentBone.position.x

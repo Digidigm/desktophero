@@ -27,11 +27,11 @@ SceneView.prototype = {
 		this.renderer.shadowMapSoft = true;
 		
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-		this.controls.addEventListener('change', this.render);
+		this.controls.addEventListener('change', this.render.bind(this));
 					
 		this.camera.position.x = 0;
 		this.camera.position.y = 0;
-		this.camera.position.z = 6;
+		this.camera.position.z = 12;
 		this.camera.lookAt(this.scene.position);
 
 		this.hemi = new THREE.HemisphereLight(0xffffff, 0xffffff);
@@ -70,6 +70,8 @@ SceneView.prototype = {
 
 	onBoneGroupRemoved: function(model, boneGroupName){
 		console.log("Bone group removed!");
+		// TODO: Remove meshes from scene.
+		// TODO: Remove bone listeners?
 	},
 
 	onMeshAdded: function(boneGroup, meshName){
