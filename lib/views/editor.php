@@ -13,6 +13,7 @@
 
 <script src="/js/SceneModel.js"></script>
 <script src="/js/SceneView.js"></script>
+<script src="/js/Character.js"></script>
 <script src="/js/Editor.js"></script>
 <script src="/js/Event.js"></script>
 <script src="/js/ObservableDict.js"></script>

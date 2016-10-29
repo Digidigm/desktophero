@@ -57,18 +57,18 @@ SceneView.prototype = {
 	},
 
 	addModelListeners: function(){
-		this.model.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
-		this.model.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
+		this.model.character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
+		this.model.character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
 	},
 
-	onBoneGroupAdded: function(model, boneGroupName){
+	onBoneGroupAdded: function(character, boneGroupName){
 		console.log("Bone group added!");
-		var boneGroup = model.boneGroups.get(boneGroupName);
+		var boneGroup = character.boneGroups.get(boneGroupName);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 
 	},
 
-	onBoneGroupRemoved: function(model, boneGroupName){
+	onBoneGroupRemoved: function(character, boneGroupName){
 		console.log("Bone group removed!");
 		// TODO: Remove meshes from scene.
 		// TODO: Remove bone listeners?
