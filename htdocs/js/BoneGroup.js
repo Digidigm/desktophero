@@ -14,13 +14,8 @@ function BoneGroup(name, skeleton){
 }
 
 BoneGroup.prototype = {
-	addMesh: function (meshName, geometry,  materials){
+	addMesh: function (meshName, mesh){
 		console.log('Adding mesh "' + meshName + '" bone group "' + this.name + '".');
-
-		materials[0].skinning = true;
-
-		var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
-		mesh.frustumCulled = false;
 
 		mesh.children = []
 		mesh.add(this.skeleton.bones[0])

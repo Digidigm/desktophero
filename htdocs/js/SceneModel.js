@@ -1,113 +1,57 @@
 function SceneModel(){
-	this.character = new Character();
-	this.loader = new THREE.JSONLoader();
-}
+	this.userSettings = new UserSettings();
 
+	this.character = new Character();
+}
+SceneModel.boneGroupsToLoad = ['left arm',
+							'right arm',
+							'torso',
+							'head',
+							'neck',
+							'handheld'];
 SceneModel.prototype = {
 	initCharacter: function(){
 		var self = this;
+		
+		var defaultDataSource = self.userSettings.libraries.get('Default');
 		var boneGroupsLeftToBeLoaded = 6;
 
-		self.loader.load('/test/models/head.js', function(geometry, materials){
-			self.character.addBoneGroup('head', geometry, materials);
-			boneGroupsLeftToBeLoaded -= 1;
-			if (boneGroupsLeftToBeLoaded <= 0){
-				self.initBoneGroupsAdded();
-			}
-		});
-		self.loader.load('/test/models/torso.js', function(geometry, materials){
-			self.character.addBoneGroup('torso', geometry, materials);
-			boneGroupsLeftToBeLoaded -= 1;
-			if (boneGroupsLeftToBeLoaded <= 0){
-				self.initBoneGroupsAdded();
-			}
-		});
-		self.loader.load('/test/models/neck.js', function(geometry, materials){
-			self.character.addBoneGroup('neck', geometry, materials);
-			boneGroupsLeftToBeLoaded -= 1;
-			if (boneGroupsLeftToBeLoaded <= 0){
-				self.initBoneGroupsAdded();
-			}
-		});
-		self.loader.load('/test/models/left arm.js', function(geometry, materials){
-			self.character.addBoneGroup('left arm', geometry, materials);
-			boneGroupsLeftToBeLoaded -= 1;
-			if (boneGroupsLeftToBeLoaded <= 0){
-				self.initBoneGroupsAdded();
-			}
-		});
-		self.loader.load('/test/models/right arm.js', function(geometry, materials){
-			self.character.addBoneGroup('right arm', geometry, materials);
-			boneGroupsLeftToBeLoaded -= 1;
-			if (boneGroupsLeftToBeLoaded <= 0){
-				self.initBoneGroupsAdded();
-			}
-		});
-		self.loader.load('/test/models/handheld.js', function(geometry, materials){
-			self.character.addBoneGroup('handheld', geometry, materials);
-			boneGroupsLeftToBeLoaded -= 1;
-			if (boneGroupsLeftToBeLoaded <= 0){
-				self.initBoneGroupsAdded();
-			}
-		});
+		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
+			var name = SceneModel.boneGroupsToLoad[i];
+
+			defaultDataSource.fetchBoneGroup(name, function(boneGroupName, boneGroup){
+				self.character.addBoneGroup(boneGroupName, boneGroup);
+				boneGroupsLeftToBeLoaded -= 1;
+				if (boneGroupsLeftToBeLoaded <= 0){
+					self.initBoneGroupsAdded();
+				}
+			});
+		}
 	},
 
 	initBoneGroupsAdded: function(){
 		var self = this;
 
-		// Attach meshes to bone groups.
-		var head = self.character.boneGroups.get("head");
-		var neck = self.character.boneGroups.get("neck");
-		var torso = self.character.boneGroups.get("torso");
-		var leftArm = self.character.boneGroups.get("left arm");
-		var rightArm = self.character.boneGroups.get("right arm");
-		var handheld = self.character.boneGroups.get("handheld");
-
+		var defaultDataSource = self.userSettings.libraries.get('Default');
 		var meshesLeftToBeLoaded = 7;
-		self.loader.load('/test/models/head.js', function(geometry, materials){
-			head.addMesh("head", geometry, materials);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});
-		self.loader.load('/test/models/hat.js', function(geometry, materials){
-			head.addMesh("hat", geometry, materials);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});
-		self.loader.load('/test/models/neck.js', function(geometry, materials){
-			neck.addMesh("neck", geometry, materials);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});
-		self.loader.load('/test/models/torso.js', function(geometry, materials){
-			torso.addMesh("torso", geometry, materials);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});
-		self.loader.load('/test/models/left arm.js', function(geometry, materials){
-			leftArm.addMesh("left arm", geometry, materials);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});
-		self.loader.load('/test/models/right arm.js', function(geometry, materials){
-			rightArm.addMesh("right arm", geometry, materials);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});
-		self.loader.load('/test/models/handheld.js', function(geometry, materials){
-			handheld.addMesh("handheld", geometry, materials);
+
+		// Attach meshes to bone groups.
+		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
+			var name = SceneModel.boneGroupsToLoad[i];
+
+			defaultDataSource.fetchMesh(name, function(name, mesh){
+				var boneGroup = self.character.boneGroups.get(name);
+				boneGroup.addMesh(name, mesh);
+				meshesLeftToBeLoaded -= 1;
+				if (meshesLeftToBeLoaded <= 0){
+					self.initMeshesAdded();
+				}
+			});
+		}
+
+		defaultDataSource.fetchMesh('hat', function(name, mesh){
+			var headGroup = self.character.boneGroups.get('head');
+			headGroup.addMesh(name, mesh);
 			meshesLeftToBeLoaded -= 1;
 			if (meshesLeftToBeLoaded <= 0){
 				self.initMeshesAdded();

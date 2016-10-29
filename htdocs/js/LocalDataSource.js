@@ -3,37 +3,86 @@
 
 function LocalDataSource(directoryURL){
 	this.directoryURL = directoryURL;
+	this.meshes = new ObservableList();
+	this.poses = new ObservableList();
+	this.boneGroups = new ObservableList();
+
+	// Populate mesh, pose and bone group lists
+	this.refreshMeshesList();
+	this.refreshPosesList();
+	this.refreshBoneGroupsList();
 }
 
-LocalDataSource.prototype = {
-	listMeshes: function(){
-		// Fake data for now.
-		return ['left arm',
-				'right arm',
-				'torso',
-				'hat',
-				'head',
-				'tentacle',
-				'neck',
-				'handheld']
-	}, 
+LocalDataSource.loader = new THREE.JSONLoader();
 
-	listPoses: function(){
-		// Fake data for now.
-		return ['rest',
-				'silly']
+LocalDataSource.prototype = {
+	getMeshes: function(){
+		return this.meshes;
 	},
 
-	listBoneGroups: function(){
+	getPoses: function(){
+		return this.poses;
+	},
+
+	getBoneGroups: function(){
+		return this.boneGroups;
+	},
+
+	refreshMeshesList: function(){
+		this.meshes.clear();
 		// Fake data for now.
-		return ['left arm',
-				'right arm',
-				'torso',
-				'hat',
-				'head',
-				'tentacle',
-				'neck',
-				'handheld']
+		this.meshes.addAll(['left arm',
+							'right arm',
+							'torso',
+							'hat',
+							'head',
+							'tentacle',
+							'neck',
+							'handheld'])
 	}, 
 
+	refreshPosesList: function(){
+		this.poses.clear();
+		// Fake data for now.
+		this.poses.addAll(['rest',
+						'silly']);
+	},
+
+	refreshBoneGroupsList: function(){
+		this.boneGroups.clear();
+		// Fake data for now.
+		this.boneGroups.addAll(['left arm',
+								'right arm',
+								'torso',
+								'hat',
+								'head',
+								'tentacle',
+								'neck',
+								'handheld']);
+	},
+
+	fetchMesh: function(name, callback){
+		var filename = this.directoryURL + '/' + name + '.js';
+		LocalDataSource.loader.load(filename, function(geometry, materials){
+			materials[0].skinning = true;
+
+			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+			mesh.frustumCulled = false;
+
+			callback(name, mesh);
+		});
+	},
+
+	fetchBoneGroup: function(name, callback){
+		var filename = this.directoryURL + '/' + name + '.js';
+		LocalDataSource.loader.load(filename, function(geometry, materials){
+			// Get skeleton out of geometry.
+			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+			var skeleton = mesh.skeleton;
+
+			// Construct new bone group with skeleton.
+			var boneGroup = new BoneGroup(name, skeleton);
+			callback(name, boneGroup);
+		});
+	}
 }

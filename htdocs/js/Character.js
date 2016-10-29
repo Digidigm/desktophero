@@ -4,13 +4,7 @@ function Character(){
 }
 
 Character.prototype = {
-	addBoneGroup: function(name, geometry, materials){
-		// Get skeleton out of geometry.
-		var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
-		var skeleton = mesh.skeleton;
-
-		// Construct new bone group with skeleton.
-		var boneGroup = new BoneGroup(name, skeleton);
+	addBoneGroup: function(name, boneGroup){
 		this.boneGroups.put(name, boneGroup);
 	},
 
