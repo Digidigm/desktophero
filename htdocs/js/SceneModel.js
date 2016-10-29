@@ -143,23 +143,13 @@ SceneModel.prototype = {
 	},
 
 	addBoneGroup: function(name, geometry, materials){
-		var self = this;
-		var model = self;
-		var promise = new Promise(
-			function(resolve, reject){
-				// Get skeleton out of geometry.
-				var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
-				var skeleton = mesh.skeleton;
+		// Get skeleton out of geometry.
+		var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+		var skeleton = mesh.skeleton;
 
-				// Construct new bone group with skeleton.
-				boneGroup = new BoneGroup(name, skeleton);
-				model.boneGroups.put(name, boneGroup);
-				console.log("Finishing one promise.");
-				window.setTimeout(resolve(), 2);
-			}
-			);
-
-		return promise;
+		// Construct new bone group with skeleton.
+		boneGroup = new BoneGroup(name, skeleton);
+		model.boneGroups.put(name, boneGroup);
 	}, 
 
 	getCurrentPose: function(){
