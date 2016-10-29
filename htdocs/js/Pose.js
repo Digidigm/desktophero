@@ -1,23 +1,16 @@
 function Pose(){
-
+	this.poseBones = [];
 }
 
-/* Pose String Format:
+Pose.toJson = function(boneGroups){
+	var pose = Pose.toPose(boneGroups);
+	return JSON.stringify(pose, ' ', ' ');
+}
 
-- bone group 1
-	- bone 1
-		- px py pz
-		- rx ry rz
-		- sx sy sz
-	- bone 2 ...
-- bone group 2 ...
-
-*/
-Pose.createPoseString = function(boneGroups){
-	str = ""
+Pose.toPose = function(boneGroups){
+	var pose = new Pose();
 
 	for (var boneGroupName in boneGroups.dict){
-		str += boneGroupName + "\n";
 
 		var boneGroup = boneGroups.get(boneGroupName);
 		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
@@ -26,24 +19,21 @@ Pose.createPoseString = function(boneGroups){
 				continue;
 			}
 
-			str += "\t" + bone.name + "\n";
-			
-			// Print position
-			str += "\t\tpos " + bone.position.x + "\n";
-			str += "\t\tpos " + bone.position.y + "\n";
-			str += "\t\tpos " + bone.position.z + "\n";
-
-			// Print rotation
-			str += "\t\trot " + bone.rotation.x + "\n";
-			str += "\t\trot " + bone.rotation.y + "\n";
-			str += "\t\trot " + bone.rotation.z + "\n";
-
-			// Print scale
-			str += "\t\tsca " + bone.scale.x + "\n";
-			str += "\t\tsca " + bone.scale.y + "\n";
-			str += "\t\tsca " + bone.scale.z + "\n";
+			poseBone = new PoseBone(bone.name, bone.position, bone.rotation, bone.scale);
+			pose.poseBones.push(poseBone);
 		}
 	}
 
-	return str;
+	return pose;
+}
+
+Pose.fromJson = function(jsonString){
+	return JSON.parse(jsonString);
+}
+
+PoseBone = function(name, position, rotation, scale){
+	this.name = name;
+	this.position = new THREE.Vector3(position.x, position.y, position.z);
+	this.rotation = new THREE.Vector3(rotation.x, rotation.y, rotation.z);
+	this.scale = new THREE.Vector3(scale.x, scale.y, scale.z);
 }
