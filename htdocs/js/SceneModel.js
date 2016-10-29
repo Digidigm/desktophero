@@ -9,6 +9,8 @@ SceneModel.boneGroupsToLoad = ['left arm',
 							'head',
 							'neck',
 							'handheld'];
+SceneModel.initialPose = 'sweetpose';
+
 SceneModel.prototype = {
 	initCharacter: function(){
 		var self = this;
@@ -83,5 +85,11 @@ SceneModel.prototype = {
 
 		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
 		torso.skeleton.bones[0].position.y = 0;
-	},
+
+		// Load initial pose.
+		dataSource = this.userSettings.libraries.get('Default');
+		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
+			self.character.loadPose(jsonPose);
+		});
+	}
 };

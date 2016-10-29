@@ -17,12 +17,10 @@ BoneGroup.prototype = {
 	addMesh: function (meshName, mesh){
 		console.log('Adding mesh "' + meshName + '" bone group "' + this.name + '".');
 
-		mesh.children = []
-		mesh.add(this.skeleton.bones[0])
+		mesh.children = [];
+		mesh.add(this.skeleton.bones[0]);
 		mesh.bind(this.skeleton);
-
 		mesh.name = meshName;
-
 		this.meshes.put(meshName, mesh);
 	},
 

@@ -2,7 +2,10 @@
 */
 
 function LocalDataSource(directoryURL){
-	this.directoryURL = directoryURL;
+	this.topDirectory = directoryURL;
+	this.meshesDirectory = directoryURL + '/meshes';
+	this.posesDirectory = directoryURL + '/poses';
+	this.boneGroupsDirectory = directoryURL + '/bone groups';
 	this.meshes = new ObservableList();
 	this.poses = new ObservableList();
 	this.boneGroups = new ObservableList();
@@ -44,8 +47,7 @@ LocalDataSource.prototype = {
 	refreshPosesList: function(){
 		this.poses.clear();
 		// Fake data for now.
-		this.poses.addAll(['rest',
-						'silly']);
+		this.poses.addAll(['coolpose']);
 	},
 
 	refreshBoneGroupsList: function(){
@@ -62,7 +64,7 @@ LocalDataSource.prototype = {
 	},
 
 	fetchMesh: function(name, callback){
-		var filename = this.directoryURL + '/' + name + '.js';
+		var filename = this.meshesDirectory + '/' + name + '.js';
 		LocalDataSource.loader.load(filename, function(geometry, materials){
 			materials[0].skinning = true;
 
@@ -73,8 +75,15 @@ LocalDataSource.prototype = {
 		});
 	},
 
+	fetchPose: function(name, callback){
+		var filename = this.posesDirectory + '/' + name + '.txt';
+		jQuery.get(filename, function(contents){
+			callback(contents);
+		});
+	},
+
 	fetchBoneGroup: function(name, callback){
-		var filename = this.directoryURL + '/' + name + '.js';
+		var filename = this.boneGroupsDirectory + '/' + name + '.js';
 		LocalDataSource.loader.load(filename, function(geometry, materials){
 			// Get skeleton out of geometry.
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
