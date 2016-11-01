@@ -24,6 +24,8 @@
 <script src="/js/ObservableDict.js"></script>
 <script src="/js/ObservableList.js"></script>
 
+<script src="/js/FileSaver.js"></script>
+
 
 <style type="text/css">
 	body {

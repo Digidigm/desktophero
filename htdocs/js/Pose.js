@@ -1,9 +1,20 @@
 function Pose(){
+	this.name = "Pose";
+	this.author = "Unknown";
+	this.library = "Unknown";
+	this.type = "Uncategorized";
+	this.tags = [];
+
 	this.poseBones = [];
 }
 
-Pose.toJson = function(boneGroups){
-	var pose = Pose.toPose(boneGroups);
+Pose.toJson = function(pose, poseName, author, library, type, tags){
+	pose.name = poseName;
+	pose.author = author;
+	pose.library = library;
+	pose.type = type;
+	pose.tags = tags;
+
 	return JSON.stringify(pose, ' ', ' ');
 }
 

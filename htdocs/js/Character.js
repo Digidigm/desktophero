@@ -1,6 +1,8 @@
 function Character(){
 	this.characterName = "New Character";
 	this.boneGroups = new ObservableDict(this);
+
+	this.characterNameChangedEvent = new Event(this);
 }
 
 Character.prototype = {
@@ -9,7 +11,7 @@ Character.prototype = {
 	},
 
 	getCurrentPose: function(){
-		return Pose.toJson(this.boneGroups);
+		return Pose.toPose(this.boneGroups);
 	},
 
 	loadPose: function(jsonString){
@@ -44,5 +46,13 @@ Character.prototype = {
 				}
 			}
 		}
+	},
+
+	getName: function(){
+		return this.characterName;
+	},
+
+	setName: function(name){
+		this.characterName = name;
 	}
 }

@@ -10,6 +10,11 @@ function LocalDataSource(directoryURL){
 	this.poses = new ObservableList();
 	this.boneGroups = new ObservableList();
 
+	// Events
+	this.meshesRefreshedEvent = new Event(this);
+	this.posesRefreshedEvent = new Event(this);
+	this.boneGroupsRefreshedEvent = new Event(this);
+
 	// Populate mesh, pose and bone group lists
 	this.refreshMeshesList();
 	this.refreshPosesList();
@@ -41,13 +46,15 @@ LocalDataSource.prototype = {
 							'head',
 							'tentacle',
 							'neck',
-							'handheld'])
+							'handheld']);
+		this.meshesRefreshedEvent.notify(this.meshes);
 	}, 
 
 	refreshPosesList: function(){
 		this.poses.clear();
 		// Fake data for now.
-		this.poses.addAll(['coolpose']);
+		this.poses.addAll(['coolpose', 'sweetpose', 'greatpose']);
+		this.posesRefreshedEvent.notify(this.poses);
 	},
 
 	refreshBoneGroupsList: function(){
@@ -61,6 +68,7 @@ LocalDataSource.prototype = {
 								'tentacle',
 								'neck',
 								'handheld']);
+		this.boneGroupsRefreshedEvent.notify(this.boneGroups);
 	},
 
 	fetchMesh: function(name, callback){

@@ -1,6 +1,9 @@
 function SceneModel(){
 	this.userSettings = new UserSettings();
 
+	this.libraries = new ObservableDict();
+	this.libraries.put("Default", new LocalDataSource("/testlib"));
+
 	this.character = new Character();
 }
 SceneModel.boneGroupsToLoad = ['left arm',
@@ -9,13 +12,41 @@ SceneModel.boneGroupsToLoad = ['left arm',
 							'head',
 							'neck',
 							'handheld'];
-SceneModel.initialPose = 'sweetpose';
+SceneModel.initialPose = 'amazing pose';
 
 SceneModel.prototype = {
+	getAvailablePoses: function(){
+		var allPoses = [];
+		for (var libraryName in this.libraries.dict){
+			var library = this.libraries.get(libraryName);
+			var poses = library.getPoses();
+			for (var i = 0; i < poses.length(); i++){
+				var pose = poses.get(i);
+				var simplePose = new SimplePose(pose.name, library, pose.author, pose.type, pose.tags);
+				allPoses.push(simplePose);
+			}
+		}
+		return allPoses;
+	},
+
+	saveCurrentPose: function(poseName, library, author, type, tags){
+		currentPose = this.character.getCurrentPose();
+		jsonString = Pose.toJson(currentPose, poseName, library, author, type, tags);
+		FileSaver.download(jsonString, poseName + ".txt");
+	},
+
+	loadPose: function(libraryName, poseName){
+		var self = this;
+		self.libraries.get(libraryName).fetchPose(poseName, function(poseJson){
+			self.character.loadPose(poseJson);
+		});
+		
+	},
+
 	initCharacter: function(){
 		var self = this;
 		
-		var defaultDataSource = self.userSettings.libraries.get('Default');
+		var defaultDataSource = self.libraries.get('Default');
 		var boneGroupsLeftToBeLoaded = 6;
 
 		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
@@ -34,7 +65,7 @@ SceneModel.prototype = {
 	initBoneGroupsAdded: function(){
 		var self = this;
 
-		var defaultDataSource = self.userSettings.libraries.get('Default');
+		var defaultDataSource = self.libraries.get('Default');
 		var meshesLeftToBeLoaded = 7;
 
 		// Attach meshes to bone groups.
@@ -87,9 +118,17 @@ SceneModel.prototype = {
 		torso.skeleton.bones[0].position.y = 0;
 
 		// Load initial pose.
-		dataSource = this.userSettings.libraries.get('Default');
+		dataSource = this.libraries.get('Default');
 		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
 			self.character.loadPose(jsonPose);
 		});
 	}
 };
+
+function SimplePose(poseName, library, author, type, tags, jsonString){
+	this.poseName = poseName;
+	this.library = library;
+	this.author = author;
+	this.type = type;
+	this.tags = tags;
+}
