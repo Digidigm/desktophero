@@ -53,7 +53,7 @@ LocalDataSource.prototype = {
 	refreshPosesList: function(){
 		this.poses.clear();
 		// Fake data for now.
-		this.poses.addAll(['coolpose', 'sweetpose', 'greatpose']);
+		this.poses.addAll(['amazing pose', 'awesome pose', 'cool pose']);
 		this.posesRefreshedEvent.notify(this.poses);
 	},
 

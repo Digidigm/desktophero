@@ -16,14 +16,15 @@ SceneModel.initialPose = 'amazing pose';
 
 SceneModel.prototype = {
 	getAvailablePoses: function(){
-		var allPoses = [];
+		var allPoses = {};
 		for (var libraryName in this.libraries.dict){
+			allPoses[libraryName] = [];
+
 			var library = this.libraries.get(libraryName);
 			var poses = library.getPoses();
 			for (var i = 0; i < poses.length(); i++){
 				var pose = poses.get(i);
-				var simplePose = new SimplePose(pose.name, library, pose.author, pose.type, pose.tags);
-				allPoses.push(simplePose);
+				allPoses[libraryName].push(pose);
 			}
 		}
 		return allPoses;
@@ -40,7 +41,6 @@ SceneModel.prototype = {
 		self.libraries.get(libraryName).fetchPose(poseName, function(poseJson){
 			self.character.loadPose(poseJson);
 		});
-		
 	},
 
 	initCharacter: function(){
@@ -124,11 +124,3 @@ SceneModel.prototype = {
 		});
 	}
 };
-
-function SimplePose(poseName, library, author, type, tags, jsonString){
-	this.poseName = poseName;
-	this.library = library;
-	this.author = author;
-	this.type = type;
-	this.tags = tags;
-}
