@@ -15,6 +15,29 @@ SceneModel.boneGroupsToLoad = ['left arm',
 SceneModel.initialPose = 'amazing pose';
 
 SceneModel.prototype = {
+	getAvailableMeshes: function(type){
+		var allMeshes = [];
+		for (var libraryName in this.libraries.dict){
+			var library = this.libraries.get(libraryName);
+			var meshes = library.getMeshes();
+			for (var meshName in meshes){
+				meshMetadata = meshes[meshName];
+				if (meshMetadata.type === type){
+					allMeshes.push(meshMetadata);
+				}
+			}
+		}
+		return allMeshes;
+	},
+
+	addMesh(boneGroupName, libraryName, meshName){
+		var boneGroup = this.character.boneGroups.get(boneGroupName);
+		mesh = this.libraries.get(libraryName).fetchMesh(meshName, function(name, mesh){
+			boneGroup.addMesh(name, mesh);
+		});
+
+	},
+
 	getAvailablePoses: function(){
 		var allPoses = {};
 		for (var libraryName in this.libraries.dict){
@@ -66,7 +89,7 @@ SceneModel.prototype = {
 		var self = this;
 
 		var defaultDataSource = self.libraries.get('Default');
-		var meshesLeftToBeLoaded = 7;
+		var meshesLeftToBeLoaded = 6;
 
 		// Attach meshes to bone groups.
 		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
@@ -82,14 +105,14 @@ SceneModel.prototype = {
 			});
 		}
 
-		defaultDataSource.fetchMesh('hat', function(name, mesh){
+		/*defaultDataSource.fetchMesh('hat', function(name, mesh){
 			var headGroup = self.character.boneGroups.get('head');
 			headGroup.addMesh(name, mesh);
 			meshesLeftToBeLoaded -= 1;
 			if (meshesLeftToBeLoaded <= 0){
 				self.initMeshesAdded();
 			}
-		});
+		});*/
 	},
 
 	initMeshesAdded: function(){

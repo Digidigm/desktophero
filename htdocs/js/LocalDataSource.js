@@ -6,7 +6,7 @@ function LocalDataSource(directoryURL){
 	this.meshesDirectory = directoryURL + '/meshes';
 	this.posesDirectory = directoryURL + '/poses';
 	this.boneGroupsDirectory = directoryURL + '/bone groups';
-	this.meshes = new ObservableList();
+	this.meshes = new ObservableDict();
 	this.poses = new ObservableList();
 	this.boneGroups = new ObservableList();
 
@@ -37,18 +37,20 @@ LocalDataSource.prototype = {
 	},
 
 	refreshMeshesList: function(){
-		this.meshes.clear();
+		this.meshes = {};
+
 		// Fake data for now.
-		this.meshes.addAll(['left arm',
-							'right arm',
-							'torso',
-							'hat',
-							'head',
-							'tentacle',
-							'neck',
-							'handheld']);
+		this.meshes['left arm'] = new MeshMetadata('left arm', 'stockto2', 'Default', 'arm', ['cool', 'great']);
+		this.meshes['right arm'] = new MeshMetadata('right arm', 'stockto2', 'Default', 'arm', ['cool', 'great']);
+		this.meshes['torso'] = new MeshMetadata('torso', 'stockto2', 'Default', 'torso', ['cool', 'great']);
+		this.meshes['hat'] = new MeshMetadata('hat', 'stockto2', 'Default', 'hat', ['cool', 'monkey']);
+		this.meshes['head'] = new MeshMetadata('head', 'stockto2', 'Default', 'head', ['cool', 'great']);
+		this.meshes['tentacle'] = new MeshMetadata('tentacle', 'stockto2', 'Default', 'arm', ['cool', 'great']);
+		this.meshes['neck'] = new MeshMetadata('neck', 'stockto2', 'Default', 'neck', ['cool', 'great']);
+		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'Default', 'weapon', ['cool', 'great']);
+
 		this.meshesRefreshedEvent.notify(this.meshes);
-	}, 
+	},
 
 	refreshPosesList: function(){
 		this.poses.clear();
@@ -102,4 +104,12 @@ LocalDataSource.prototype = {
 			callback(name, boneGroup);
 		});
 	}
+}
+
+function MeshMetadata(name, author, library, type, tags){
+	this.name = name;
+	this.author = author;
+	this.library = library;
+	this.type = type;
+	this.tags = tags;
 }
