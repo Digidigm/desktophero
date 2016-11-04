@@ -68,5 +68,20 @@ BoneGroup.prototype = {
 	attachToBone: function(parentBone){
 		parentBone.add(this.skeleton.bones[0]);
 		this.parentBone = parentBone;
+	},
+
+	unattach: function(){
+		var bone0 = this.skeleton.bones[0];
+
+		if (this.parentBone != null){
+			this.parentBone.remove(bone0);
+		}
+
+		this.parentBone = null;
+
+		bone0.position.x = 0;
+		bone0.position.y = 0;
+		bone0.position.z = 0;
+		bone0.updateMatrixWorld()
 	}
 };

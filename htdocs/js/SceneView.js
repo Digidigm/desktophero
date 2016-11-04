@@ -38,6 +38,10 @@ SceneView.prototype = {
 		this.scene.add(this.hemi);
 	},
 
+	exportToSTL: function(){
+		// TODO
+	},
+
 	render: function(){
 
 	},

@@ -35,7 +35,6 @@ SceneModel.prototype = {
 		mesh = this.libraries.get(libraryName).fetchMesh(meshName, function(name, mesh){
 			boneGroup.addMesh(name, mesh);
 		});
-
 	},
 
 	getAvailablePoses: function(){
@@ -51,6 +50,54 @@ SceneModel.prototype = {
 			}
 		}
 		return allPoses;
+	},
+
+	getAvailableBoneGroups: function(){
+		var allBoneGroups = {};
+		for (var libraryName in this.libraries.dict){
+			allBoneGroups[libraryName] = [];
+
+			var library = this.libraries.get(libraryName);
+			var boneGroups = library.getBoneGroups();
+			for (var i = 0; i < boneGroups.length(); i++){
+				var boneGroup = boneGroups.get(i);
+				allBoneGroups[libraryName].push(boneGroup);
+			}
+		}
+		return allBoneGroups;
+	},
+
+	addBoneGroup: function(libraryName, boneGroupName){
+		// TODO: Change the name of the bone group if a bone group with
+		// that name already exists on the character.
+		self = this;
+		self.libraries.get(libraryName).fetchBoneGroup(boneGroupName, function(name, boneGroup){
+			self.character.addBoneGroup(name, boneGroup);
+		});
+	},
+
+	getAvailableAttachPoints: function(){
+		var allAttachPoints = {};
+		var boneGroups = this.character.boneGroups;
+		for (var boneGroupName in boneGroups.dict){
+			allAttachPoints[boneGroupName] = [];
+			var boneGroup = boneGroups.get(boneGroupName);
+			for (var attachPointName in boneGroup.attachPoints){
+				allAttachPoints[boneGroupName].push(attachPointName);
+			}
+		}
+		return allAttachPoints;
+	},
+
+	attachBoneGroup: function(boneGroupName, toBoneGroupName, attachPointName){
+		var boneGroup = this.character.boneGroups.get(boneGroupName);
+		var attachBone = this.character.boneGroups.get(toBoneGroupName).attachPoints[attachPointName];
+		boneGroup.attachToBone(attachBone);
+	},
+
+	unattachBoneGroup: function(boneGroupName){
+		var boneGroup = this.character.boneGroups.get(boneGroupName);
+		boneGroup.unattach();
 	},
 
 	saveCurrentPose: function(poseName, library, author, type, tags){
