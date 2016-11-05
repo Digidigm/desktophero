@@ -1,16 +1,18 @@
 function SceneView(model){
 	this.model = model;
 
-	this.scene = undefined;
-	this.camera = undefined;
-	this.renderer = undefined;
-	this.guiControls = undefined;
+	this.scene;
+	this.camera;
+	this.renderer;
+	this.guiControls;
 
-	this.hemi = undefined;
-	this.SCREEN_WIDTH = undefined;
-	this.SCREEN_HEIGHT = undefined;
+	this.hemi;
+	this.SCREEN_WIDTH;
+	this.SCREEN_HEIGHT;
 
-	this.loader = undefined;
+	this.loader;
+
+	this.exporter = new THREE.STLExporter();
 
 	this.addModelListeners();
 }
@@ -39,7 +41,20 @@ SceneView.prototype = {
 	},
 
 	exportToSTL: function(){
-		// TODO
+		var stlString = this.exporter.parse(this.scene);
+		var blob = new Blob([stlString], {type: 'text/plain'});
+		
+		this.download(blob, model.character.getName() + '.stl');
+	},
+
+	download: function(blob, filename) {
+		var element = document.createElement('a');
+		element.setAttribute('href', window.URL.createObjectURL(new Blob([blob])));
+		element.setAttribute('download', filename);
+		element.style.display = 'none';
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
 	},
 
 	render: function(){

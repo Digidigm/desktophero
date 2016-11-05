@@ -1,8 +1,8 @@
 function Character(){
-	this.characterName = "New Character";
+	this.name = "New Character";
 	this.boneGroups = new ObservableDict(this);
 
-	this.characterNameChangedEvent = new Event(this);
+	this.nameChangedEvent = new Event(this);
 }
 
 Character.prototype = {
@@ -49,10 +49,11 @@ Character.prototype = {
 	},
 
 	getName: function(){
-		return this.characterName;
+		return this.name;
 	},
 
 	setName: function(name){
-		this.characterName = name;
+		this.name = name;
+		this.nameChangedEvent.notify(this.name);
 	}
 }

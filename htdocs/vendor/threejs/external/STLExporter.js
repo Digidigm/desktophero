@@ -74,8 +74,6 @@ THREE.STLExporter.prototype = {
 									boneIndex2 = boneIndices[2]
 									boneIndex3 = boneIndices[3]
 									
-									console.log(boneIndex0 + ", " + boneIndex1 + ", " + boneIndex2 + ", " + boneIndex3)
-									
 									if (boneIndex0 < 0){
 										boneIndex0 = 0
 									}
@@ -128,24 +126,3 @@ THREE.STLExporter.prototype = {
 		};
 	}() )
 };
-
-// Use FileSaver.js 'saveAs' function to save the string
-window.saveSTL = function( scene, name ){  
-  var exporter = new THREE.STLExporter();
-  var stlString = exporter.parse( scene );
-  
-  var blob = new Blob([stlString], {type: 'text/plain'});
-  
-  download(blob, name + '.stl');
-}
-
-function download(blob, filename) {
-	console.log("Downloading file.");
-	var element = document.createElement('a');
-	element.setAttribute('href', window.URL.createObjectURL(new Blob([blob])));
-	element.setAttribute('download', filename);
-	element.style.display = 'none';
-	document.body.appendChild(element);
-	element.click();
-	document.body.removeChild(element);
-}

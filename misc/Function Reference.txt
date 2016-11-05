@@ -1,0 +1,9 @@
+Add a new bone group to a character:
+
+	model.addBoneGroup("Default", "tentacle");
+	model.getAvailableMeshes();
+	model.addMesh("tentacle", "Default", "tentaclemesh");
+	model.getAvailableAttachPoints();
+	model.attachBoneGroup("tentacle", "torso", "#left arm");
+
+	model.unattachBoneGroup("tentacle");
