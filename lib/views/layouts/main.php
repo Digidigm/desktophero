@@ -119,7 +119,7 @@
             <div id="collapsingMobileUser" class="collapse navbar-toggleable-custom dropdown-menu-custom p-x hidden-md-up" role="tabpanel" aria-labelledby="collapsingMobileUser">
               <div class="media m-t">
                 <div class="media-left">
-                  <img src="img/face5.jpg" height="60" width="60" alt="Avatar" class="img-circle">
+                  <img src="/img/face5.jpg" height="60" width="60" alt="Avatar" class="img-circle">
                 </div>
                 <div class="media-body media-middle">
                   <h5 class="media-heading">Firstname Lastname</h5>
