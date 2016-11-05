@@ -11,7 +11,7 @@ class Config {
             $this->config = array_replace_recursive($config['development'],$config['production']);
         }
         else {
-            $this->config = ["error",$json_error];
+            $this->config = array("error",$json_error);
         }
     }
 

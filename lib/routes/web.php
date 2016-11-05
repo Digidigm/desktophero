@@ -15,13 +15,13 @@ $app->get(
     function () use ($app,$session){
         $app->render(
             'layouts/main.php',
-            [
+            array(
                 'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
                 'variable' => "value",
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'home'
-            ] //array of parameters for template
+            ) //array of parameters for template
         );
    }
 );
@@ -40,11 +40,11 @@ $app->get(
 
         $app->render(
             'layouts/main.php',
-            [
+            array(
                 'loggedin' => $session->get('loggedin'),
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'page2'
-            ] //array of parameters for template
+            ) //array of parameters for template
         );
     }
 );
@@ -53,12 +53,12 @@ $app->get(
     function () use ($app,$session){
         $app->render(
             'layouts/main.php',
-            [
+            array(
                 'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'editor'
-            ] //array of parameters for template
+            ) //array of parameters for template
         );
     }
 );
@@ -67,12 +67,12 @@ $app->get(
     function () use ($app,$session){
         $app->render(
             'layouts/main.php',
-            [
+            array(
                 'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'page4'
-            ] //array of parameters for template
+            ) //array of parameters for template
         );
     }
 );
@@ -82,12 +82,12 @@ $app->get(
     function () use ($app,$session){
         $app->render(
             'layouts/main.php',
-            [
+            array(
                 'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'login'
-            ] //array of parameters for template
+            ) //array of parameters for template
         );
     }
 );

@@ -17,17 +17,17 @@ $db_conx= new \Softpath\DatabaseConnection($config->database);
 $pdo = $db_conx->getPDO();
 
 $app = new \Slim\Slim(
-    [
+    array(
         'templates.path' => BASE_PATH . "/views"
-    ]
+    )
 );
 
 
-$session_settings = [
+$session_settings = array(
     'expires' => $config->session_expires,
     'secret'  => $config->salt,
     'name'    => 'CHANGE ME'
-];
+);
 $session = \Softpath\Session::getInstance($pdo,$session_settings);
 $app->add($session);
 

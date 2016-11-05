@@ -79,7 +79,7 @@ class Session extends \Slim\Middleware {
         if (!is_null($session_id)) {
             $session_query = "SELECT session_data,expires FROM sessions WHERE token = ?";
             $stmt = $this->pdo->prepare($session_query);
-            $stmt->execute([$session_id]);
+            $stmt->execute(array($session_id));
             $session = $stmt->fetch(\PDO::FETCH_ASSOC);
             //if a session was not found create a new one.
             //check that the session hasn't expired.
@@ -111,7 +111,7 @@ class Session extends \Slim\Middleware {
 
         $create_session_query = "INSERT INTO sessions (user_id,token,expires,session_data) VALUES (?,?,FROM_UNIXTIME(?),?);";
         $stmt = $this->pdo->prepare($create_session_query);
-        $stmt->execute([$user_id,$session_id,$expire_timestamp,$session_data]);
+        $stmt->execute(array($user_id,$session_id,$expire_timestamp,$session_data));
 
         $expires = gmstrftime("%A %d-%b-%y %T %Z",$this->settings['expires']);
         $this->app->setCookie('softpath_session', $session_id, $expires);

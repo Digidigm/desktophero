@@ -23,7 +23,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                  $user_query = 'SELECT user_id FROM users WHERE email_address = ? AND pass_phrase = SHA1(?);';
                  $stmt = $pdo->prepare($user_query);
-                 $stmt->execute([$username,$password]);
+                 $stmt->execute(array($username,$password));
 
                  //to debug a query:
                  //print_r($stmt->debugDumpParams() );
@@ -61,7 +61,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 oci_bind_by_name($stmt,":id",$id,10);
                 oci_execute($stmt);
                 $result = oci_fetch_assoc($stmt);
-                $lc_result = [];
+                $lc_result = array();
                 foreach ($result as $k => $v) {
                     $lc_result[strtolower($k)] = $v;
                 }
@@ -84,9 +84,9 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 oci_bind_by_name($stmt,":offset",$offset);
                 oci_bind_by_name($stmt,":limit",$limit);
                 oci_execute($stmt);
-                $results = [];
+                $results = array();
                 while (( $row = oci_fetch_assoc($stmt)) != false){
-                    $normal = [];
+                    $normal = array();
                     foreach($row as $k => $v) {    
                         $normal[strtolower($k)] = $v;
                     }
