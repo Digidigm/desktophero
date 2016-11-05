@@ -44,17 +44,7 @@ SceneView.prototype = {
 		var stlString = this.exporter.parse(this.scene);
 		var blob = new Blob([stlString], {type: 'text/plain'});
 		
-		this.download(blob, model.character.getName() + '.stl');
-	},
-
-	download: function(blob, filename) {
-		var element = document.createElement('a');
-		element.setAttribute('href', window.URL.createObjectURL(new Blob([blob])));
-		element.setAttribute('download', filename);
-		element.style.display = 'none';
-		document.body.appendChild(element);
-		element.click();
-		document.body.removeChild(element);
+		FileSaver.download(blob, model.character.getName() + '.stl');
 	},
 
 	render: function(){

@@ -55,5 +55,12 @@ Character.prototype = {
 	setName: function(name){
 		this.name = name;
 		this.nameChangedEvent.notify(this.name);
+	}, 
+
+	toJSON: function(){
+		return {
+			name: this.name,
+			boneGroups: this.boneGroups.dict
+		};
 	}
 }

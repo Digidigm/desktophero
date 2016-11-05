@@ -1,10 +1,14 @@
-function BoneGroup(name, skeleton){
+function BoneGroup(name, libraryName, skeleton){
 	this.name = name;
+	this.libraryName = libraryName; // Keeps track of where this bone group is found, for saving characters.
 	this.skeleton = skeleton;
 	this.meshes = new ObservableDict(this);
 	this.currentPose;
 	this.attachPoints = {};
-	this.parentBone === null;
+
+	this.parentBoneGroupName; // Used when saving character.
+	this.parentBoneName; // Used when saving character.
+	this.parentBone = null;
 
 	for (var i = 0; i < skeleton.bones.length; i++){
 		bone = skeleton.bones[i];
@@ -49,7 +53,10 @@ BoneGroup.prototype = {
 		this.meshes.put(meshName, mesh);
 
 		if (this.parentBone != null){
-			this.attachToBone(this.parentBone); // Restore bone parent.
+			// Restore bone parent.
+			this.attachToBone(this.parentBoneGroupName, 
+								this.parentBoneName, 
+								this.parentBone); 
 			// Restore previous position, rotation, scale.
 			bone0.position.x = position.x;
 			bone0.position.y = position.y;
@@ -65,8 +72,10 @@ BoneGroup.prototype = {
 		}
 	},
 
-	attachToBone: function(parentBone){
+	attachToBone: function(parentBoneGroupName, parentBoneName, parentBone){
 		parentBone.add(this.skeleton.bones[0]);
+		this.parentBoneGroupName = parentBoneGroupName;
+		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
 	},
 
@@ -83,5 +92,15 @@ BoneGroup.prototype = {
 		bone0.position.y = 0;
 		bone0.position.z = 0;
 		bone0.updateMatrixWorld()
+	},
+
+	toJSON: function(){
+		return {
+			name: this.name,
+			libraryName: this.libraryName,
+			meshes: this.meshes.dict,
+			parentBoneGroupName: this.parentBoneGroupName,
+			parentBoneName: this.parentBoneName
+		};
 	}
 };

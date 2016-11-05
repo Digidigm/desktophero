@@ -2,7 +2,7 @@ function SceneModel(){
 	this.userSettings = new UserSettings();
 
 	this.libraries = new ObservableDict();
-	this.libraries.put("Default", new LocalDataSource("/testlib"));
+	this.libraries.put("Default", new LocalDataSource("Default", "/testlib"));
 
 	this.character = new Character();
 }
@@ -92,7 +92,7 @@ SceneModel.prototype = {
 	attachBoneGroup: function(boneGroupName, toBoneGroupName, attachPointName){
 		var boneGroup = this.character.boneGroups.get(boneGroupName);
 		var attachBone = this.character.boneGroups.get(toBoneGroupName).attachPoints[attachPointName];
-		boneGroup.attachToBone(attachBone);
+		boneGroup.attachToBone(toBoneGroupName, attachPointName, attachBone);
 	},
 
 	unattachBoneGroup: function(boneGroupName){
@@ -111,6 +111,18 @@ SceneModel.prototype = {
 		self.libraries.get(libraryName).fetchPose(poseName, function(poseJson){
 			self.character.loadPose(poseJson);
 		});
+	},
+
+	saveCharacter: function(){
+		// Must save bone groups, meshes attached to bone groups, 
+		// places meshes are attached, pos/rot/scale of bone groups, pose.
+
+		var json = {
+			character: this.character.toJSON(),
+			pose: this.character.getCurrentPose()
+		};
+
+		FileSaver.download(JSON.stringify(json, null, " "), this.character.name + ".js");
 	},
 
 	initCharacter: function(){
@@ -178,11 +190,11 @@ SceneModel.prototype = {
 		var rightArm = self.character.boneGroups.get("right arm");
 		var handheld = self.character.boneGroups.get("handheld");
 
-		neck.attachToBone(torso.attachPoints["#neck"]);
-		leftArm.attachToBone(torso.attachPoints["#left arm"]);
-		rightArm.attachToBone(torso.attachPoints["#right arm"]);
-		head.attachToBone(neck.attachPoints["#top"]);
-		handheld.attachToBone(leftArm.attachPoints["#hand"]);
+		neck.attachToBone("torso", "#neck", torso.attachPoints["#neck"]);
+		leftArm.attachToBone("torso", "#left arm", torso.attachPoints["#left arm"]);
+		rightArm.attachToBone("torso", "#right arm", torso.attachPoints["#right arm"]);
+		head.attachToBone("neck", "#top", neck.attachPoints["#top"]);
+		handheld.attachToBone("left arm", "#hand", leftArm.attachPoints["#hand"]);
 
 		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
 		torso.skeleton.bones[0].position.y = 0;

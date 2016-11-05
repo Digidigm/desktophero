@@ -1,5 +1,5 @@
 function ObservableDict(origin){
-	this.dict = {}
+	this.dict = {};
 	this.itemAddedEvent = new Event(origin);
 	this.itemRemovedEvent = new Event(origin);
 }

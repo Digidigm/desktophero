@@ -1,7 +1,8 @@
 /* A datasource that is a folder on the same server where DesktopHero is being hosted.
 */
 
-function LocalDataSource(directoryURL){
+function LocalDataSource(name, directoryURL){
+	this.name = name;
 	this.topDirectory = directoryURL;
 	this.meshesDirectory = directoryURL + '/meshes';
 	this.posesDirectory = directoryURL + '/poses';
@@ -74,11 +75,15 @@ LocalDataSource.prototype = {
 	},
 
 	fetchMesh: function(name, callback){
+		var self = this;
 		var filename = this.meshesDirectory + '/' + name + '.js';
 		LocalDataSource.loader.load(filename, function(geometry, materials){
 			materials[0].skinning = true;
 
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+			mesh.name = name;
+			mesh.libraryName = self.name;
+			
 			mesh.frustumCulled = false;
 
 			callback(name, mesh);
@@ -92,16 +97,17 @@ LocalDataSource.prototype = {
 		});
 	},
 
-	fetchBoneGroup: function(name, callback){
-		var filename = this.boneGroupsDirectory + '/' + name + '.js';
+	fetchBoneGroup: function(meshName, callback){
+		var self = this;
+		var filename = this.boneGroupsDirectory + '/' + meshName + '.js';
 		LocalDataSource.loader.load(filename, function(geometry, materials){
 			// Get skeleton out of geometry.
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
 			var skeleton = mesh.skeleton;
 
 			// Construct new bone group with skeleton.
-			var boneGroup = new BoneGroup(name, skeleton);
-			callback(name, boneGroup);
+			var boneGroup = new BoneGroup(meshName, self.name, skeleton);
+			callback(meshName, boneGroup);
 		});
 	}
 }
