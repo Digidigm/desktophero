@@ -19,6 +19,7 @@
 <script src="/js/Character.js"></script>
 <script src="/js/BoneGroup.js"></script>
 <script src="/js/Pose.js"></script>
+<script src="/js/Materials.js"></script>
 
 <script src="/js/Event.js"></script>
 <script src="/js/ObservableDict.js"></script>

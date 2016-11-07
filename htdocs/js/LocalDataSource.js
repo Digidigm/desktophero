@@ -83,8 +83,12 @@ LocalDataSource.prototype = {
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
 			mesh.name = name;
 			mesh.libraryName = self.name;
-			
+
 			mesh.frustumCulled = false;
+			geometry.computeFaceNormals();
+			geometry.computeVertexNormals();
+			mesh.castShadow = true;
+			mesh.receiveShadow = true;
 
 			callback(name, mesh);
 		});

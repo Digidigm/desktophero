@@ -2,9 +2,11 @@ function SceneModel(){
 	this.userSettings = new UserSettings();
 
 	this.libraries = new ObservableDict();
-	this.libraries.put("Default", new LocalDataSource("Default", "/testlib"));
+	this.libraries.put("default", new LocalDataSource("default", "/testlib"));
 
 	this.character = new Character();
+
+	this.materials = {};
 }
 SceneModel.boneGroupsToLoad = ['left arm',
 							'right arm',
@@ -30,9 +32,11 @@ SceneModel.prototype = {
 		return allMeshes;
 	},
 
-	addMesh(boneGroupName, libraryName, meshName){
+	addMesh(boneGroupName, libraryName, meshName, material){
+		var defaultMaterial = self.materials["default"];
 		var boneGroup = this.character.boneGroups.get(boneGroupName);
-		mesh = this.libraries.get(libraryName).fetchMesh(meshName, function(name, mesh){
+		this.libraries.get(libraryName).fetchMesh(meshName, function(name, mesh){
+			mesh.material = new THREE.MeshFaceMaterial([defaultMaterial]);
 			boneGroup.addMesh(name, mesh);
 		});
 	},
@@ -128,7 +132,7 @@ SceneModel.prototype = {
 	initCharacter: function(){
 		var self = this;
 		
-		var defaultDataSource = self.libraries.get('Default');
+		var defaultDataSource = self.libraries.get('default');
 		var boneGroupsLeftToBeLoaded = 6;
 
 		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
@@ -147,15 +151,17 @@ SceneModel.prototype = {
 	initBoneGroupsAdded: function(){
 		var self = this;
 
-		var defaultDataSource = self.libraries.get('Default');
+		var defaultDataSource = self.libraries.get('default');
 		var meshesLeftToBeLoaded = 6;
 
+		var defaultMaterial = self.materials["default"];
 		// Attach meshes to bone groups.
 		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
 			var name = SceneModel.boneGroupsToLoad[i];
 
 			defaultDataSource.fetchMesh(name, function(name, mesh){
 				var boneGroup = self.character.boneGroups.get(name);
+				mesh.material = new THREE.MeshFaceMaterial([defaultMaterial]);
 				boneGroup.addMesh(name, mesh);
 				meshesLeftToBeLoaded -= 1;
 				if (meshesLeftToBeLoaded <= 0){
@@ -163,15 +169,6 @@ SceneModel.prototype = {
 				}
 			});
 		}
-
-		/*defaultDataSource.fetchMesh('hat', function(name, mesh){
-			var headGroup = self.character.boneGroups.get('head');
-			headGroup.addMesh(name, mesh);
-			meshesLeftToBeLoaded -= 1;
-			if (meshesLeftToBeLoaded <= 0){
-				self.initMeshesAdded();
-			}
-		});*/
 	},
 
 	initMeshesAdded: function(){
@@ -200,7 +197,7 @@ SceneModel.prototype = {
 		torso.skeleton.bones[0].position.y = 0;
 
 		// Load initial pose.
-		dataSource = this.libraries.get('Default');
+		dataSource = this.libraries.get('default');
 		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
 			self.character.loadPose(jsonPose);
 		});
