@@ -81,7 +81,7 @@ $(document).ready( function(){
         <a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-presets-data" aria-expanded="true" aria-controls="editor-presets-data"> Figure Characteristics </a>
       </h5>
     </div>
-    <div id="editor-presets-data" class="collapse in scroll" role="tabpanel" aria-labelledby="editor-presets">
+    <div id="editor-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-presets">
         <!--Filled by AJAX: GET ALL PRESET MORPH TARGETS-->
     </div>
   </div>
@@ -167,10 +167,10 @@ $(document).ready( function(){
   <div class="panel card clearfix">
     <div class="card-header" role="tab" id="editor-base">
       <h5>
-        <a class="collapsed" data-toggle="collapse scroll" data-parent="#editor-accordion" href="#editor-base-data" aria-expanded="false" aria-controls="editor-base-data"> Base </a>
+        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-base-data" aria-expanded="false" aria-controls="editor-base-data"> Base </a>
       </h5>
     </div>
-    <div id="editor-base-data" class="collapse" role="tabpanel" aria-labelledby="editor-base">
+    <div id="editor-base-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-base">
       <div class="card-block">
         List of Figure Base &amp; Floor Models
       </div>

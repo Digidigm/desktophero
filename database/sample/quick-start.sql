@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.5.20)
 # Database: hero
-# Generation Time: 2016-11-05 19:47:09 +0000
+# Generation Time: 2016-11-09 23:35:16 +0000
 # ************************************************************
 
 
@@ -49,6 +49,21 @@ CREATE TABLE `figure_likes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `figure_likes` WRITE;
+/*!40000 ALTER TABLE `figure_likes` DISABLE KEYS */;
+
+INSERT INTO `figure_likes` (`id`, `figure_id`, `user_id`, `whence`)
+VALUES
+	(1,1,1,1478370992),
+	(2,1,2,1478370992),
+	(3,1,3,1478370992),
+	(4,4,1,1478370992),
+	(5,5,1,1478370992),
+	(6,6,1,1478370992),
+	(7,7,7,1478370992);
+
+/*!40000 ALTER TABLE `figure_likes` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table figure_tags
@@ -64,6 +79,27 @@ CREATE TABLE `figure_tags` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `figure_tags` WRITE;
+/*!40000 ALTER TABLE `figure_tags` DISABLE KEYS */;
+
+INSERT INTO `figure_tags` (`id`, `figure_id`, `tag_id`, `whence`)
+VALUES
+	(1,1,1,1478370992),
+	(2,2,2,1478370992),
+	(3,3,3,1478370992),
+	(4,4,4,1478370992),
+	(5,5,5,1478370992),
+	(6,6,6,1478370992),
+	(7,7,7,1478370992),
+	(8,8,8,1478370992),
+	(9,9,9,1478370992),
+	(10,10,10,1478370992),
+	(11,1,1,1478370992),
+	(12,1,2,1478370992),
+	(13,1,3,1478370992);
+
+/*!40000 ALTER TABLE `figure_tags` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table figures
@@ -111,12 +147,12 @@ VALUES
 	(8,1,'Madame West',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
 	(9,1,'Bobby Sharpshooter',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
 	(10,1,'X134',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
-	(11,1,'Spike',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
-	(12,1,'Nebuchadnezzar King of Persia',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
-	(13,1,'Rupert Madden Knickersley-Knockerbotham IV',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
-	(14,1,'Mildred Snodgrass-Wigglesworth',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
-	(15,1,'Spencer Clippingsworth-Twistleton',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3),
-	(16,1,'呂羽都',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,NULL,NULL,1478370992,1478370992,1,3);
+	(11,1,'Spike',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,1,NULL,1478370992,1478370992,1,3),
+	(12,1,'Nebuchadnezzar King of Persia',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,1,NULL,1478370992,1478370992,1,3),
+	(13,1,'Rupert Madden Knickersley-Knockerbotham IV',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,1,NULL,1478370992,1478370992,1,3),
+	(14,1,'Mildred Snodgrass-Wigglesworth',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,1,NULL,1478370992,1478370992,1,3),
+	(15,1,'Spencer Clippingsworth-Twistleton',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,1,NULL,1478370992,1478370992,1,3),
+	(16,1,'呂羽都',NULL,'Pellentesque nibh felis, eleifend id, commodo in, interdum vitae, leo. Praesent eu elit. Ut eu ligula. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas elementum augue nec nisl. Proin auctor lorem at nibh. Curabitur nulla purus, feugiat id, elementum in, lobortis quis, pede. Vivamus sodales adipiscing sapien. Vestibulum posuere nulla eget wisi. Integer volutpat ligula eget enim. Suspendisse vitae arcu. Quisque pellentesque. Nullam consequat, sem vitae rhoncus tristique, mauris nulla fermentum est, bibendum ullamcorper sapien magna et quam. Sed dapibus vehicula odio. Proin bibendum gravida nisl. Fusce lorem. Phasellus sagittis, nulla in hendrerit laoreet, libero lacus feugiat urna, eget hendrerit pede magna vitae lorem. Praesent mauris.',NULL,NULL,'https://placekitten.com/g/640/640','https://placekitten.com/g/640/640','https://placekitten.com/g/64/64',NULL,NULL,NULL,NULL,NULL,1,NULL,1478370992,1478370992,1,3);
 
 /*!40000 ALTER TABLE `figures` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -147,24 +183,24 @@ LOCK TABLES `gallery` WRITE;
 
 INSERT INTO `gallery` (`id`, `created`, `figure_id`, `user_id`, `type`, `photo`, `thumbnail`, `caption`, `flag_nsfw`, `flag_deleted`, `flag_featured`)
 VALUES
-	(1,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Aliquam in lacus.',NULL,NULL,NULL),
-	(9,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Phasellus aliquam enim et tortor.',NULL,NULL,NULL),
-	(10,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Proin ornare dignissim lacus.',NULL,1,NULL),
-	(11,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Dignissim lacus.',NULL,NULL,NULL),
-	(12,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Phasellus pulvinar, nulla non aliquam eleifend, tortor wisi scel',NULL,NULL,NULL),
-	(13,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Vestibulum at metus.',NULL,NULL,NULL),
-	(14,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Nunc quis justo.',NULL,NULL,NULL),
-	(15,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Proin ornare dignissim lacus.',NULL,NULL,NULL),
-	(16,1478368169,1,1,'print','http://beerhold.it/300/500','http://beerhold.it/200/300','Donec nisl.',NULL,NULL,NULL),
-	(17,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Praesent ultricies facilisis nisl.',NULL,NULL,NULL),
-	(18,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Phasellus pulvinar, nulla non aliquam eleifend, tortor wisi scel',NULL,NULL,NULL),
-	(19,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Quisque posuere, purus sit amet malesuada blandit, sapien sapien',NULL,NULL,NULL),
-	(20,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Nullam nibh dolor, blandit sed, fermentum id, imperdiet sit amet',NULL,NULL,NULL),
-	(21,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Quisque sit amet est et sapien ullamcorper pharetra.',1,NULL,NULL),
-	(22,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Aliquam sagittis magna in felis egestas rutrum.',NULL,NULL,NULL),
-	(23,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Etiam non wisi.',NULL,NULL,NULL),
-	(24,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Aliquam erat volutpat.',NULL,NULL,NULL),
-	(25,1478368169,1,1,'featured','http://beerhold.it/300/500','http://beerhold.it/200/300','Curabitur sed leo.',NULL,NULL,NULL);
+	(1,1478368169,1,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Aliquam in lacus.',NULL,NULL,NULL),
+	(9,1478368169,2,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Phasellus aliquam enim et tortor.',NULL,NULL,NULL),
+	(10,1478368169,3,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Proin ornare dignissim lacus.',NULL,1,NULL),
+	(11,1478368169,4,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Dignissim lacus.',NULL,NULL,NULL),
+	(12,1478368169,5,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Phasellus pulvinar, nulla non aliquam eleifend, tortor wisi scel',NULL,NULL,NULL),
+	(13,1478368169,6,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Vestibulum at metus.',NULL,NULL,NULL),
+	(14,1478368169,7,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Nunc quis justo.',NULL,NULL,NULL),
+	(15,1478368169,8,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Proin ornare dignissim lacus.',NULL,NULL,NULL),
+	(16,1478368169,9,1,'print','http://placekitten.com/300/500','http://placekitten.com/200/300','Donec nisl.',NULL,NULL,NULL),
+	(17,1478368169,1,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Praesent ultricies facilisis nisl.',NULL,NULL,NULL),
+	(18,1478368169,2,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Phasellus pulvinar, nulla non aliquam eleifend, tortor wisi scel',NULL,NULL,NULL),
+	(19,1478368169,3,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Quisque posuere, purus sit amet malesuada blandit, sapien sapien',NULL,NULL,NULL),
+	(20,1478368169,4,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Nullam nibh dolor, blandit sed, fermentum id, imperdiet sit amet',NULL,NULL,NULL),
+	(21,1478368169,5,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Quisque sit amet est et sapien ullamcorper pharetra.',1,NULL,NULL),
+	(22,1478368169,6,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Aliquam sagittis magna in felis egestas rutrum.',NULL,NULL,NULL),
+	(23,1478368169,7,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Etiam non wisi.',NULL,NULL,NULL),
+	(24,1478368169,8,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Aliquam erat volutpat.',NULL,NULL,NULL),
+	(25,1478368169,9,1,'featured','http://placekitten.com/300/500','http://placekitten.com/200/300','Curabitur sed leo.',NULL,NULL,NULL);
 
 /*!40000 ALTER TABLE `gallery` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -194,11 +230,12 @@ DROP TABLE IF EXISTS `model_presets`;
 CREATE TABLE `model_presets` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
+  `ordinality` int(11) DEFAULT NULL,
   `preset_name` varchar(64) DEFAULT NULL,
   `preset_data` text,
   `preset_short_desc` varchar(255) DEFAULT NULL,
   `preset_category` varchar(64) DEFAULT NULL,
-  `preset_type` int(11) DEFAULT NULL,
+  `preset_type` varchar(11) DEFAULT NULL,
   `preset_model_id` varchar(64) DEFAULT NULL,
   `photo_render` varchar(255) DEFAULT NULL,
   `photo_inspiration` varchar(255) DEFAULT NULL,
@@ -215,6 +252,52 @@ CREATE TABLE `model_presets` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `model_presets` WRITE;
+/*!40000 ALTER TABLE `model_presets` DISABLE KEYS */;
+
+INSERT INTO `model_presets` (`id`, `user_id`, `ordinality`, `preset_name`, `preset_data`, `preset_short_desc`, `preset_category`, `preset_type`, `preset_model_id`, `photo_render`, `photo_inspiration`, `photo_thumbnail`, `flag_nsfw_sex`, `flag_nsfw_violence`, `flag_nsfw_other`, `flag_deleted`, `flag_hidden`, `flag_featured`, `flag_private`, `date_created`, `date_updated`)
+VALUES
+	(1,NULL,100,'Elfin Female',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(2,NULL,200,'Elfin Male',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(3,NULL,300,'Human Male',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(4,NULL,400,'Human Female',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(5,NULL,500,'Dwarven Male',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(6,NULL,600,'Dwarven Female',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(7,NULL,700,'Gnomish Male',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(8,NULL,800,'Gnomish Female',NULL,NULL,'race','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(9,NULL,200,'Slight',NULL,NULL,'stature','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(10,NULL,300,'Average',NULL,NULL,'stature','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(11,NULL,400,'Heroic',NULL,NULL,'stature','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(12,NULL,100,'Tiny',NULL,NULL,'stature','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(13,NULL,500,'Monsterous',NULL,NULL,'stature','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(14,NULL,100,'Waifish',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(15,NULL,200,'Slender',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(16,NULL,300,'Average',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(17,NULL,400,'Soft',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(18,NULL,500,'Heavy',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(19,NULL,600,'Rotund',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(20,NULL,700,'Morbid',NULL,NULL,'weight','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(21,NULL,100,'Child',NULL,NULL,'age','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(22,NULL,200,'Teen',NULL,NULL,'age','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(23,NULL,300,'Adult',NULL,NULL,'age','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(24,NULL,400,'Middle Age',NULL,NULL,'age','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(25,NULL,500,'Elderly',NULL,NULL,'age','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(26,NULL,600,'Venerable',NULL,NULL,'age','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(27,NULL,100,'Androgenous',NULL,NULL,'XY','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(28,NULL,200,'Average',NULL,NULL,'XY','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(29,NULL,300,'Cut',NULL,NULL,'XY','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(30,NULL,400,'Action Hero',NULL,NULL,'XY','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(31,NULL,500,'Super Hero',NULL,NULL,'XY','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(32,NULL,100,'Androgenous',NULL,NULL,'XX','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(33,NULL,200,'Average',NULL,NULL,'XX','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(34,NULL,300,'Hourglass',NULL,NULL,'XX','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(35,NULL,500,'Super Hero',NULL,NULL,'XX','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(36,NULL,600,'Absurd',NULL,NULL,'XX','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(37,NULL,600,'Absurd',NULL,NULL,'XY','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+	(38,NULL,400,'Vixen',NULL,NULL,'XX','morph',NULL,NULL,NULL,'http://placekitten.com/55/55',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+
+/*!40000 ALTER TABLE `model_presets` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table model_tags
@@ -230,6 +313,19 @@ CREATE TABLE `model_tags` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `model_tags` WRITE;
+/*!40000 ALTER TABLE `model_tags` DISABLE KEYS */;
+
+INSERT INTO `model_tags` (`id`, `model_id`, `tag_id`, `whence`)
+VALUES
+	(1,1,1,1478370992),
+	(2,1,2,1478370992),
+	(3,1,4,1478370992),
+	(4,5,5,1478370992),
+	(5,6,6,1478370992);
+
+/*!40000 ALTER TABLE `model_tags` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table models
@@ -353,15 +449,36 @@ CREATE TABLE `tags` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `tag_hint` varchar(255) DEFAULT NULL,
   `tag_label` varchar(24) DEFAULT NULL,
-  `tag_synonyms` text,
+  `tag_synonyms` varchar(255) DEFAULT '',
+  `tag_type` varchar(11) DEFAULT NULL,
   `flag_nsfw` tinyint(1) DEFAULT NULL,
   `flag_approved` tinyint(1) DEFAULT NULL,
   `flag_deleted` tinyint(1) DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `created` int(11) DEFAULT NULL,
+  `thumbnail` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `tags` WRITE;
+/*!40000 ALTER TABLE `tags` DISABLE KEYS */;
+
+INSERT INTO `tags` (`id`, `tag_hint`, `tag_label`, `tag_synonyms`, `tag_type`, `flag_nsfw`, `flag_approved`, `flag_deleted`, `created_by`, `created`, `thumbnail`)
+VALUES
+	(1,'Genre: The Old West','Old West','west,western,cowboy,cowgirl','genre',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(2,'Genre: High Medieval','Medieval','knights,europe,castles','genre',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(3,'Genre: Sci-Fi','Sci-Fi','robots,aliens,future,sci-fi','genre',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(4,'Genre: Modern','Modern','modern,now,current','genre',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(5,'Genre: Noir','Noir','20\'s,30\'s,noir,film noir,detective','genre',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(6,'Genre: Horror','Horror','horror,blood,guts,madness','genre',1,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(7,'Swords','Swords','swords,short sword,long sword','user',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(8,'Bows','Bows','bows,cross bow,long bow,compound bow','user',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(9,'BSDM','BSDM','BSDM','user',1,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(10,'Magic','Magic','magic,spells,cantrip','extra',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55'),
+	(11,'Pets','Pets','pets,dog,cat,animal,companion','extra',NULL,1,NULL,1,1478370992,'http://placekitten.com/55/55');
+
+/*!40000 ALTER TABLE `tags` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table users
