@@ -321,7 +321,31 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $app->response->setBody($model);
             }
         );
+        $app->get(
+            '/model/tags/:tid',
+            function ($tid = 1) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model/tags/:fid
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/model/tags/1
+                //Gets all of the models for a tag based on tag id and outputs json
 
+                /*
+                    [ {TAG}, {TAG}, {TAG} ]
+                */
+
+                $query = "SELECT * FROM model_tags WHERE tag_id = ?";
+                $tid = filter_var($tid, FILTER_SANITIZE_NUMBER_INT);   
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($tid));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $model_tags = json_encode($result);
+                $app->response->setBody($model_tags);
+            }
+        );
         $app->get(
             '/model/:type/:category',
             function ($type, $category) use ($app,$pdo,$config,$session) {
@@ -892,6 +916,111 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
             }
         );
 
+        /* MODEL TAG ROUTES */
+        $app->get(
+            '/tags/model/:fid',
+            function ($fid = 1) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/tags/model/:fid
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/tags/model/1
+                //Gets all of the tags for a model based on a model id and outputs json
+
+                /*
+                    [ {TAG}, {TAG}, {TAG} ]
+                */
+
+                $query = "SELECT * FROM model_tags WHERE model_id = ?";
+                $fid = filter_var($fid, FILTER_SANITIZE_NUMBER_INT);   
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($fid));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $model_tags = json_encode($result);
+                $app->response->setBody($model_tags);
+            }
+        );
+        
+        //ROUTE FOR GET /MODEL/TAGS/:ID  moved to the model block above to avoid collisions
+
+        $app->get(
+            '/model/tags/recent(/:num)',
+            function ($num = 10) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model_tags/recent/10
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/model/tags/recent/10
+                //Gets tags that have recently been added to any model
+
+                 /*
+                    {"recent_tags": [ {TAG}, {TAG}, {TAG} ] }
+                */
+
+                //TODO: make it so you don't get hidden model_tags unless you're an admin
+
+                $query = "SELECT * FROM model_tags ORDER BY whence DESC LIMIT :num";
+                $num = filter_var($num, FILTER_SANITIZE_NUMBER_INT);  
+                
+                $stmt = $pdo->prepare($query);
+                $stmt->bindValue(':num', (int)$num, PDO::PARAM_INT);
+                $stmt->execute();
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $model_tags_gallery = array();
+                
+                $model_tags_gallery["recent_tags"] = $result;
+                $model_tags_gallery = json_encode($model_tags_gallery);
+                $app->response->setBody($model_tags_gallery);
+            }
+        );
+        $app->put(
+            '/model/tags/',
+            function () use ($app,$pdo,$config,$session) {
+                //NOT IMPLEMENTED.  Tags mappings should not be edited but deleted and recreated
+                //TODO: Make this output the right HTTP code for NOT IMPLEMENTED
+                $app->response->setBody("<h1>Not Implemented</h1>");
+            }
+        );
+        $app->post(
+            '/model/tags/:fid/:tid',
+            function () use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model_tags
+                //Example:  POST http://hero.50.16.238.24.xip.io/api/v1/model_tags
+                //Adds a tag to a model
+
+                //TODO: Make CREATE model_tags POST route
+                //TODO: Check for dupilclate model_tags data urls
+
+                $query = "INSERT INTO model_tags VALUES() FIELDS();";
+
+                $model_tags = array();
+                $model_tags["item"] = "Not Yet Implemented: POST model_tags create";
+                $model_tags = json_encode($model_tags);
+                $app->response->setBody($model_tags); 
+            }
+        );
+        $app->delete(
+            '/model/tags/:fid/:tid',
+            function ($mid) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model_tags/:fid/:tid
+                //Example:  DEL http://hero.50.16.238.24.xip.io/api/v1/model_tags/:fid/:tid
+                //Deletes tag TID from model FID
+
+                //TODO: Make delete model_tags DEL route
+                //TODO: Make sure only admins and users themselves can delete model_tags items
+                $query = "DELETE FROM model_tags set flag_deleted = 1 WHERE id = ? AND id = ?";
+
+                $model_tags = array();
+                $model_tags["item"] = "Not Yet Implemented: DEL model_tags delete";
+                $model_tags = json_encode($model_tags);
+                $app->response->setBody($model_tags); 
+            }
+        );
+
+
         /*TAGS Routes */
         $app->get(
             '/tags/keywords/:word1((/:word2)/:word3)',
@@ -1181,7 +1310,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
 
         /* TODO
-        
+
         TODO: GET / POST / PUT / DELETE ROUTES for flagging models, figures NSFW and add them to the admin queue
         TODO: GET / POST / PUT / DELETE ROUTES for model presets
 
