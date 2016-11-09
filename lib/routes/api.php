@@ -463,6 +463,33 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
             }
         );
         $app->get(
+            '/figure/featured',
+            function () use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/figure/featured
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/figure/featured
+                //Gets all of the data for figures based on the featured flag
+
+                /*
+                    [ {MODEL} , {MODEL}, {MODEL} ]
+                    See model item above for details
+
+                */
+
+                $query = "SELECT * FROM figures WHERE flag_featured = 1 AND flag_deleted is null";
+                $uid = filter_var($uid, FILTER_SANITIZE_NUMBER_INT);   
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($uid));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $figure = json_encode($result);
+                $app->response->setBody($figure);
+            }
+        );
+        $app->get(
             '/figure/keywords/:word1((/:word2)/:word3)',
             function ($word1, $word2 = "", $word3 = "") use ($app,$pdo,$config,$session) {
                 // [[HOST]]/api/v1/figure/:word/:word/:word
@@ -681,11 +708,13 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                         "tag_hint": STRING - Typically of the CLASS:PROPERTY format to facilitate searching
                         "tag_label": STRING - Short label for use in the UI,
                         "tag_synonyms": STRING - comma separated list for use in searching,
+                        "tag_type" : STRING - categorization, bascailly ENUM for genres, presets, user entered data, et al
                         "flag_nsfw": BOOL - is the tag objectionable,
                         "flag_approved": BOOL - admin approved for use,
                         "flag_deleted": BOOL - available,
                         "created_by": INT user_id,
                         "created": UNIXTIME
+                        "thumbnail" : S3 Thumbnail image
                     }
                 */
 
@@ -701,6 +730,29 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 
                 $tags = json_encode($result[0]);
+                $app->response->setBody($tags);
+            }
+        );
+        $app->get(
+            '/tags/by/:type',
+            function ($type) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/tags/by/genre
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/tags/by/genre
+                //Gets all of the data for a tags in the tag type and outputs json
+
+
+                $query = "SELECT * FROM tags WHERE tag_type = ? AND flag_deleted is null";
+                $type = filter_var($type, FILTER_SANITIZE_STRING);   
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($type));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                $tags = json_encode($result);
                 $app->response->setBody($tags);
             }
         );
@@ -1307,6 +1359,121 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
             }
         );
 
+        $app->get(
+            '/preset/all',
+            function () use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model/:type/:category
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/preset/morph/race
+                //Gets much of the data for a set of models morph targets and outputs JSON
+
+                /*  { 
+                        morph: {
+                            age: {
+                                [preset],[preset],[preset],[preset],[preset],[preset]
+                            },
+                            stature: {
+                                [preset],[preset],[preset],[preset],[preset],[preset]
+                            }
+                            ....
+
+                        }
+                    }                    
+
+                */
+
+                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM model_presets WHERE flag_deleted is null ORDER BY preset_type,preset_category,ordinality";
+                
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $presets = array();
+                foreach($result as $k => $v) {
+                    if ( ! isset( $presets[$v["preset_type"]] )) {
+                        $presets[$v["preset_type"]] = array();    
+                    }
+                    if ( ! isset( $presets[$v["preset_type"]][$v['preset_category']] )) {
+                        $presets[$v["preset_type"]][$v['preset_category']] = array();
+                    }
+                    $presets[$v["preset_type"]][$v['preset_category']][] = $v;
+                }
+                
+                $presets = json_encode($presets);
+                $app->response->setBody($presets);
+            }
+        );
+        $app->get(
+            '/preset/:type/:category',
+            function ($type, $category) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model/:type/:category
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/preset/morph/race
+                //Gets much of the data for a set of models morph targets and outputs JSON
+
+                //TODO: make it so you get get your own private models and not other peoples
+                //TODO: make it so you don't get hidden models unless you're an admin
+
+                /*
+                    { "mesh" : [ {MODEL} , {MODEL}, {MODEL} ]}
+                    See model item above for details
+
+                */
+
+                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM model_presets WHERE preset_type = ? AND preset_category = ? AND flag_deleted is null ORDER By ordinality";
+                $type = filter_var($type, FILTER_SANITIZE_STRING);
+                $category = filter_var($category, FILTER_SANITIZE_STRING); 
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($type,$category));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $model_gallery = array();
+                
+                $model_gallery[$type] = $result;
+                $model_gallery = json_encode($model_gallery);
+                $app->response->setBody($model_gallery);
+            }
+        );
+        $app->get(
+            '/preset/all/:category',
+            function ($type, $category) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model/:type/:category
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/preset/morph/race
+                //Gets much of the data for a set of models morph targets and outputs JSON
+
+                //TODO: make it so you get get your own private models and not other peoples
+                //TODO: make it so you don't get hidden models unless you're an admin
+
+                /*
+                    { "mesh" : [ {MODEL} , {MODEL}, {MODEL} ]}
+                    See model item above for details
+
+                */
+
+                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models_presets WHERE preset_type = ? AND preset_category = ? AND flag_deleted is null";
+                $type = filter_var($type, FILTER_SANITIZE_STRING);
+                $category = filter_var($category, FILTER_SANITIZE_STRING); 
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($type,$category));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $model_gallery = array();
+                
+                $model_gallery[$type] = $result;
+                $model_gallery = json_encode($model_gallery);
+                $app->response->setBody($model_gallery);
+            }
+        );
 
 
         /* TODO

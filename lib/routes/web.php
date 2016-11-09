@@ -49,15 +49,16 @@ $app->get(
     }
 );
 $app->get(
-    '/editor/?',
-    function () use ($app,$session){
+    '/editor(/:fid)/?',
+    function ($fid = 0) use ($app,$session){
         $app->render(
             'layouts/main.php',
             array(
-                'componentjs' => "/components/twitterjs.php",
+                //'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
                 'template_dir' => BASE_PATH . "./views/",
-                'template' => 'editor'
+                'template' => 'editor',
+                'figure_id' => $fid
             ) //array of parameters for template
         );
     }
