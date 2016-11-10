@@ -15,6 +15,8 @@ function SceneView(model){
 
 	this.cubeMap;
 
+	this.boneHandles = [];
+
 	this.addModelListeners();
 }
 
@@ -88,20 +90,34 @@ SceneView.prototype = {
 
 	render: function(){
 
+		for (var i = 0; i < this.boneHandles.length; i++){
+			var boneHandle = this.boneHandles[i];
+			var boneGroupName = boneHandle.boneGroupName;
+ 			var boneIndex = boneHandle.boneIndex;
+
+ 			var boneGroup = this.model.character.boneGroups.get(boneGroupName);
+ 			var bone = boneGroup.skeleton.bones[boneIndex];
+
+ 			var globalBonePosition = new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld);
+
+			boneHandle.position.x = globalBonePosition.x;
+			boneHandle.position.y = globalBonePosition.y;
+			boneHandle.position.z = globalBonePosition.z;
+		}
 	},
 
 	animate: function(){
 		requestAnimationFrame(this.animate.bind(this));
-	    this.render();
-	    this.renderer.render(this.scene, this.camera);
+		this.render();
+		this.renderer.render(this.scene, this.camera);
 	},
 
 	resize: function(innerWidth, innerHeight){
 		this.SCREEN_WIDTH = window.innerWidth;
-        this.SCREEN_HEIGHT = window.innerHeight;
-        this.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+		this.SCREEN_HEIGHT = window.innerHeight;
+		this.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+		this.camera.updateProjectionMatrix();
+		this.renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 	},
 
 	addModelListeners: function(){
@@ -114,6 +130,16 @@ SceneView.prototype = {
 		var boneGroup = character.boneGroups.get(boneGroupName);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 
+		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
+			var bone = boneGroup.skeleton.bones[i];
+			var sphere = new THREE.Mesh(new THREE.SphereGeometry(.4, 5, 5), new THREE.MeshBasicMaterial({color: 0xffff00, wireframe: true}));
+			sphere.boneGroupName = boneGroupName;
+			sphere.boneIndex = i;
+			this.boneHandles.push(sphere);
+
+			this.scene.add(sphere);
+		}
+		
 	},
 
 	onBoneGroupRemoved: function(character, boneGroupName){
@@ -124,6 +150,73 @@ SceneView.prototype = {
 
 	onMeshAdded: function(boneGroup, meshName){
 		console.log("Mesh " + meshName + " added to bone group " + boneGroup.name + ".");
-		this.scene.add(boneGroup.meshes.get(meshName));
+
+		var mesh = boneGroup.meshes.get(meshName);
+		this.scene.add(mesh);
+
+		var helper = new THREE.BoundingBoxHelper(mesh, 0xff0000);
+		helper.update();
+		this.scene.add(helper);
+	},
+
+	getCameraDistanceFrom: function(camera, x, y, z){
+		var cameraDistance = new THREE.Vector3();
+		var target = new THREE.Vector3(x,y,z);
+		cameraDistance.subVectors(camera.position, target);
+		return cameraDistance.length();
 	}
 };
+
+document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+var projector = new THREE.Projector();
+
+function onDocumentMouseDown( event ) {
+	var defaultMaterial = model.materials["clay"];
+	var scene = view.scene;
+	var camera = view.camera;
+
+    event.preventDefault();
+
+    var vector = new THREE.Vector3(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+      - ( event.clientY / window.innerHeight ) * 2 + 1,
+        0.5
+    );
+    vector.unproject(camera);
+
+    var ray = new THREE.Ray(camera.position, 
+                             vector.sub(camera.position).normalize());
+
+    for (var i = 0; i < view.boneHandles.length; i++){
+    	var boneHandle = view.boneHandles[i];
+    	var intersection = ray.intersectsSphere(boneHandle.geometry);
+    	console.log(intersection);
+    	if (intersection){
+    		console.log("Clicked on " + boneHandle.boneGroupName + " bone " + boneHandle.boneIndex);
+    	}
+    }
+    
+
+
+
+    /*if (intersects != null) {
+
+
+        var particle = new THREE.Particle( defaultMaterial );
+        particle.position.x = intersects.x;
+        particle.position.y = intersects.y;
+        particle.position.z = intersects.z;
+        particle.scale.x = particle.scale.y = 8;
+        scene.add( particle );
+
+    }*/
+
+    /*
+    // Parse all the faces
+    for ( var i in intersects ) {
+        intersects[ i ].face.material[ 0 ].color
+            .setHex( Math.random() * 0xffffff | 0x80000000 );
+    }
+    */
+}
