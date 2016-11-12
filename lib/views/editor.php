@@ -7,26 +7,63 @@
 
 
 <script>
-$(document).ready( function(){
-	//keep it all using the REST apis rather than a combination of internal and external functions
-	//TODO: turn these into knockout modules
 
-	//GET ALL GENRE TAGS
-	$.getJSON("/api/v1/tags/by/genre", function( tags ){
+//works for things in a flat list with the tag table name currently
+var getSimpleItems = function(url,target){
+	$.getJSON(url, function( tags ){
 		//Get all the Genre Tags.  These will be used as macro filters for all the other lists
 		var slides = "";
 		$.each( tags, function(k,v){
 			slides += "<div class='mini-select col-md-2' data-tag-id='" +v.id+ "'> <img src='" +v.thumbnail+ "' alt='" + v.tag_hint + "'><span class='label'>"+ v.tag_label +"</span></div>\n" ;
 		});
 
-		$("#editor-genre-data").html(slides);
+		$("#"+target).html(slides);
 	});
+};
 
-	//GET ALL PRESETS
-	$.getJSON("/api/v1/preset/all", function( presets ){
-		//Get all the Presets.  These will will a morph target tab
+//works for models
+var getTabbedItems = function(url,target,key) {
+	
+	$.getJSON(url, function( data ){
+	
 		
-		var tabs = "<ul class='nav nav-tabs' id='preset-tabs'>";
+		var tabs = "<ul class='nav nav-tabs' id='"+target+"-tabs'>";
+		var content = "<div class='tab-content clearfix'>";
+
+		$.each( data[key], function(k,v){
+			//make a new tab
+			var slides = "";
+
+			tabs += "<li role='presentation' class='nav-item'><a class='nav-link' href='#panel-"+v[0].model_category+"' data-toggle='tab'>"+ v[0].model_category +"</a></li>";
+			var panel = "<div class='tab-pane fade' id='panel-"+ v[0].model_category+"' role='tabpanel'>";
+
+			$.each( v, function(kk,vv){
+				//make a new slide
+				slides += "<div class='mini-select col-md-3' data-tag-id='" +vv.id+ "'> <img src='" +vv.photo_thumbnail+ "' alt='" + vv.model_name + "'><span class='label'>"+ vv.model_name +"</span></div>\n";
+			});
+
+			content += panel += slides += "</div>";
+		});
+
+		tabs += "</ul>";
+		content += "</div>";
+		tabs += content;
+
+		$("#"+target).html(tabs);
+		$("#"+target + "-tabs li a").click(function (e) {
+  			e.preventDefault();
+  			$(this).tab('show');
+		});
+		$("#"+target + "-tabs li:first a").tab('show');
+	});
+};
+
+//get the presests from the table and lays them out with some special rules
+var getPresets = function() {
+	$.getJSON("/api/v1/preset/all", function( presets ){
+		//Get all the Presets.  These will sort into a morph target tab
+		
+		var tabs = "<ul class='nav nav-tabs' id='editor-presets-data-tabs'>";
 		var content = "<div class='tab-content clearfix'>";
 
 		$.each( presets.morph, function(k,v){
@@ -50,13 +87,48 @@ $(document).ready( function(){
 		tabs += content;
 
 		$("#editor-presets-data").html(tabs);
-
-		$('#preset-tabs li a').click(function (e) {
+		$('#editor-presets-data-tabs li a').click(function (e) {
   			e.preventDefault();
   			$(this).tab('show');
 		});
-		$("#preset-tabs li:first a").tab('show');
+		$("#editor-presets-data-tabs li:first a").tab('show');
 	});
+};
+
+$(document).ready( function(){
+	//keep it all using the REST apis rather than a combination of internal and external functions
+	//TODO: turn these into knockout modules if it makes sense
+
+	//GET ALL GENRE TAGS
+	getSimpleItems("/api/v1/tags/by/genre","editor-genre-data");
+
+	//GET ALL PRESETS
+	getPresets();
+
+	//GET ALL HEAD MESHES
+	getTabbedItems("/api/v1/model/by/head/mesh","editor-head-data","head");
+
+	//GET ALL ARMS MESHES
+	getTabbedItems("/api/v1/model/by/arms/mesh","editor-arms-data","arms");
+
+	//GET ALL HANDS MESHES
+	getTabbedItems("/api/v1/model/by/hands/mesh","editor-hands-data","hands");
+
+	//GET ALL CHEST / UPPER BODY MESHES
+	getTabbedItems("/api/v1/model/by/chest/mesh","editor-chests-data","chest");
+
+	//GET ALL LEGS / LOWER BODY MESHES
+	getTabbedItems("/api/v1/model/by/legs/mesh","editor-legs-data","legs");
+
+	//GET ALL FEET and FOOTWare BODY MESHES
+	getTabbedItems("/api/v1/model/by/feet/mesh","editor-feet-data","feet");
+
+	//GET ALL FEET and FOOTWare BODY MESHES
+	getTabbedItems("/api/v1/model/by/base/mesh","editor-bases-data","base");
+
+
+
+	
 });
 </script>
 
@@ -71,7 +143,7 @@ $(document).ready( function(){
       </h5>
     </div>
     <div id="editor-genre-data" class="collapse in scroll" role="tabpanel" aria-labelledby="editor-genre">
-        <!--Filled by AJAX: GET ALL GENRE TAGS-->
+        <!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#editor-genre-data"); -->
     </div>
   </div>
 
@@ -82,19 +154,19 @@ $(document).ready( function(){
       </h5>
     </div>
     <div id="editor-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-presets">
-        <!--Filled by AJAX: GET ALL PRESET MORPH TARGETS-->
+        <!--Filled by AJAX: getPresets(); -->
     </div>
   </div>
 
   <div class="panel card clearfix">
     <div class="card-header" role="tab" id="editor-heads">
       <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-heads-data" aria-expanded="false" aria-controls="editor-heads-data"> Heads </a>
+        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-head-data" aria-expanded="false" aria-controls="editor-head-data"> Heads </a>
       </h5>
     </div>
-    <div id="editor-heads-data" class="collapse scroll" role="tabpanel" aria-labelledby="headingTwo">
+    <div id="editor-head-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-head">
       <div class="card-block">
-        List of Head Models
+         <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#editor-head-data","head"); -->
       </div>
     </div>
   </div>
@@ -107,7 +179,7 @@ $(document).ready( function(){
     </div>
     <div id="editor-arms-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-arms">
       <div class="card-block">
-        List of Arm Models
+        <!-- getTabbedItems("/api/v1/model/by/arms/mesh","editor-arms-data","arms"); -->
       </div>
     </div>
   </div>
@@ -120,7 +192,7 @@ $(document).ready( function(){
     </div>
     <div id="editor-hands-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-hands">
       <div class="card-block">
-        List of Hands &amp; Carried Items
+        <!-- getTabbedItems("/api/v1/model/by/hands/mesh","editor-hands-data","hands"); -->
       </div>
     </div>
   </div>
@@ -133,7 +205,7 @@ $(document).ready( function(){
     </div>
     <div id="editor-chests-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-chests">
       <div class="card-block">
-        List of Chests and Tops
+        <!-- getTabbedItems("/api/v1/model/by/chests/mesh","editor-chests-data","chests"); -->
       </div>
     </div>
   </div>
@@ -146,7 +218,7 @@ $(document).ready( function(){
     </div>
     <div id="editor-legs-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-legs">
       <div class="card-block">
-        List of Legs and Bottoms
+        <!-- getTabbedItems("/api/v1/model/by/legs/mesh","editor-legs-data","legs"); -->
       </div>
     </div>
   </div>
@@ -159,7 +231,7 @@ $(document).ready( function(){
     </div>
     <div id="editor-feet-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-feet">
       <div class="card-block">
-        List of Feet &amp; Footware
+        <!-- getTabbedItems("/api/v1/model/by/feet/mesh","editor-feet-data","feet"); -->
       </div>
     </div>
   </div>
@@ -167,12 +239,12 @@ $(document).ready( function(){
   <div class="panel card clearfix">
     <div class="card-header" role="tab" id="editor-base">
       <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-base-data" aria-expanded="false" aria-controls="editor-base-data"> Base </a>
+        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-bases-data" aria-expanded="false" aria-controls="editor-bases-data"> Bases </a>
       </h5>
     </div>
-    <div id="editor-base-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-base">
+    <div id="editor-bases-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-bases">
       <div class="card-block">
-        List of Figure Base &amp; Floor Models
+        <!-- getTabbedItems("/api/v1/model/by/base/mesh","editor-bases-data","base"); -->
       </div>
     </div>
   </div>

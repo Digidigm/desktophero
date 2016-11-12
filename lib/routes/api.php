@@ -294,6 +294,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                         "photo_render": S3 URL   //screen cap of the model from three.js
                         "photo_inspiration": S3 URL   //upload from the user if they had something they were trying to create
                         "photo_thumbnail": S3 URL   //smaller vesion of the screen cap
+                        "flag_chirality" : STRING // R, L, or N for the default chirality of the model right, left, not applicable
                         "flag_nsfw_sex": Bool,  //is the model naked or in an overtly sexually provacative pose
                         "flag_nsfw_violence": Bool,  //is the model gorey or horror-ish in a way that would scare kids (chest burster)
                         "flag_nsfw_other": Bool,  //is the model inappropriate for some other reason (obscene gesture, inappropraite racial stereotype, politically provockative)
@@ -346,6 +347,64 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $app->response->setBody($model_tags);
             }
         );
+        
+         $app->get(
+            '/model/by/:attachment/:type',
+            function ($attachment, $type) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/model/by/:attachment/:type
+                //Example:  GET http://hero.50.16.238.24.xip.io/api/v1/model/by/head/mesh
+                //Gets much of the data for a set of models (meshes, poses, or skeletons) by the bone groups it cares about and outputs JSON,
+                //so heads, hats, sunglasses, mousaches, bears are all --> head, even if they are different categories and sorts them by category
+
+                //TODO: make it so you get get your own private models and not other peoples
+                //TODO: make it so you don't get hidden models unless you're an admin
+
+                /*
+                    { "head" : {
+                        "hats" : [ {MODEL} , {MODEL}, {MODEL} ],
+                        "beards" : [ {MODEL} , {MODEL}, {MODEL} ],
+                        "glasses" : [ {MODEL} , {MODEL}, {MODEL} ],
+                        "faces" : [ {MODEL} , {MODEL}, {MODEL} ],
+                        "hair" : [ {MODEL} , {MODEL}, {MODEL} ]
+                        }
+                    }
+                    See model item above for details
+                */
+
+                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_category, photo_render, photo_thumbnail, date_created, date_updated, flag_chirality, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_attachment = ? AND flag_deleted is null ORDER BY model_category";
+                $type = filter_var($type, FILTER_SANITIZE_STRING);
+                $attachment = filter_var($attachment, FILTER_SANITIZE_STRING); 
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array($type,$attachment));
+
+                //to debug a query:
+                //print_r($stmt->debugDumpParams() );
+                
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $model_gallery = array();
+                
+                $model_gallery[$attachment] = $result;
+                $model_gallery = json_encode($model_gallery);
+                $app->response->setBody($model_gallery);
+
+
+                $presets = array();
+                foreach($result as $k => $v) {
+                    if ( ! isset( $presets[$v["model_attachment"]] )) {
+                        $presets[$v["model_attachment"]] = array();    
+                    }
+                    if ( ! isset( $presets[$v["model_attachment"]][$v['model_category']] )) {
+                        $presets[$v["model_attachment"]][$v['model_category']] = array();
+                    }
+                    $presets[$v["model_attachment"]][$v['model_category']][] = $v;
+                }
+                
+                $presets = json_encode($presets);
+                $app->response->setBody($presets);
+            }
+        );
+
         $app->get(
             '/model/:type/:category',
             function ($type, $category) use ($app,$pdo,$config,$session) {
@@ -1368,14 +1427,9 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 /*  { 
                         morph: {
-                            age: {
-                                [preset],[preset],[preset],[preset],[preset],[preset]
-                            },
-                            stature: {
-                                [preset],[preset],[preset],[preset],[preset],[preset]
-                            }
+                            age: [ [preset],[preset],[preset],[preset],[preset],[preset] ],
+                            stature: [ [preset],[preset],[preset],[preset],[preset],[preset] ],
                             ....
-
                         }
                     }                    
 
