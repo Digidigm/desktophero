@@ -4,3 +4,11 @@ THREE.SkinnedMesh.prototype.toJSON = function(){
 		name: this.name
 	};
 }
+
+THREE.Bone.prototype.rotateOnWorldAxis = function(axis, radians) {
+    var rotWorldMatrix = new THREE.Matrix4();
+    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+    rotWorldMatrix.multiply(this.matrix);
+    this.matrix = rotWorldMatrix;
+    this.rotation.setFromRotationMatrix(this.matrix);
+}
