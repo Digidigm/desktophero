@@ -290,6 +290,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                         "model_short_desc": STRING   //user provided description of the model
                         "model_category": TEXT (basically ENUM for parts of the models)
                         "model_type": TEXT (basically ENUM for types of models: skeleton, mesh, pose, etc)
+                        "model_url" : S3 URL //place where the actual model file is stored
                         "model_attachment": JSON (data about how to combine it with other models in the scene)
                         "photo_render": S3 URL   //screen cap of the model from three.js
                         "photo_inspiration": S3 URL   //upload from the user if they had something they were trying to create
@@ -371,7 +372,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                     See model item above for details
                 */
 
-                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_category, photo_render, photo_thumbnail, date_created, date_updated, flag_chirality, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_attachment = ? AND flag_deleted is null ORDER BY model_category";
+                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_category, model_url, photo_render, photo_thumbnail, date_created, date_updated, flag_chirality, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_attachment = ? AND flag_deleted is null ORDER BY model_category";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);
                 $attachment = filter_var($attachment, FILTER_SANITIZE_STRING); 
 
@@ -421,7 +422,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, photo_render, photo_thumbnail, date_created, date_updated, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_category = ? AND flag_deleted is null";
+                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_url, photo_render, photo_thumbnail, date_created, date_updated, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_category = ? AND flag_deleted is null";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);
                 $category = filter_var($category, FILTER_SANITIZE_STRING); 
 

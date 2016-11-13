@@ -8,6 +8,12 @@
 
 <script>
 
+var bodyMap = {};  //an object with a persistent rendering of the current model configuration as defined in the UI
+var modelMap = {};  //an object iwth a persistent list of the models available for each attachment / category
+modelMap.presets = {};  //object that contains the presets data
+modelMap.mids = {}; //object that sorts the models by their model id, duplicate of the data in the attachment/category object, just organized differently
+modelMap.tags = {}; //object that lists the model ids inside each tag id.  updated whenever a query is made against an empty tag
+
 //works for things in a flat list with the tag table name currently
 var getSimpleItems = function(url,target){
 	$.getJSON(url, function( tags ){
@@ -18,7 +24,33 @@ var getSimpleItems = function(url,target){
 		});
 
 		$("#"+target).html(slides);
+
 	});
+};
+
+var getModelsForTags = function(url, tid, cb) {
+	
+	//if the tag id isn't in the data model yet, then get it
+	if (! (tid in modelMap.tags) ) {
+		$.getJSON(url, function(tags){
+			var modelsForTags = [];
+		
+			$.each(tags, function(k,v){
+				modelsForTags.push(v.model_id);
+			});
+
+			modelMap.tags[tid] = modelsForTags;
+			
+		}).always(function(){
+			//once the model is full, execute the callback function requested and exit
+			if(cb) cb(tid);
+			return;
+		});			
+	} else {
+		//if we already have the tags, then just execute the callback funciton
+		if(cb) cb(tid);	
+	}
+	
 };
 
 //works for models
@@ -29,6 +61,7 @@ var getTabbedItems = function(url,target,key) {
 		
 		var tabs = "<ul class='nav nav-tabs' id='"+target+"-tabs'>";
 		var content = "<div class='tab-content clearfix'>";
+		modelMap[key] = data[key];  //add or reset the attachment key for the persistent model, eg "head"
 
 		$.each( data[key], function(k,v){
 			//make a new tab
@@ -39,7 +72,8 @@ var getTabbedItems = function(url,target,key) {
 
 			$.each( v, function(kk,vv){
 				//make a new slide
-				slides += "<div class='mini-select col-md-3' data-tag-id='" +vv.id+ "'> <img src='" +vv.photo_thumbnail+ "' alt='" + vv.model_name + "'><span class='label'>"+ vv.model_name +"</span></div>\n";
+				slides += "<div class='mini-select col-md-3' data-model-id='" +vv.id+ "'> <img src='" +vv.photo_thumbnail+ "' alt='" + vv.model_name + "'><span class='label'>"+ vv.model_name +"</span></div>\n";
+				modelMap.mids[vv.id] = vv;
 			});
 
 			content += panel += slides += "</div>";
@@ -65,6 +99,7 @@ var getPresets = function() {
 		
 		var tabs = "<ul class='nav nav-tabs' id='editor-presets-data-tabs'>";
 		var content = "<div class='tab-content clearfix'>";
+		modelMap.presets.morph = presets.morph;
 
 		$.each( presets.morph, function(k,v){
 			//make a new tab
@@ -129,7 +164,48 @@ $(document).ready( function(){
 	//GET ALL POSES
 	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
 
-	
+	//DO SOMETHING IF YOU CLICK ON A MODEL
+	$("#editor-accordion").on("click",".mini-select[data-model-id]", function(e){
+		var mid = $(this).data("model-id");
+		alert("You clicked model: " + mid );
+		//console.log( modelMap.mids[mid] );
+
+		$(this).toggleClass("ui-selected");
+
+		//TODO: call a function that affects the scene, add or remove the model from the figure
+		//TODO: call a function that updates the current bodyMap
+
+	});
+
+	//DO SOMETHING IF YOU CLICK A FILTER
+	$("#editor-accordion").on("click",".mini-select[data-tag-id]", function(e){
+
+		//Tag ID of the filter is recorded on the element
+		var tid = $(this).data("tag-id");
+		alert("You clicked to filter on: " + tid );
+
+		//Give it a nice UI decoration so you know you clicked it
+		$(this).toggleClass("ui-selected");
+
+		//GET ALL THE MODEL IDs WITH THAT TAG (if you've already done that call, this function will use the cached result)
+		var url = "/api/v1/model/tags/" + tid;
+		getModelsForTags(url,tid,function(){
+
+			//now that we have the list, toggle UI elements without this tag
+			//console.log(modelMap.tags[tid]);
+
+			//find all mini-select items in the UI then filter them down to ones that are not in the list from the modelMap.tags data model 
+			$(".mini-select[data-model-id]").filter( function(){
+				//if it's -1, it's not in the list of approved models to show and it should have it's visibility toggled
+				//remember the ids are stored as strings right now because they're properties not array indecies
+				return modelMap.tags[tid].indexOf( $(this).data('model-id').toString() ) == -1;
+				
+			}).toggleClass("hidden");
+		});
+	});
+
+
+
 });
 </script>
 
@@ -321,9 +397,13 @@ $(document).ready( function(){
 	#editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; margin-left: -5px; text-align: center; width: 100%;}
 	#editor-accordion .card .scroll {max-height: 200px; overflow: scroll; }
 	#editor-accordion .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
+	#editor-accordion .card .mini-select.hidden { display:none;}
 	#editor-accordion .card .mini-select:hover { background: #ccc; }
 	#editor-accordion .card-header { padding: 0.1rem 1.25rem; margin-bottom: 10px}
 	#editor-accordion .card-header h5 { margin: 0 !important;}
 	#editor-accordion .card-header a { display: block; padding: 0.1rem 1.25rem; margin: -0.1rem -1.25rem; border: none; outline: none;}
-
+	#editor-accordion .ui-selected {box-shadow: 0px 0px 5px #fff; }
+	#editor-accordion .ui-selected:after {
+		background: rgba(0, 0, 0, 0) url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjM2My4wMjVweCIgaGVpZ2h0PSIzNjMuMDI0cHgiIHZpZXdCb3g9IjAgMCAzNjMuMDI1IDM2My4wMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2My4wMjUgMzYzLjAyNDsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggc3R5bGU9ImZpbGw6IzAzMDMwMzsiIGQ9Ik0xODEuNTEyLDM2My4wMjRDODEuNDMsMzYzLjAyNCwwLDI4MS42MDEsMCwxODEuNTEzQzAsODEuNDI0LDgxLjQzLDAsMTgxLjUxMiwwDQoJCQkJYzEwMC4wODMsMCwxODEuNTEzLDgxLjQyNCwxODEuNTEzLDE4MS41MTNDMzYzLjAyNSwyODEuNjAxLDI4MS41OTUsMzYzLjAyNCwxODEuNTEyLDM2My4wMjR6IE0xODEuNTEyLDExLjcxDQoJCQkJQzg3Ljg4LDExLjcxLDExLjcxLDg3Ljg4NiwxMS43MSwxODEuNTEzczc2LjE3LDE2OS44MDIsMTY5LjgwMiwxNjkuODAyYzkzLjYzMywwLDE2OS44MDMtNzYuMTc1LDE2OS44MDMtMTY5LjgwMg0KCQkJCVMyNzUuMTQ1LDExLjcxLDE4MS41MTIsMTEuNzF6Ii8+DQoJCTwvZz4NCgk8L2c+DQoJPGc+DQoJCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAzMDM7IiBwb2ludHM9IjE0Ny45NTcsMjU4LjkzNSA4My4wNjgsMTk0LjA0NiA5MS4zNDgsMTg1Ljc2NyAxNDcuOTU3LDI0Mi4zNzUgMjcxLjE3MSwxMTkuMTY2IA0KCQkJMjc5LjQ1MSwxMjcuNDQ1IAkJIi8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat scroll 0 0 / contain ;content: "";display: block;height: 50%;left: 25%;position: absolute;top: 15%;width: 50%;}
+	
 </style>
