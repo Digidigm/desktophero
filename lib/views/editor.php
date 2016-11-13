@@ -126,7 +126,8 @@ $(document).ready( function(){
 	//GET ALL FEET and FOOTWare BODY MESHES
 	getTabbedItems("/api/v1/model/by/base/mesh","editor-bases-data","base");
 
-
+	//GET ALL POSES
+	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
 
 	
 });
