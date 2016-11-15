@@ -209,149 +209,44 @@ $(document).ready( function(){
 });
 </script>
 
-
-
 <div id="editor-accordion" class="col-md-4" role="tablist" aria-multiselectable="true">
-
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-genre">
-      <h5>
-        <a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-genre-data" aria-expanded="true" aria-controls="editor-genre-data"> Genre Filter </a>
-      </h5>
-    </div>
-    <div id="editor-genre-data" class="collapse in scroll" role="tabpanel" aria-labelledby="editor-genre">
-        <!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#editor-genre-data"); -->
-    </div>
-  </div>
-
   <div class="panel card clearfix">
     <div class="card-header" role="tab" id="editor-presets">
       <h5>
-        <a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-presets-data" aria-expanded="true" aria-controls="editor-presets-data"> Figure Characteristics </a>
+        <a data-toggle="collapse" href="#editor-presets-data" aria-expanded="true" aria-controls="editor-presets-data"> Figure Characteristics </a>
       </h5>
     </div>
     <div id="editor-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-presets">
         <!--Filled by AJAX: getPresets(); -->
     </div>
   </div>
-
   <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-heads">
+    <div class="card-header" role="tab" id="main">
       <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-head-data" aria-expanded="false" aria-controls="editor-head-data"> Heads </a>
+        <a data-toggle="collapse" href="#main" aria-expanded="true" aria-controls="main-data"> Main </a>
       </h5>
     </div>
-    <div id="editor-head-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-head">
-      <div class="card-block">
-         <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#editor-head-data","head"); -->
-      </div>
-    </div>
-  </div>
-  
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-arms">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-arms-data" aria-expanded="false" aria-controls="editor-arms-data"> Arms </a>
-      </h5>
-    </div>
-    <div id="editor-arms-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-arms">
-      <div class="card-block">
-        <!-- getTabbedItems("/api/v1/model/by/arms/mesh","editor-arms-data","arms"); -->
-      </div>
-    </div>
-  </div>
 
-   <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-hands">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-hands-data" aria-expanded="false" aria-controls="editor-hands-data"> Hands &amp; Items </a>
-      </h5>
+    <div id="main-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-presets">
+    	<ul class="nav nav-tabs" id="main-data-tabs">
+    		<li role="presentation" class="nav-item">
+    			<a class="nav-link active" href="#panel-meshes" data-toggle="tab" aria-expanded="true">Meshes</a>
+    		</li>
+    		<li role="presentation" class="nav-item">
+    			<a class="nav-link active" href="#panel-meshes" data-toggle="tab" aria-expanded="true">Poses</a>
+    		</li>
+    		<li role="presentation" class="nav-item">
+    			<a class="nav-link active" href="#panel-meshes" data-toggle="tab" aria-expanded="true">Bone Groups</a>
+    		</li>
+    		<li role="presentation" class="nav-item">
+    			<a class="nav-link active" href="#panel-meshes" data-toggle="tab" aria-expanded="true">Settings</a>
+    		</li>
+    	</ul>
+    	<div class="tab-content clearfix">
+    		<div class = "tab-pane fade active in" id="panel-meshes"
     </div>
-    <div id="editor-hands-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-hands">
-      <div class="card-block">
-        <!-- getTabbedItems("/api/v1/model/by/hands/mesh","editor-hands-data","hands"); -->
-      </div>
-    </div>
-  </div>
 
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-chests">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-chests-data" aria-expanded="false" aria-controls="editor-chests-data"> Upper Body </a>
-      </h5>
-    </div>
-    <div id="editor-chests-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-chests">
-      <div class="card-block">
-        <!-- getTabbedItems("/api/v1/model/by/chests/mesh","editor-chests-data","chests"); -->
-      </div>
-    </div>
   </div>
-
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-legs">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-legs-data" aria-expanded="false" aria-controls="editor-legs-data"> Lower Body </a>
-      </h5>
-    </div>
-    <div id="editor-legs-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-legs">
-      <div class="card-block">
-        <!-- getTabbedItems("/api/v1/model/by/legs/mesh","editor-legs-data","legs"); -->
-      </div>
-    </div>
-  </div>
-
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-feet">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-feet-data" aria-expanded="false" aria-controls="editor-feet-data"> Feet & Footware </a>
-      </h5>
-    </div>
-    <div id="editor-feet-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-feet">
-      <div class="card-block">
-        <!-- getTabbedItems("/api/v1/model/by/feet/mesh","editor-feet-data","feet"); -->
-      </div>
-    </div>
-  </div>
-
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-base">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-bases-data" aria-expanded="false" aria-controls="editor-bases-data"> Bases </a>
-      </h5>
-    </div>
-    <div id="editor-bases-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-bases">
-      <div class="card-block">
-        <!-- getTabbedItems("/api/v1/model/by/base/mesh","editor-bases-data","base"); -->
-      </div>
-    </div>
-  </div>
-
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-poses">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-poses-data" aria-expanded="false" aria-controls="editor-poses-data"> Poses </a>
-      </h5>
-    </div>
-    <div id="editor-poses-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-poses">
-      <div class="card-block">
-        List of Figure Poses
-      </div>
-    </div>
-  </div>
-
-  <div class="panel card clearfix">
-    <div class="card-header" role="tab" id="editor-print">
-      <h5>
-        <a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-print-data" aria-expanded="false" aria-controls="editor-print-data"> Size, Print, Material </a>
-      </h5>
-    </div>
-    <div id="editor-print-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-print">
-      <div class="card-block">
-        Size, Print, Material
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
@@ -394,6 +289,7 @@ $(document).ready( function(){
 
 	#editor-accordion { top: 15%; right:  0; position: absolute; }
 	#editor-accordion .card {background-color:  #7B7B73; }
+
 	#editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; margin-left: -5px; text-align: center; width: 100%;}
 	#editor-accordion .card .scroll {max-height: 200px; overflow: scroll; }
 	#editor-accordion .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
