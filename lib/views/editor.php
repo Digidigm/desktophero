@@ -5,6 +5,8 @@
   </div>
 </div>
 
+<!-- TODO: figure out why Landio insists on this element being on the page.  Apparently it's baked into the minified JS -->
+<div id="demo_video"></div>
 
 <script>
 
@@ -524,10 +526,10 @@ $(document).ready( function(){
 						<div class="panel card clearfix">
 							<div class="card-header" role="tab" id="body-genre">
 								<h5>
-									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-genre-data" aria-expanded="true" aria-controls="body-genre-data"> Genre </a>
+									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-genre-data" aria-expanded="false" aria-controls="body-genre-data"> Genre </a>
 								</h5>
 							</div>
-							<div id="body-genre-data" class="collapse in scroll" role="tabpanel" aria-labelledby="body-genre">
+							<div id="body-genre-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-genre">
 								<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#body-genre-data"); -->
 							</div>
 						</div>
@@ -535,7 +537,7 @@ $(document).ready( function(){
 						<div class="panel card clearfix">
 							<div class="card-header" role="tab" id="body-options">
 								<h5>
-									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-options-data" aria-expanded="true" aria-controls="body-options-data"> Options </a>
+									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-options-data" aria-expanded="false" aria-controls="body-options-data"> Options </a>
 								</h5>
 							</div>
 							<div id="body-options-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-options">
@@ -605,7 +607,7 @@ $(document).ready( function(){
 				<a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-genre-data" aria-expanded="true" aria-controls="editor-genre-data"> Genre Filter </a>
 			</h5>
 		</div>
-		<div id="editor-genre-data" class="collapse in scroll" role="tabpanel" aria-labelledby="editor-genre">
+		<div id="editor-genre-data" class="collapse active scroll" role="tabpanel" aria-labelledby="editor-genre">
 			<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#editor-genre-data"); -->
 		</div>
 	</div>
@@ -613,7 +615,7 @@ $(document).ready( function(){
 	<div class="panel card clearfix">
 		<div class="card-header" role="tab" id="editor-presets">
 			<h5>
-				<a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-presets-data" aria-expanded="true" aria-controls="editor-presets-data"> Figure Characteristics </a>
+				<a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-presets-data" aria-expanded="false" aria-controls="editor-presets-data"> Figure Characteristics </a>
 			</h5>
 		</div>
 		<div id="editor-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-presets">
@@ -785,7 +787,7 @@ $(document).ready( function(){
 	#body-accordion-container ul.nav, #editor-accordion ul.nav {white-space: nowrap; overflow-x: auto;}
 	#body-accordion-container ul.nav li, #editor-accordion ul.nav li {display: inline-block; float: none;}
 	#body-accordion-container .card, #editor-accordion .card {background-color:  #7B7B73; }
-	#body-accordion-container .card .label, #editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; margin-left: -5px; text-align: center; width: 100%;}
+	#body-accordion-container .card .label, #editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
 	#body-accordion-container .card .scroll, #editor-accordion .card .scroll {max-height: 200px; overflow: scroll; }
 	#body-accordion-container .card .mini-select, #editor-accordion .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
 	#body-accordion-container .card .mini-select .label, #editor-accordion .card .mini-select .label {white-space: normal;}

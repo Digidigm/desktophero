@@ -204,14 +204,14 @@
   }
 
   function init() {
-    onScrollAnimations();
-    inputPlaceholders();
+    //onScrollAnimations();
+    //inputPlaceholders();
     navMobileCollapse();
     navSearch();
-    htmlVideo();
+    //htmlVideo();
     scrollToTop();
-    donutChart();
-    videoModal();
+    //donutChart();
+    //videoModal();
   }
 
   init();

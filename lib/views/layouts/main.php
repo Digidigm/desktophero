@@ -30,12 +30,13 @@
         <meta name="msapplication-config" content="/img/favicon/browserconfig.xml">
         <meta name="theme-color" content="#663fb5">
         <link rel="stylesheet" href="/css/animate.min.css">
+
+        <!-- TODO: Build landio with the alpha6+ version of bootstrap so you don't have to include both -->
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
         <link rel="stylesheet" href="/css/landio.css">
 
         
         <script src="/vendor/jquery/jquery.min.js"></script>
-        
-
         <link href="/css/style.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -201,6 +202,7 @@
           </div>
         </footer>
 
+        <!--
         <script src="/vendor/knockoutjs/knockout-3.4.0.js"> </script>
         <script>
             /* object: "ko" provided by knockout script natively */
@@ -226,6 +228,7 @@
             ko.components.register('claims_form', { require: 'modules/claims_form'});
             ko.applyBindings();
         </script>
+        -->
 
         <!--3D Related Scripts -->
         <!--script src="/vendor/threejs/build/three.js"></script>
@@ -238,12 +241,23 @@
         <script src="/vendor/threejs/examples/js/Detector.js"></script>
         <script src="/vendor/threejs/examples/js/libs/stats.min.js"></script-->
 
-        <!--Feature Specific Scripts -->
-        <script src="/js/login.js"></script>
+        
 
         <!--Theme Scripts -->
-        <script src="/js/landio.min.js"></script>
+        <!--TODO: Update bootstrap helper scripts with the rest of the Alpha6+ code -->
+        <script src="/js/bootstrap/util.js"></script>
         <script src="/js/bootstrap/carousel.js"></script>
+        <script src="/js/bootstrap/collapse.js"></script>
+        <script src="/js/bootstrap/dropdown.js"></script>
+        <script src="/js/bootstrap/modal.js"></script>
+        <script src="/js/bootstrap/carousel.js"></script>
+
+        <!-- TODO: Go through this script and pull out all the things we're not using -->
+        <script src="/js/landio.js"></script>
+
+        <!--Feature Specific Scripts -->
+        <script src="/js/login.js"></script>
+        
 
     </body>
 </html>
