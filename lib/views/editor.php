@@ -522,68 +522,79 @@ $(document).ready( function(){
 					</div>
 				</div>
 				<div class="tab-pane" id="tab4primary">
-					<div id="body-accordion-settings" role="tablist" aria-multiselectable="true">
+					<div id="settings-accordion" role="tablist" aria-multiselectable="true">
 						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-genre">
+							<div class="card-header" role="tab" id="settings-genre">
 								<h5>
-									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-genre-data" aria-expanded="false" aria-controls="body-genre-data"> Genre </a>
+									<a data-toggle="collapse" data-parent="#settings-accordion-settings" href="#settings-genre-data" aria-expanded="false" aria-controls="settings-genre-data"> Genre </a>
 								</h5>
 							</div>
-							<div id="body-genre-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-genre">
-								<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#body-genre-data"); -->
+							<div id="settings-genre-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-genre">
+								<div class="card-block">
+									This is Genre
+									<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#settings-genre-data"); -->
+								</div>
 							</div>
 						</div>
 
 						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-options">
+							<div class="card-header" role="tab" id="settings-options">
 								<h5>
-									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-options-data" aria-expanded="false" aria-controls="body-options-data"> Options </a>
+									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-options-data" aria-expanded="false" aria-controls="settings-options-data"> Options </a>
 								</h5>
 							</div>
-							<div id="body-options-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-options">
-								<ul>
-									<li>Left Handed</li>
-									<li>Right Handed</li>
-									<li>Ambidexterous</li>
-									<li>Male</li>
-									<li>Female</li>
-									<li>Androgenous</li>
-									<li>Thing</li>
-									<li>Otherthing</li>
-								</ul>
-								<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#body-genre-data"); -->
+							<div id="settings-options-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-options">
+								<div class="card-block">
+									<ul>
+										<li>Left Handed</li>
+										<li>Right Handed</li>
+										<li>Ambidexterous</li>
+										<li>Male</li>
+										<li>Female</li>
+										<li>Androgenous</li>
+										<li>Thing</li>
+										<li>Otherthing</li>
+									</ul>
+									<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#settings-genre-data"); -->
+								</div>
 							</div>
 						</div>
 
 						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-characteristics">
+							<div class="card-header" role="tab" id="settings-characteristics">
 								<h5>
-									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-characteristics-data" aria-expanded="true" aria-controls="body-characteristics-data"> Figure Characteristics </a>
+									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-characteristics-data" aria-expanded="true" aria-controls="settings-characteristics-data"> Figure Characteristics </a>
 								</h5>
 							</div>
-							<div id="body-characteristics-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-characteristics">
-								<!--Filled by AJAX: getcharacteristics(); -->
+							<div id="settings-characteristics-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-characteristics">
+								<div class="card-block">
+									This is Figure Characteristics
+									<!--Filled by AJAX: getcharacteristics(); -->
+								</div>
 							</div>
 						</div>
 
 						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-presets">
+							<div class="card-header" role="tab" id="settings-presets">
 								<h5>
-									<a data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-presets-data" aria-expanded="true" aria-controls="body-presets-data"> Presets </a>
+									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-presets-data" aria-expanded="true" aria-controls="settings-presets-data"> Presets </a>
 								</h5>
 							</div>
-							<div id="body-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-presets">
-								<!--Filled by AJAX: getPresets(); -->
+							<div id="settings-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-presets">
+								<div class="card-block">
+									This is Presets
+									<!--Filled by AJAX: getPresets(); -->
+								</div>
 							</div>
 						</div>
 
 						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-print">
+							<div class="card-header" role="tab" id="settings-print">
 								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion-settings" href="#body-print-data" aria-expanded="false" aria-controls="body-print-data"> Size, Print, Material </a>
+									<a class="collapsed" data-toggle="collapse" data-parent="#settings-accordion" href="#settings-print-data" aria-expanded="false" aria-controls="settings-print-data"> Size, Print, Material </a>
 								</h5>
 							</div>
-							<div id="body-print-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-print">
+							<div id="settings-print-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-print">
 								<div class="card-block">
 									Size, Print, Material
 								</div>
@@ -780,11 +791,10 @@ $(document).ready( function(){
 	h5 {font-weight: normal;}
 	.card, .card-header:first-child, .nav-tabs .nav-link  {border: none; border-radius: 0;}
 	
-
 	#body-accordion-container { top: 15%; left:  1%; position: absolute; padding: 0; }
 	#editor-accordion { top: 15%; right:  1%; position: absolute; }
-	#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none;}
-	#body-accordion-container ul.nav, #editor-accordion ul.nav {white-space: nowrap; overflow-x: auto;}
+	#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000;}
+	#body-accordion-container ul.nav, #editor-accordion ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
 	#body-accordion-container ul.nav li, #editor-accordion ul.nav li {display: inline-block; float: none;}
 	#body-accordion-container .card, #editor-accordion .card {background-color:  #7B7B73; }
 	#body-accordion-container .card .label, #editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
