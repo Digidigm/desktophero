@@ -37,7 +37,7 @@ function SceneView(model){
 SceneView.prototype = {
 	init: function(){
 		this.scene = new THREE.Scene();
-		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .001, 500);
+		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
 		this.renderer = new THREE.WebGLRenderer({antialias:true});
 		
 		this.renderer.setClearColor(0x000033);
@@ -45,7 +45,7 @@ SceneView.prototype = {
 		this.renderer.shadowMapEnabled= true;
 		this.renderer.shadowMapSoft = true;
 
-		this.renderer.shadowMapType = THREE.PCFSoftShadowMap
+		this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
 		
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		this.controls.addEventListener('change', this.render.bind(this));
@@ -61,11 +61,9 @@ SceneView.prototype = {
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 
-		this.model.materials["metallic"] = Materials.createReflectiveMaterial(
-				new THREE.Color(.75, .75, .7), .4, this.cubeMap);
-		this.model.materials["clay"] = Materials.createReflectiveMaterial(
-				new THREE.Color(.5, .4, .5), 0.02, this.cubeMap);
-		this.model.materials["default"] = this.model.materials["metallic"]
+		this.model.materials.metallic = Materials.createReflectiveMaterial( new THREE.Color(0.75, 0.75, 0.7), 0.4, this.cubeMap);
+		this.model.materials.clay = Materials.createReflectiveMaterial( 	new THREE.Color(0.5, 0.4, 0.5), 0.02,  this.cubeMap);
+		this.model.materials.default = this.model.materials.metallic;
 
 		this.initLights();
 	},
@@ -78,7 +76,7 @@ SceneView.prototype = {
 		pointLight.position.z = 20;
 		pointLight.position.x = -5;
 		pointLight.castShadow = true;
-		pointLight.intensity = .75;
+		pointLight.intensity = 0.75;
 		this.scene.add(pointLight);
 
 		var pointLight2 = new THREE.SpotLight(0xffffdd);
@@ -152,7 +150,7 @@ SceneView.prototype = {
 				continue;
 			}
 
-			var sphere = new THREE.Mesh(new THREE.SphereGeometry(.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
+			var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
 			sphere.boneGroupName = boneGroupName;
 			sphere.boneIndex = i;
 			this.boneHandles.push(sphere);
@@ -184,7 +182,7 @@ SceneView.prototype = {
 	}, 
 
 	startBoneRotate: function(){
-		if (this.selectedBone == null){
+		if (this.selectedBone === null){
 			return;
 		}
 
@@ -222,7 +220,7 @@ SceneView.prototype = {
 		console.log("Rotation axis set to " + this.rotationAxis + ".");
 	},
 
-	getClickVector(mouseX, mouseY, camera){
+	getClickVector: function(mouseX, mouseY, camera){
 		var vector = new THREE.Vector3(
 			( event.clientX / window.innerWidth ) * 2 - 1,
 		  - ( event.clientY / window.innerHeight ) * 2 + 1,
@@ -257,13 +255,13 @@ SceneView.prototype = {
 			if (bone.name.startsWith("#")){
 				continue;
 			}
-			if (closestBone == null || intersections[i].distance < closestDistance){
+			if (closestBone === null || intersections[i].distance < closestDistance){
 				closestBone = bone;
 				closestDistance = intersections[i].distance;
 			}
 		}
 		this.selectedBone = closestBone;
-		if (closestBone != null){
+		if (closestBone !== null){
 			console.log("Clicked on " + this.selectedBone.name);
 		}
 	},
@@ -272,9 +270,10 @@ SceneView.prototype = {
 		console.log("Middle click");
 	},
 
-	onMouseMove(mouseX, mouseY){
-		this.mouseX = event.clientX;
-		this.mouseY = event.clientY;
+	onMouseMove: function(mouseX, mouseY){
+		//TODO: These were generating thousands of errors so i commented them out
+		//this.mouseX = event.clientX;
+		//this.mouseY = event.clientY;
 
 		if (this.rotateMode){
 			var factor = 500.0;
@@ -316,7 +315,7 @@ SceneView.prototype = {
 function onMouseDown(event){
 	event.preventDefault();
 
-	if (event.button == 0){
+	if (event.button === 0){
 		view.onLeftClick(event.clientX, event.clientY);
 	} else if (event.button == 1){
 		view.onMiddleClick(event.clientX, event.clientY);
@@ -326,7 +325,8 @@ function onMouseDown(event){
 }
 
 function onMouseMove(event){
-	view.onMouseMove(event.clientX, event.clientY);
+	//TODO: this was generating errors and was commented out
+	//view.onMouseMove(event.clientX, event.clientY);
 }
 
 function onKeyDown(event){
@@ -338,7 +338,7 @@ function onKeyDown(event){
       keynum = event.which;
     }
 
-    var letter = String.fromCharCode(keynum)
+    var letter = String.fromCharCode(keynum);
 
     if (letter == 'Q' || letter == 'q'){
     	view.toggleBoneHandlesVisible();
