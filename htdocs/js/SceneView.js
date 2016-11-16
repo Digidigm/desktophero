@@ -220,7 +220,7 @@ SceneView.prototype = {
 		console.log("Rotation axis set to " + this.rotationAxis + ".");
 	},
 
-	getClickVector: function(mouseX, mouseY, camera){
+	getClickVector: function(mouseX, mouseY, camera, event){
 		var vector = new THREE.Vector3(
 			( event.clientX / window.innerWidth ) * 2 - 1,
 		  - ( event.clientY / window.innerHeight ) * 2 + 1,
@@ -230,20 +230,20 @@ SceneView.prototype = {
 		return vector;
 	},
 
-	onLeftClick: function(mouseX, mouseY){
+	onLeftClick: function(mouseX, mouseY, event){
 		if (this.rotateMode){
 			this.finalizeBoneRotate();
 			return;
 		} 
 	},
 
-	onRightClick: function(mouseX, mouseY){
+	onRightClick: function(mouseX, mouseY, event){
 		if (this.rotateMode){
 			this.cancelBoneRotate();
 			return;
 		}
 
-		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
+		var clickVector = this.getClickVector(mouseX, mouseY, this.camera, event);
 		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
 
 		var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
@@ -266,14 +266,14 @@ SceneView.prototype = {
 		}
 	},
 
-	onMiddleClick: function(mouseX, mouseY){
+	onMiddleClick: function(mouseX, mouseY, event){
 		console.log("Middle click");
 	},
 
-	onMouseMove: function(mouseX, mouseY){
+	onMouseMove: function(event){
 		//TODO: These were generating thousands of errors so i commented them out
-		//this.mouseX = event.clientX;
-		//this.mouseY = event.clientY;
+		this.mouseX = event.clientX;
+		this.mouseY = event.clientY;
 
 		if (this.rotateMode){
 			var factor = 500.0;
@@ -316,11 +316,11 @@ function onMouseDown(event){
 	event.preventDefault();
 
 	if (event.button === 0){
-		view.onLeftClick(event.clientX, event.clientY);
+		view.onLeftClick(event.clientX, event.clientY, event);
 	} else if (event.button == 1){
-		view.onMiddleClick(event.clientX, event.clientY);
+		view.onMiddleClick(event.clientX, event.clientY, event);
 	} else if (event.button == 2){
-		view.onRightClick(event.clientX, event.clientY);
+		view.onRightClick(event.clientX, event.clientY, event);
 	}
 }
 

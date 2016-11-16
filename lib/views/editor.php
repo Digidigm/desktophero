@@ -5,8 +5,6 @@
   </div>
 </div>
 
-<!-- TODO: figure out why Landio insists on this element being on the page.  Apparently it's baked into the minified JS -->
-<div id="demo_video"></div>
 
 <script>
 
@@ -751,6 +749,12 @@ $(document).ready( function(){
 		</div>
 	</div>
 </div>
+
+<footer class="footer">
+  	<div class="container">
+    	<span class="text-muted">Place sticky footer content here.</span>
+  	</div>
+</footer>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
 <script src="/vendor/threejs/build/three.js"></script>
