@@ -53,14 +53,14 @@
               <!-- TODO: Change LOGO to Desktop Hero -->
               <span class="icon-logo"></span>
             </a>
-            <a class="navbar-toggler hidden-md-up pull-right" data-toggle="collapse" href="#collapsingNavbar" aria-expanded="false" aria-controls="collapsingNavbar">
+            <a class="navbar-toggler hidden-md-up float-right" data-toggle="collapse" href="#collapsingNavbar" aria-expanded="false" aria-controls="collapsingNavbar">
             &#9776;
           </a>
-            <a class="navbar-toggler navbar-toggler-custom hidden-md-up pull-right" data-toggle="collapse" href="#collapsingMobileUser" aria-expanded="false" aria-controls="collapsingMobileUser">
+            <a class="navbar-toggler navbar-toggler-custom hidden-md-up float-right" data-toggle="collapse" href="#collapsingMobileUser" aria-expanded="false" aria-controls="collapsingMobileUser">
               <span class="icon-user"></span>
             </a>
             <div id="collapsingNavbar" class="collapse navbar-toggleable-custom" role="tabpanel" aria-labelledby="collapsingNavbar">
-              <ul class="nav navbar-nav pull-right">
+              <ul class="nav navbar-nav float-right">
                 <li class="nav-item nav-item-toggable">
                   <a class="nav-link" href="/editor/">Make Your Hero</a>
                 </li>
@@ -109,7 +109,7 @@
                     <a href="#" class="dropdown-item text-uppercase">View favorite models</a>
                       <a href="#" class="dropdown-item text-uppercase">Manage my models</a>
                       <a href="#" class="dropdown-item text-uppercase text-muted">Log out</a>
-                      <a href="#" class="btn-circle has-gradient pull-right m-b">
+                      <a href="#" class="btn-circle has-gradient float-right m-b">
                         <span class="sr-only">Edit</span>
                         <span class="icon-edit"></span>
                       </a>
@@ -130,7 +130,7 @@
               <a href="#" class="dropdown-item text-uppercase">View favorite models</a>
               <a href="#" class="dropdown-item text-uppercase">Manage my models</a>
               <a href="#" class="dropdown-item text-uppercase text-muted">Log out</a>
-              <a href="#" class="btn-circle has-gradient pull-right m-b">
+              <a href="#" class="btn-circle has-gradient float-right m-b">
                 <span class="sr-only">Edit</span>
                 <span class="icon-edit"></span>
               </a>

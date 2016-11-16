@@ -238,6 +238,7 @@ SceneView.prototype = {
 	},
 
 	onRightClick: function(mouseX, mouseY, event){
+		
 		if (this.rotateMode){
 			this.cancelBoneRotate();
 			return;
@@ -271,7 +272,6 @@ SceneView.prototype = {
 	},
 
 	onMouseMove: function(event){
-		//TODO: These were generating thousands of errors so i commented them out
 		this.mouseX = event.clientX;
 		this.mouseY = event.clientY;
 
@@ -313,7 +313,21 @@ SceneView.prototype = {
 };
 
 function onMouseDown(event){
-	event.preventDefault();
+
+	//make it so i can still pull up the JS console by using shift-right-click
+	//make it so you can click on UI
+	//TODO: Test this in multiple browsers
+	var target = event.originalEvent || event.originalTarget;
+	if (event.shiftKey || ! $(target.srcElement || target.originalTarget).is('canvas') ) {
+
+		//if you hold down shift or cick on anything other than the canvas do the normal thing
+		console.log("don't prevent me");
+
+	} else {
+
+		//if you're holding down shift or you click on a canvas element, don't do the normal thin
+		event.preventDefault();
+	}
 
 	if (event.button === 0){
 		view.onLeftClick(event.clientX, event.clientY, event);
@@ -330,7 +344,15 @@ function onMouseMove(event){
 }
 
 function onKeyDown(event){
-	var keynum;
+
+	//check to see if you're typing in a input or form field, if so skip this event
+	var target = event.target;
+	if ( $(target).is('input') || $(target).is('textarea') ) {
+		//continue bubling up the event chain, but don't do this method
+		return true;
+	}
+
+	var keynum;	
 
     if(window.event) { // IE                    
       keynum = event.keyCode;

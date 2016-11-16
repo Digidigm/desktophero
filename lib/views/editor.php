@@ -13,6 +13,141 @@ var modelMap = {};  //an object iwth a persistent list of the models available f
 modelMap.presets = {};  //object that contains the presets data
 modelMap.mids = {}; //object that sorts the models by their model id, duplicate of the data in the attachment/category object, just organized differently
 modelMap.tags = {}; //object that lists the model ids inside each tag id.  updated whenever a query is made against an empty tag
+figure = {};       //object that will have all our figure modification methods in it
+figure.id = null;  //all the defaults
+figure.figure_name = "";
+figure.figure_data = "";
+figure.figure_story = "";
+figure.figure_description = "";
+figure.figure_automatic_description = "";
+figure.photo_render = "";
+figure.photo_inspiration = "";
+figure.photo_thumbnail = "";
+figure.flag_nsfw_sex = 0;
+figure.flag_nsfw_violence = 0;
+figure.flag_nsfw_other = 0;
+figure.flag_deleted = 0;
+figure.flag_hidden = 1;
+figure.flag_featured = 0;
+figure.flag_private = 1;
+figure.flag_date_created = Math.floor(Date.now() / 1000);
+figure.flag_date_updated = Math.floor(Date.now() / 1000);
+figure.count_downloads = 0;
+figure.count_views = 0;
+figure.editable = ["figure_name","figure_data","figure_story","figure_description","figure_automatic_description","photo_thumbnail","photo_inspiration","photo_render","flag_nsfw_sex","flag_nsfw_violence","flag_nsfw_other","flag_private","flag_featured","flag_hidden","flag_deleted"]; //this isn't secure, it's convenient.  security is handled serverside
+
+user = {};			//object that will have the (untrusted) user information in it
+
+//SETUP THE FIGURE METHODS
+figure.id = <?php echo $figure_id; ?>;
+user.id = <?php echo $user_id; ?>;
+
+var uilog = function(msg) {
+	var el = $("#uiconsole");
+	el.val ( el.val() + "\n" + msg);
+	console.log(msg);
+};
+var clearuilog = function() {
+	var el = $("#uiconsole");
+	el.val("");
+};
+
+figure.create = function(){
+
+	//POST a new model to get an ID
+	$.ajax({
+		type: "POST",
+		url: '/api/v1/figure',
+		data: {},
+		success: function(data) {
+			//Set the new ID to the returned figureID
+			figure.id = data.id;
+
+			//reset the UI to default values
+			figure.refreshUI();
+		},
+		async: false,
+		dataType: "json"});
+	
+};
+figure.get = function(){
+
+	//GET an existing model
+	$.ajax({
+		type: "GET",
+		url: "/api/v1/figure/"+figure.id,
+		success: function(data) {
+
+			//go through each field in the editable list and stash the data in our figure object
+			for (var i in figure.editable) {
+				k = figure.editable[i];
+				figure[k] = data[k];
+			}
+			//make sure the UI matches the truth in the figure object
+			uilog("Figure Loaded");
+			figure.refreshUI();
+		},
+		async: false,
+		dataType: "json"
+	});
+};
+figure.update = function(){
+	
+	//PUT to update an existing model will new data from the figure object
+	//Filter the things out of figure that we don't want to send to the server
+	var out = {};
+	for (var i in figure){
+		if (figure.editable.indexOf(i) !== -1 ) {
+			out[i] = figure[i];
+		}
+	}
+
+	$.ajax({
+		type: "PUT",
+		headers: {"X-HTTP-Method-Override": "PUT"},
+		url: '/api/v1/figure/' + figure.id,
+		contentType: "x-www-form-urlencoded",
+		data: out,
+		success: function(data) {
+			uilog("Figure Saved.");
+		},
+		async: false,
+		dataType: "json"});
+
+};
+figure.delete = function(){
+
+};
+figure.refreshUI = function(){
+
+	//all text and text areas
+	$("[data-bind]").each( function(i){
+		var key = $(this).data('bind');
+		$(this).val( figure[key] );
+	});
+
+	//TODO Make sure FigureSetup panel is updated
+	//TODO Make sure library panel is updated
+	
+};
+
+//Check to see if we are editing a model or creating a new one
+if (figure.id) {
+
+	uilog("Geting your figure!");
+	//TODO: create load model process
+	figure.get();
+	//Load it into the canvas
+	uilog("Editing Figure ID:" + figure.id);
+
+} else {
+
+	uilog("Creating new figure for you!");
+	figure.create();
+	uilog("New Figure ID:" + figure.id);
+	
+}
+
 
 //works for things in a flat list with the tag table name currently
 var getSimpleItems = function(url,target){
@@ -130,9 +265,19 @@ var getPresets = function() {
 	});
 };
 
+
+
 $(document).ready( function(){
 	//keep it all using the REST apis rather than a combination of internal and external functions
 	//TODO: turn these into knockout modules if it makes sense
+
+	//Create a running narrative of what's happening for users in the UI console
+	clearuilog();
+	uilog( "User ID is: " + user.id);
+	uilog( "Figure ID is: " + figure.id);
+
+	//now tha all the HTML is present, make sure to refresh the UI
+	figure.refreshUI();
 
 	//GET ALL GENRE TAGS
 	getSimpleItems("/api/v1/tags/by/genre","editor-genre-data");
@@ -204,12 +349,18 @@ $(document).ready( function(){
 		});
 	});
 
-
+	//DO SOMETHING IF YOU TYPE IN A FIELD
+	//This just real time saves what you're typing into the object
+	$("[data-bind]").on("keyup", function(){
+		key = $(this).data("bind");
+		value = $(this).val();
+		figure[key] = value;
+	});
 
 });
 </script>
 
-<div id="body-accordion-container" class="col-md-2">
+<div id="body-accordion-container" class="col-md-3">
 	<h2 class="text-white"> Figure Setup </h2>
 	<div class="panel with-nav-tabs panel-primary">
 		<div class="panel-heading">
@@ -587,6 +738,29 @@ $(document).ready( function(){
 						</div>
 
 						<div class="panel card clearfix">
+							<div class="card-header" role="tab" id="settings-story">
+								<h5>
+									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-story-data" aria-expanded="true" aria-controls="settings-story-data"> Story </a>
+								</h5>
+							</div>
+							<div id="settings-story-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-story">
+								<div class="card-block">
+									<label>Describe Your Character</label>
+									<textarea name="figure_description" data-object="figure" data-bind="figure_description"></textarea>
+
+									<label>Tell Their Story</label>
+									<textarea name="figure_story" data-object="figure" data-bind="figure_story"></textarea>
+									
+									<label>Inspiration Photo</label>
+									<!-- Key is the file's name on S3 and will be filled in with JS -->
+                					<input type="hidden" name="key" value="">
+                					<input type="file" name="file" multiple>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="panel card clearfix">
 							<div class="card-header" role="tab" id="settings-print">
 								<h5>
 									<a class="collapsed" data-toggle="collapse" data-parent="#settings-accordion" href="#settings-print-data" aria-expanded="false" aria-controls="settings-print-data"> Size, Print, Material </a>
@@ -750,10 +924,43 @@ $(document).ready( function(){
 	</div>
 </div>
 
+<div id='status-box'>
+	<h5 class='text-white'>Console</h5>
+    <form action="<?php //echo $s3FormDetails['url']; ?>"
+          method="POST"
+          enctype="multipart/form-data"
+          class="direct-upload hidden">
+
+        <?php //foreach ($s3FormDetails['inputs'] as $name => $value) { ?>
+            <input type="hidden" name="<?php //echo $name; ?>" value="<?php //echo $value; ?>">
+        <?php //} ?>
+
+        <!-- Key is the file's name on S3 and will be filled in with JS -->
+        <input type="hidden" name="key" value="">
+        <!-- input type="file" name="file" multiple -->
+
+        <!-- Progress Bars to show upload completion percentage -->
+        <div class="progress-bar-area"></div>
+
+    </form>
+
+    <!-- This area will be filled with our results (mainly for debugging) -->
+    <div>
+        <textarea id="uiconsole"></textarea>
+    </div>
+</div>
+
 <footer class="footer">
   	<div class="container">
-    	<span class="text-muted">Place sticky footer content here.</span>
+    	<div class="input-group input-group-lg">
+  			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
+  			<span class="input-group-btn">
+        		<button class="btn btn-secondary" type="button" onclick="figure.update()">Save Figure</button>
+      		</span>
+		</div>
   	</div>
+
+  	
 </footer>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
@@ -780,6 +987,10 @@ $(document).ready( function(){
 <script src="/js/FileSaver.js"></script>
 <script src="/js/Global.js"></script>
 
+<!-- Load the FileUpload Plugin (more info @ https://github.com/blueimp/jQuery-File-Upload) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.5.7/jquery.fileupload.js"></script>
+
 
 <style type="text/css">
 	body {
@@ -788,6 +999,10 @@ $(document).ready( function(){
 		background-color: #000;
 		margin: 0px;
 	}
+
+	.bg-inverse-custom { margin-top:  auto; }
+	.container {max-width: 100%; width: 1140px;}
+
 	.text-white {color: #fff;}
 	.dg {margin-top: 5%;}
 	.section-footer { display:  none;}
@@ -814,4 +1029,10 @@ $(document).ready( function(){
 	#body-accordion-container .ui-selected:after, #editor-accordion .ui-selected:after  {
 		background: rgba(0, 0, 0, 0) url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjM2My4wMjVweCIgaGVpZ2h0PSIzNjMuMDI0cHgiIHZpZXdCb3g9IjAgMCAzNjMuMDI1IDM2My4wMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2My4wMjUgMzYzLjAyNDsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggc3R5bGU9ImZpbGw6IzAzMDMwMzsiIGQ9Ik0xODEuNTEyLDM2My4wMjRDODEuNDMsMzYzLjAyNCwwLDI4MS42MDEsMCwxODEuNTEzQzAsODEuNDI0LDgxLjQzLDAsMTgxLjUxMiwwDQoJCQkJYzEwMC4wODMsMCwxODEuNTEzLDgxLjQyNCwxODEuNTEzLDE4MS41MTNDMzYzLjAyNSwyODEuNjAxLDI4MS41OTUsMzYzLjAyNCwxODEuNTEyLDM2My4wMjR6IE0xODEuNTEyLDExLjcxDQoJCQkJQzg3Ljg4LDExLjcxLDExLjcxLDg3Ljg4NiwxMS43MSwxODEuNTEzczc2LjE3LDE2OS44MDIsMTY5LjgwMiwxNjkuODAyYzkzLjYzMywwLDE2OS44MDMtNzYuMTc1LDE2OS44MDMtMTY5LjgwMg0KCQkJCVMyNzUuMTQ1LDExLjcxLDE4MS41MTIsMTEuNzF6Ii8+DQoJCTwvZz4NCgk8L2c+DQoJPGc+DQoJCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAzMDM7IiBwb2ludHM9IjE0Ny45NTcsMjU4LjkzNSA4My4wNjgsMTk0LjA0NiA5MS4zNDgsMTg1Ljc2NyAxNDcuOTU3LDI0Mi4zNzUgMjcxLjE3MSwxMTkuMTY2IA0KCQkJMjc5LjQ1MSwxMjcuNDQ1IAkJIi8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat scroll 0 0 / contain ;content: "";display: block;height: 50%;left: 25%;position: absolute;top: 15%;width: 50%;}
 	
+	.footer { background-color: rgba(245, 245, 245, 0.5); bottom: 0; height: 60px; position: absolute; width: 100%; padding-top: 5px;}
+	.footer .input-group .form-control {z-index: 1000000000; background-color: rgba(245, 245, 245, 0.25);}
+
+	textarea { background-color: #ccc; border: medium none; font-size: 10px; height: 10em; margin-bottom: 10px; margin-top: -5px; padding: 3px; width: 100%;}
+	#status-box {bottom: 8%;height: 125px;left: 1%;position: absolute;width: 254px;}
+	#status-box textarea {background-color: rgba(245, 245, 245, 0.5); font-family: monospace;}
 </style>

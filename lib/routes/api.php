@@ -654,7 +654,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                     }
                 */
 
-                $query = "SELECT * FROM figures WHERE id = ? AND flag_deleted is null";
+                $query = "SELECT * FROM figures WHERE id = ? AND flag_deleted is false";
                 $type = filter_var($mid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -664,25 +664,93 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 //print_r($stmt->debugDumpParams() );
                 
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $figure = json_encode($result[0]);
-                $app->response->setBody($figure);
+                if (count($result)) {
+                    $figure = json_encode($result[0]);
+                    $app->response->setBody($figure);    
+                } else {
+                    $app->response->setBody("error");
+                }
+                
             }
         );
         $app->put(
-            '/figure/:mid',
-            function ($mid) use ($app,$pdo,$config,$session) {
-                // [[HOST]]/api/v1/figure/:pid
+            '/figure/:fid',
+            function ($fid) use ($app,$pdo,$config,$session) {
+                // [[HOST]]/api/v1/figure/:fid
                 //Example:  PUT http://hero.50.16.238.24.xip.io/api/v1/figure/1
                 //Updates supplied data for a figure id and then returns the updated figure entry in JSON
 
-                //TODO: Make UPDATE figure PUT route
-                //TODO: Make PUT route only work for Admins and the user himself
-                $query = "UPDATE gallery set foo=bar, baz=bam WHERE id = ?";
-                $uid = filter_var($mid, FILTER_SANITIZE_NUMBER_INT);
+                //TODO: Figure out why i have to do this.  Something is wierd.
+                $request = $app->getInstance()->request();
+                $body = $request->getBody();
+                parse_str($body,$put);
 
+                $figure_id = filter_var($fid, FILTER_SANITIZE_NUMBER_INT);
+                $figure_name = filter_var(                  $put['figure_name'], FILTER_SANITIZE_STRING);
+                $figure_data = filter_var(                  $put['figure_data'], FILTER_SANITIZE_STRING);
+                $figure_story = filter_var(                 $put['figure_story'], FILTER_SANITIZE_STRING);
+                $figure_description = filter_var(           $put['figure_description'], FILTER_SANITIZE_STRING);
+                $figure_automatic_description = filter_var( $put['figure_automatic_description'], FILTER_SANITIZE_STRING);
+                $photo_render = filter_var(                 $put['photo_render'], FILTER_SANITIZE_STRING);
+                $photo_inspiration = filter_var(            $put['photo_inspiration'], FILTER_SANITIZE_STRING);
+                $photo_thumbnail = filter_var(              $put['photo_thumbnail'], FILTER_SANITIZE_STRING);
+                $flag_nsfw_sex = filter_var(                $put['flag_nsfw_sex'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_nsfw_violence = filter_var(           $put['flag_nsfw_violence'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_nsfw_other = filter_var(              $put['flag_nsfw_other'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_deleted = filter_var(                 $put['flag_deleted'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_hidden = filter_var(                  $put['flag_hidden'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_featured = filter_var(                $put['flag_featured'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_private = filter_var(                 $put['flag_private'], FILTER_SANITIZE_NUMBER_INT);
+                $date_updated = time();
+
+                //TODO: Make PUT route only work for Admins and the user himself
+                $query = "UPDATE figures set`figure_name`=:figure_name, 
+                                            `figure_data`=:figure_data, 
+                                            `figure_story`=:figure_story,
+                                            `figure_description`=:figure_description,
+                                            `figure_automatic_description`=:figure_automatic_description,
+                                            `photo_render`=:photo_render,
+                                            `photo_inspiration`=:photo_inspiration,
+                                            `photo_thumbnail`=:photo_thumbnail,
+                                            `flag_nsfw_sex`=:flag_nsfw_sex,
+                                            `flag_nsfw_violence`=:flag_nsfw_violence,
+                                            `flag_nsfw_other`=:flag_nsfw_other,
+                                            `flag_deleted`=:flag_deleted,
+                                            `flag_hidden`=:flag_hidden,
+                                            `flag_featured`=:flag_featured,
+                                            `flag_private`=:flag_private,
+                                            `date_updated`= :date_updated
+                                            WHERE id = :figure_id";
+                
+                $stmt = $pdo->prepare($query);
+                $stmt->bindValue(":figure_name",       $figure_name);
+                $stmt->bindValue(":figure_data",       $figure_data);
+                $stmt->bindValue(":figure_story",      $figure_story);
+                $stmt->bindValue(":figure_description",$figure_description);
+                $stmt->bindValue(":figure_automatic_description",  $figure_automatic_description);
+                $stmt->bindValue(":photo_render",      $photo_render);
+                $stmt->bindValue(":photo_inspiration", $photo_inspiration);
+                $stmt->bindValue(":photo_thumbnail",   $photo_thumbnail);
+                $stmt->bindValue(":flag_nsfw_sex",     (int)$flag_nsfw_sex,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_nsfw_violence",(int)$flag_nsfw_violence,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_nsfw_other",   (int)$flag_nsfw_other,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_deleted",      (int)$flag_deleted,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_hidden",       (int)$flag_hidden,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_featured",     (int)$flag_featured,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_private",      (int)$flag_private,PDO::PARAM_INT);
+                $stmt->bindValue(":date_updated",      (int)$date_updated,PDO::PARAM_INT);
+                $stmt->bindValue(":figure_id",         (int)$figure_id, PDO::PARAM_INT);
+                $stmt->execute();
+
+                //TODO: make this handle not being successful
                 $figure = array();
-                $figure["item"] = "Not Yet Implemented: PUT user update";
+                $figure["result"] = "success";
                 $figure = json_encode($figure);
+
+                //$arr = $stmt->errorInfo();
+                //print_r($arr);
+                //print_r($stmt->debugDumpParams());
+
                 $app->response->setBody($figure); 
             }
         );
@@ -692,14 +760,16 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 // [[HOST]]/api/v1/figure
                 //Example:  POST http://hero.50.16.238.24.xip.io/api/v1/figure
                 //Creates a new figure with the supplied data and then returns the new item in JSON
+                //This route doesn't take any parameters and only creates a stub entry that is updated or later deleted
 
                 //TODO: Make CREATE figure POST route
-                //TODO: Check for dupilclate figure data urls
+                //TODO: Check for dupilclate figure data url
 
-                $query = "INSERT INTO figure VALUES() FIELDS();";
+                $query = "INSERT INTO figures (`user_id`,`date_created`,`date_updated`,`count_downloads`,`count_views`,`flag_hidden`,`flag_private`) VALUES (0,'UNIX_TIMESTAMP(now())','UNIX_TIMESTAMP(now())',0,0,1,1);";
+                $stmt = $pdo->prepare($query);
+                $result = $stmt->execute();
 
-                $figure = array();
-                $figure["item"] = "Not Yet Implemented: POST figure create";
+                $figure = array("id" => $pdo->lastInsertID() );
                 $figure = json_encode($figure);
                 $app->response->setBody($figure); 
             }

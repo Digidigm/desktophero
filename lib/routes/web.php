@@ -56,6 +56,8 @@ $app->get(
             array(
                 //'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
+                //TODO: make this the actual logged in user's id or 0 if you're logged out
+                'user_id' => 0,
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'editor',
                 'figure_id' => $fid
