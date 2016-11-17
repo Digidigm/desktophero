@@ -13,6 +13,9 @@ var modelMap = {};  //an object iwth a persistent list of the models available f
 modelMap.presets = {};  //object that contains the presets data
 modelMap.mids = {}; //object that sorts the models by their model id, duplicate of the data in the attachment/category object, just organized differently
 modelMap.tags = {}; //object that lists the model ids inside each tag id.  updated whenever a query is made against an empty tag
+
+s3FormDetails = {};
+
 figure = {};       //object that will have all our figure modification methods in it
 figure.id = null;  //all the defaults
 figure.figure_name = "";
@@ -38,9 +41,19 @@ figure.editable = ["figure_name","figure_data","figure_story","figure_descriptio
 
 user = {};			//object that will have the (untrusted) user information in it
 
+//for uploader
+filesUploaded = [];
+folders = [];
+
+
 //SETUP THE FIGURE METHODS
 figure.id = <?php echo $figure_id; ?>;
 user.id = <?php echo $user_id; ?>;
+
+//gets encrypted magic form data for uploading images and models
+$.get("/api/v1/uploads",function(data){
+	s3FormDetails = data;
+},"json");
 
 var uilog = function(msg) {
 	var el = $("#uiconsole");
@@ -110,6 +123,7 @@ figure.update = function(){
 		data: out,
 		success: function(data) {
 			uilog("Figure Saved.");
+			figure.refreshUI();
 		},
 		async: false,
 		dataType: "json"});
@@ -126,9 +140,22 @@ figure.refreshUI = function(){
 		$(this).val( figure[key] );
 	});
 
+	//all photos
+	$("[data-photo]").each( function(i){
+		var key = $(this).data('photo');
+		$(this).attr("src", figure[key] );
+	});
+
+	//all file uploads should be blanked out
+	$('[type="file"]').val("");
+
+	//remove old file upload bars
+	$('.progress-bar-area').empty();
+
+
 	//TODO Make sure FigureSetup panel is updated
 	//TODO Make sure library panel is updated
-	
+
 };
 
 //Check to see if we are editing a model or creating a new one
@@ -309,6 +336,9 @@ $(document).ready( function(){
 	//GET ALL POSES
 	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
 
+	//GET THE MAGIC S3 UPLOADER DATA
+
+
 	//DO SOMETHING IF YOU CLICK ON A MODEL
 	$("#editor-accordion").on("click",".mini-select[data-model-id]", function(e){
 		var mid = $(this).data("model-id");
@@ -355,6 +385,70 @@ $(document).ready( function(){
 		key = $(this).data("bind");
 		value = $(this).val();
 		figure[key] = value;
+	});
+
+	//HANDLE FILE UPLOADS
+	//TODO: Make this work for more than just this form.  Needs some abstraction
+	var _f1 = $("#inspiration-upload");
+	var file_key = "";
+	$(_f1).attr('action',s3FormDetails.url);
+	
+	_f1.fileupload({
+		url: s3FormDetails.url,
+		type: "POST",
+		datatype: 'xml',
+		add: function(e, data) {
+
+			// Show warning message if your leaving the page during an upload.
+			window.onbeforeunload = function () {
+                return 'You have unsaved changes.';
+            };
+
+            // Give the file which is being uploaded it's current content-type (It doesn't retain it otherwise)
+            // and give it a unique name (so it won't overwrite anything already on s3).
+            var file = data.files[0];
+            file_key = user.id + "." + Date.now() + '.' + file.name;
+
+            data.formData = {
+            	"AWSAccessKeyId" : s3FormDetails.AWSAccessKeyId,
+            	"acl" : s3FormDetails.acl,
+            	"policy" : s3FormDetails.policy,
+            	"signature" : s3FormDetails.signature,
+            	'key' : file_key,
+				'Content-Type' : file.type,
+				'success_action_redirect' : s3FormDetails.success_action_redirect
+			};
+
+            // Actually submit to form to S3.
+            data.submit();
+
+            // Show the progress bar
+            // Uses the file size as a unique identifier
+            var bar = $('<div class="progress" data-mod="'+file.size+'"><div class="bar"></div></div>');
+            $('.progress-bar-area').append(bar);
+            bar.slideDown('fast');
+
+		},
+		progress: function(e, data) {
+			var percent = Math.round((data.loaded / data.total) * 100);
+            $('.progress[data-mod="'+data.files[0].size+'"] .bar').css('width', percent + '%').html(percent+'%');
+		},
+		fail: function (e, data) {
+			window.onbeforeunload = null;
+			$('.progress[data-mod="'+data.files[0].size+'"] .bar').css('width', '100%').addClass('red').html('');
+
+		},
+		done: function (e, data) {
+			window.onbeforeunload = null;
+
+	        // Upload Complete, show information about the upload in a textarea
+	        // from here you can do what you want as the file is on S3
+	        // e.g. save reference to your server using another ajax call or log it, etc.
+	        var original = data.files[0];
+	        uilog("File Uploaded: " + original.name + " [" + original.size +"bytes]");
+	        figure.photo_inspiration = s3FormDetails.url + "/" + file_key;
+	        figure.update();
+		}
 	});
 
 });
@@ -752,9 +846,11 @@ $(document).ready( function(){
 									<textarea name="figure_story" data-object="figure" data-bind="figure_story"></textarea>
 									
 									<label>Inspiration Photo</label>
-									<!-- Key is the file's name on S3 and will be filled in with JS -->
-                					<input type="hidden" name="key" value="">
-                					<input type="file" name="file" multiple>
+									<form enctype='multipart/form-data' id='inspiration-upload'>
+                						<input type="file" name="file" multiple>
+                					</form>
+
+                					<img data-photo='photo_inspiration' class='figure-photo'>
 								</div>
 							</div>
 						</div>
@@ -925,23 +1021,11 @@ $(document).ready( function(){
 </div>
 
 <div id='status-box'>
-	<h5 class='text-white'>Console</h5>
-    <form action="<?php //echo $s3FormDetails['url']; ?>"
-          method="POST"
-          enctype="multipart/form-data"
-          class="direct-upload hidden">
-
-        <?php //foreach ($s3FormDetails['inputs'] as $name => $value) { ?>
-            <input type="hidden" name="<?php //echo $name; ?>" value="<?php //echo $value; ?>">
-        <?php //} ?>
-
-        <!-- Key is the file's name on S3 and will be filled in with JS -->
-        <input type="hidden" name="key" value="">
-        <!-- input type="file" name="file" multiple -->
-
-        <!-- Progress Bars to show upload completion percentage -->
-        <div class="progress-bar-area"></div>
-
+	<h5 class='text-white float-left'>Console</h5>
+	<!-- Progress Bars to show upload completion percentage -->
+    <div class="progress-bar-area float-right"></div>
+    <form method="POST" enctype="multipart/form-data" class="direct-upload hidden">
+        <!--filled by JS as needed -->
     </form>
 
     <!-- This area will be filled with our results (mainly for debugging) -->
@@ -1031,6 +1115,8 @@ $(document).ready( function(){
 	
 	.footer { background-color: rgba(245, 245, 245, 0.5); bottom: 0; height: 60px; position: absolute; width: 100%; padding-top: 5px;}
 	.footer .input-group .form-control {z-index: 1000000000; background-color: rgba(245, 245, 245, 0.25);}
+
+	.figure-photo {width: 96%;}
 
 	textarea { background-color: #ccc; border: medium none; font-size: 10px; height: 10em; margin-bottom: 10px; margin-top: -5px; padding: 3px; width: 100%;}
 	#status-box {bottom: 8%;height: 125px;left: 1%;position: absolute;width: 254px;}

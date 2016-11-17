@@ -1599,7 +1599,66 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $app->response->setBody($model_gallery);
             }
         );
+        $app->get(
+            '/uploads',
+            function () use ($app,$pdo,$config,$session) {
 
+                //TODO: Make sure this is only available to LOGGED IN users
+
+                date_default_timezone_set("America/New_York");
+                $awsKey = 'AKIAILPAAMGAY7QOWT7Q';
+                $awsSecret = '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';
+                $s3Bucket = 'desktop-hero';
+                $region = '';
+                $acl = 'public-read';
+                $date = gmdate("Ymd\THis\Z");
+                $shortDate = gmdate("Ymd");
+                $url = "https://desktop-hero.s3.amazonaws.com";
+                $expy = gmdate('Y-m-d\TG:i:s\Z', strtotime('+6 hours'));
+                $redirect = "#";
+                $key = "\$key";
+
+                //DO NOT MODIFY THIS AT ALL, EVEN WHITESPACE
+                $policy = "{
+                    'expiration': '$expy',
+                    'conditions': [
+                        {
+                            'acl': '$acl'
+                        },
+                        {
+                            'success_action_redirect': '$redirect',
+                        },
+                        {
+                            'bucket':'$s3Bucket',
+                        },
+                        [
+                            'starts-with',
+                            '$key',
+                            ''
+                        ],
+                        [
+                            'starts-with',
+                            '\$Content-Type',
+                            ''
+                        ]
+                    ]
+                }";
+                $policyB64 = base64_encode($policy);
+                $signature = base64_encode(hash_hmac( 'sha1', base64_encode(utf8_encode($policy)), $awsSecret, true));
+
+                $return = array(
+                    "url" => $url,
+                    "key" => "filename",
+                    "Content-Type" => "content/type",
+                    "AWSAccessKeyId" => $awsKey,
+                    "acl" => $acl,
+                    "success_action_redirect" => $redirect,
+                    "policy" => $policyB64,
+                    "signature" => $signature
+                );
+                $app->response->setBody( json_encode($return) );
+            }
+        );
 
         /* TODO
 
