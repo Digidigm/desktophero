@@ -361,6 +361,25 @@ var getPresets = function() {
 
 
 $(document).ready( function(){
+
+	//ATTACH SPINNERS TO AJAX EVENTS
+	var $loading = $('#loadingDiv');
+	var loaderCount = 0;
+	$(document)
+	  .ajaxSend(function () {
+	    $loading.show();
+	    loaderCount++;
+	    console.log(loaderCount);
+	  })
+	  .ajaxComplete(function () {
+	  	loaderCount--;
+	  	console.log(loaderCount);
+	  	if (loaderCount <= 0) {
+	  		$loading.hide();
+	  		loaderCount = 0;	
+	  	}
+	});
+
 	//keep it all using the REST apis rather than a combination of internal and external functions
 	//TODO: turn these into knockout modules if it makes sense
 
@@ -401,17 +420,6 @@ $(document).ready( function(){
 
 	//GET ALL POSES
 	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
-
-	//ATTACH SPINNERS TO AJAX EVENTS
-	var $loading = $('#loadingDiv').hide();
-	$(document)
-	  .ajaxStart(function () {
-	    $loading.show();
-	  })
-	  .ajaxStop(function () {
-	    $loading.hide();
-	});
-
 
 	//DO SOMETHING IF YOU CLICK ON A MODEL
 	$("#editor-accordion").on("click",".mini-select[data-model-id]", function(e){
@@ -1173,7 +1181,9 @@ $(document).ready( function(){
 
 	#body-accordion-container { top: 15%; left:  1%; position: absolute; padding: 0; }
 	#editor-accordion { top: 15%; right:  1%; position: absolute; }
-	#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000;}
+	.nav-tabs .nav-link {background-color: rgba(125, 125, 125, 0.7)}
+
+	#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000; }
 	#body-accordion-container ul.nav, #editor-accordion ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
 	#body-accordion-container ul.nav li, #editor-accordion ul.nav li {display: inline-block; float: none;}
 	#body-accordion-container .card, #editor-accordion .card {background-color:  #7B7B73; }

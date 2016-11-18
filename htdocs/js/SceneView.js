@@ -32,10 +32,12 @@ function SceneView(model){
 	this.Z_AXIS = new THREE.Vector3(0,0,1);
 
 	this.addModelListeners();
+
 }
 
 SceneView.prototype = {
 	init: function(){
+
 		this.scene = new THREE.Scene();
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
 		this.renderer = new THREE.WebGLRenderer({
@@ -69,6 +71,8 @@ SceneView.prototype = {
 		this.model.materials.default = this.model.materials.metallic;
 
 		this.initLights();
+
+		loader.onLoadComplete=function(){ console.log("I happened!"); }; 
 	},
 
 	initLights: function(){
@@ -119,6 +123,7 @@ SceneView.prototype = {
 			boneHandle.position.y = globalBonePosition.y;
 			boneHandle.position.z = globalBonePosition.z;
 		}
+
 	},
 
 	animate: function(){
