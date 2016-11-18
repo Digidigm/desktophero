@@ -50,6 +50,27 @@ folders = [];
 figure.id = <?php echo $figure_id; ?>;
 user.id = <?php echo $user_id; ?>;
 
+
+function dataURItoBlob(dataURI) {
+    // convert base64/URLEncoded data component to raw binary data held in a string
+    var byteString;
+    if (dataURI.split(',')[0].indexOf('base64') >= 0)
+        byteString = atob(dataURI.split(',')[1]);
+    else
+        byteString = unescape(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to a typed array
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ia], {type:mimeString});
+}
+
 //gets encrypted magic form data for uploading images and models
 $.get("/api/v1/uploads",function(data){
 	s3FormDetails = data;
@@ -122,7 +143,7 @@ figure.update = function(){
 		contentType: "x-www-form-urlencoded",
 		data: out,
 		success: function(data) {
-			uilog("Figure Saved.");
+			uilog("Figure Data Sent To Server.");
 			figure.refreshUI();
 		},
 		async: false,
@@ -156,6 +177,51 @@ figure.refreshUI = function(){
 	//TODO Make sure FigureSetup panel is updated
 	//TODO Make sure library panel is updated
 
+};
+figure.screenCap = function(cb){
+	//Take a screencap of the model for our purposes
+	var data =  dataURItoBlob( window.view.renderer.domElement.toDataURL("image/png") );
+	//var data =  window.view.renderer.domElement.toDataURL("image/png");
+    var __file_key = "captures/"+ user.id + "." + figure.id + "screencap.png";
+
+    //setup the form with the magic input
+    var formData = new FormData();
+    formData.append('key', __file_key);
+    formData.append('AWSAccessKeyId', s3FormDetails.AWSAccessKeyId);
+    formData.append('acl', s3FormDetails.acl);
+    formData.append('policy', s3FormDetails.policy);
+    formData.append('signature', s3FormDetails.signature);
+    formData.append('Content-Type', "image/png");
+    formData.append('success_action_redirect', s3FormDetails.success_action_redirect);
+    formData.append('file', data);
+
+    //send it off to S3
+	$.ajax({
+		url: s3FormDetails.url,
+		type: "POST",
+		async: false,
+		data: formData,
+		contentType: false,
+		processData: false,
+		success: function(){
+			figure.photo_render = "https://desktop-hero.s3.amazonaws.com/" + __file_key;
+			uilog("Screen Cap created");
+			
+			//if a callback fuction is specified, run it (see figure.save)
+			if (cb) { cb(); }
+		}
+	});
+};
+
+//when you click the save button
+figure.save = function() {
+
+	//first get and save a screencap to s3
+	figure.screenCap( function(){
+		//then when that is done, call the update process
+		figure.update();
+	});
+	uilog("Figure Saved");
 };
 
 //Check to see if we are editing a model or creating a new one
@@ -336,7 +402,15 @@ $(document).ready( function(){
 	//GET ALL POSES
 	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
 
-	//GET THE MAGIC S3 UPLOADER DATA
+	//ATTACH SPINNERS TO AJAX EVENTS
+	var $loading = $('#loadingDiv').hide();
+	$(document)
+	  .ajaxStart(function () {
+	    $loading.show();
+	  })
+	  .ajaxStop(function () {
+	    $loading.hide();
+	});
 
 
 	//DO SOMETHING IF YOU CLICK ON A MODEL
@@ -349,7 +423,6 @@ $(document).ready( function(){
 
 		//TODO: call a function that affects the scene, add or remove the model from the figure
 		//TODO: call a function that updates the current bodyMap
-
 	});
 
 	//DO SOMETHING IF YOU CLICK A FILTER
@@ -388,12 +461,9 @@ $(document).ready( function(){
 	});
 
 	//HANDLE FILE UPLOADS
-	//TODO: Make this work for more than just this form.  Needs some abstraction
-	var _f1 = $("#inspiration-upload");
-	var file_key = "";
-	$(_f1).attr('action',s3FormDetails.url);
-	
-	_f1.fileupload({
+	var __file_key = "";  //need a global place to store the file name between async actions TODO: Make this better
+	//data-folder="inspiration" data-upload="image" data-for="photo_inspiration"
+	$("[data-upload]").fileupload({
 		url: s3FormDetails.url,
 		type: "POST",
 		datatype: 'xml',
@@ -407,14 +477,16 @@ $(document).ready( function(){
             // Give the file which is being uploaded it's current content-type (It doesn't retain it otherwise)
             // and give it a unique name (so it won't overwrite anything already on s3).
             var file = data.files[0];
-            file_key = user.id + "." + Date.now() + '.' + file.name;
+            var folder = $(this).data('folder');
+
+            __file_key = folder +"/"+ user.id + "." + Date.now() + '.' + file.name;
 
             data.formData = {
             	"AWSAccessKeyId" : s3FormDetails.AWSAccessKeyId,
             	"acl" : s3FormDetails.acl,
             	"policy" : s3FormDetails.policy,
             	"signature" : s3FormDetails.signature,
-            	'key' : file_key,
+            	'key' : __file_key,
 				'Content-Type' : file.type,
 				'success_action_redirect' : s3FormDetails.success_action_redirect
 			};
@@ -445,12 +517,13 @@ $(document).ready( function(){
 	        // from here you can do what you want as the file is on S3
 	        // e.g. save reference to your server using another ajax call or log it, etc.
 	        var original = data.files[0];
-	        uilog("File Uploaded: " + original.name + " [" + original.size +"bytes]");
-	        figure.photo_inspiration = s3FormDetails.url + "/" + file_key;
+	        var property = $(this).data('for');
+	        var type = $(this).data('upload');
+	        figure[property] = s3FormDetails.url + "/" + __file_key;
 	        figure.update();
+	       	uilog(type + " Uploaded: " + original.name + " [" + original.size +"bytes]");
 		}
 	});
-
 });
 </script>
 
@@ -846,7 +919,7 @@ $(document).ready( function(){
 									<textarea name="figure_story" data-object="figure" data-bind="figure_story"></textarea>
 									
 									<label>Inspiration Photo</label>
-									<form enctype='multipart/form-data' id='inspiration-upload'>
+									<form enctype='multipart/form-data' id='inspiration-upload' data-folder="inspiration" data-upload="image" data-for="photo_inspiration">
                 						<input type="file" name="file" multiple>
                 					</form>
 
@@ -1034,17 +1107,19 @@ $(document).ready( function(){
     </div>
 </div>
 
+<div id='loadingDiv'>
+	<img src='/img/loading.gif'>
+</div>
+
 <footer class="footer">
   	<div class="container">
     	<div class="input-group input-group-lg">
   			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
   			<span class="input-group-btn">
-        		<button class="btn btn-secondary" type="button" onclick="figure.update()">Save Figure</button>
+        		<button class="btn btn-secondary" type="button" onclick="figure.save()">Save Figure</button>
       		</span>
 		</div>
-  	</div>
-
-  	
+  	</div>  	
 </footer>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
@@ -1094,6 +1169,8 @@ $(document).ready( function(){
 	h5 {font-weight: normal;}
 	.card, .card-header:first-child, .nav-tabs .nav-link  {border: none; border-radius: 0;}
 	
+	#loadingDiv {background-color: rgba(125, 125, 125, 0.7); height: 100%;left: 0;position: absolute;text-align: center;top: 0;width: 100%;}
+
 	#body-accordion-container { top: 15%; left:  1%; position: absolute; padding: 0; }
 	#editor-accordion { top: 15%; right:  1%; position: absolute; }
 	#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000;}

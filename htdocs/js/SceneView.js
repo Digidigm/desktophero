@@ -38,7 +38,10 @@ SceneView.prototype = {
 	init: function(){
 		this.scene = new THREE.Scene();
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
-		this.renderer = new THREE.WebGLRenderer({antialias:true});
+		this.renderer = new THREE.WebGLRenderer({
+													antialias:true,
+													preserveDrawingBuffer   : true   // required to support .toDataURL()
+												});
 		
 		this.renderer.setClearColor(0x000033);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -368,6 +371,10 @@ function onKeyDown(event){
     	view.startBoneRotate();
     } else if ('XxYyZz'.indexOf(letter) != -1){
     	view.setRotationAxis(letter);
+    } else if (letter == "p" || letter == "P"){
+    	//TODO: Make this update the photo_render
+    	var dataUrl =  window.view.renderer.domElement.toDataURL("image/png");
+    	console.log(dataUrl);
     }
 }
 

@@ -1616,7 +1616,9 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $url = "https://desktop-hero.s3.amazonaws.com";
                 $expy = gmdate('Y-m-d\TG:i:s\Z', strtotime('+6 hours'));
                 $redirect = "#";
-                $key = "\$key";
+                //$key is the name of the file based on the upload
+                //$Content-Type is the type of the content based on the upload
+                //These are filled in here with the signature so it knows to expect this part to be variable
 
                 //DO NOT MODIFY THIS AT ALL, EVEN WHITESPACE
                 $policy = "{
@@ -1633,7 +1635,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                         },
                         [
                             'starts-with',
-                            '$key',
+                            '\$key',
                             ''
                         ],
                         [
