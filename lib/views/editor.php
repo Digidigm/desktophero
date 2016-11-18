@@ -7,6 +7,8 @@
 
 
 <script>
+var loader = {};
+loader.count = 0;
 
 var bodyMap = {};  //an object with a persistent rendering of the current model configuration as defined in the UI
 var modelMap = {};  //an object iwth a persistent list of the models available for each attachment / category
@@ -358,26 +360,32 @@ var getPresets = function() {
 	});
 };
 
-
+loader.show = function(){
+	$("#loadingDiv").show();
+	loader.count++;
+};
+loader.hide = function(){
+	loader.count--;
+  	if (loader.count <= 0) {
+  		$("#loadingDiv").hide();
+  		loader.count = 0;	
+  	}
+};
 
 $(document).ready( function(){
 
+	//we know there's going to be at least a few seconds of loading.  this will prevent flicker while the scene renders\
+	//TODO Make this sensitive to the onLoadComplete handler from three.js or whatever it's called
+	loader.show();
+	setTimeout(function(){ loader.hide(); }, 8000);
+
 	//ATTACH SPINNERS TO AJAX EVENTS
-	var $loading = $('#loadingDiv');
-	var loaderCount = 0;
 	$(document)
 	  .ajaxSend(function () {
-	    $loading.show();
-	    loaderCount++;
-	    console.log(loaderCount);
+	    	loader.show();
 	  })
 	  .ajaxComplete(function () {
-	  	loaderCount--;
-	  	console.log(loaderCount);
-	  	if (loaderCount <= 0) {
-	  		$loading.hide();
-	  		loaderCount = 0;	
-	  	}
+	  		loader.hide();
 	});
 
 	//keep it all using the REST apis rather than a combination of internal and external functions

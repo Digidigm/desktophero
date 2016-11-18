@@ -71,8 +71,6 @@ SceneView.prototype = {
 		this.model.materials.default = this.model.materials.metallic;
 
 		this.initLights();
-
-		loader.onLoadComplete=function(){ console.log("I happened!"); }; 
 	},
 
 	initLights: function(){
