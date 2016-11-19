@@ -10,6 +10,7 @@
 
 	.bg-inverse-custom { margin-top:  auto; }
 	.container {max-width: 100%; width: 1140px;}
+	.card-block span.filename {border: none; border-radius: 0; display: inline; font-size: 1em; height: auto; line-height: 1em; margin: auto; text-align: left; width: auto; color: white; font-weight: bold;}
 </style>
 
 
@@ -212,6 +213,11 @@ myModel.refreshUI = function(){
 	$(this).attr("src", myModel[key] );
   });
 
+  $("[data-file]").each(function(i){
+  	var key = $(this).data('file');
+	$(this).html( myModel[key] );
+  });
+
   //all file uploads should be blanked out
   $('[type="file"]').val("");
 
@@ -362,6 +368,9 @@ $(document).ready( function(){
 				//store all this file upload data in our singleton
 				myModel.data.model = data;
 
+				$("[data-file=model_url]").html(file.name);
+				myModel.model_url = file.name;
+
 				//get the files data and read it		
 				var reader = new FileReader();
 				reader.readAsText(file);
@@ -378,7 +387,9 @@ $(document).ready( function(){
 
 			case "image":
 				//store all this file upload data in our singleton
+				$("[data-file=photo_inspiration]").html(file.name);
 				myModel.data.photo = data;
+				myModel.photo_inspiration = file.name;
 
 			break;
 		}
@@ -651,10 +662,12 @@ $(document).ready( function(){
 				    </select>
 				</div>
 
+				
 				<form enctype='multipart/form-data' id='model-file' data-upload="model">
 					<div class="form-group">
 						<label for="model-file-input">Model File</label>
 					  	<input type="file" class="form-control-file" id="model-file-input" aria-describedby="fileHelp">
+					  	Current File: <span class='filename' data-file='model_url'> </span>
 					</div>
 				</form>
 			</div>
@@ -701,6 +714,7 @@ $(document).ready( function(){
 			<form enctype='multipart/form-data' id='inspiration-upload' data-folder="inspiration" data-upload="image" data-for="photo_inspiration">
 				<input type="file" name="file" multiple>
 			</form>
+			Current File: <span class='filename' data-file='photo_inspiration'> </span>
 
 			<img data-photo='photo_inspiration' class='figure-photo'>
 		</div>
