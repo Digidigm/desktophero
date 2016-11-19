@@ -140,7 +140,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete user DEL route
                 //TODO: Make sure only admins and users themselves can delete
-                $user_query = "UPDATE users set flag_deleted = 1, date_updated = unixtimestamp WHERE user_id = ?";
+                $user_query = "UPDATE users set flag_deleted = true, date_updated = unixtimestamp WHERE user_id = ?";
 
                 $person = array();
                 $person["user"] = "Not Yet Implemented: DEL user delete";
@@ -173,7 +173,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                     }
                 */
 
-                $query = "SELECT * FROM gallery WHERE id = ? AND flag_deleted is null";
+                $query = "SELECT * FROM gallery WHERE id = ? AND flag_deleted is false";
                 $gid = filter_var($gid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -201,7 +201,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT * FROM gallery WHERE type = ? AND flag_deleted is null";
+                $query = "SELECT * FROM gallery WHERE type = ? AND flag_deleted is false";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);   
 
                 $stmt = $pdo->prepare($query);
@@ -263,7 +263,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete gellery DEL route
                 //TODO: Make sure only admins and users themselves can delete gallery items
-                $query = "UPDATE gallery set flag_deleted = 1, date_updated = unixtimestamp WHERE id = ?";
+                $query = "UPDATE gallery set flag_deleted = true, date_updated = unixtimestamp WHERE id = ?";
 
                 $gallery = array();
                 $gallery["item"] = "Not Yet Implemented: DEL photo delete";
@@ -309,7 +309,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT * FROM models WHERE id = ? AND flag_deleted is null";
+                $query = "SELECT * FROM models WHERE id = ? AND flag_deleted is false";
                 $type = filter_var($mid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -372,7 +372,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                     See model item above for details
                 */
 
-                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_category, model_url, photo_render, photo_thumbnail, date_created, date_updated, flag_chirality, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_attachment = ? AND flag_deleted is null ORDER BY model_category";
+                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_category, model_url, photo_render, photo_thumbnail, date_created, date_updated, flag_chirality, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_attachment = ? AND flag_deleted is false ORDER BY model_category";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);
                 $attachment = filter_var($attachment, FILTER_SANITIZE_STRING); 
 
@@ -422,7 +422,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_url, photo_render, photo_thumbnail, date_created, date_updated, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_category = ? AND flag_deleted is null";
+                $query = "SELECT id, user_id, model_name, model_short_desc, model_attachment, model_url, photo_render, photo_thumbnail, date_created, date_updated, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models WHERE model_type = ? AND model_category = ? AND flag_deleted is false";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);
                 $category = filter_var($category, FILTER_SANITIZE_STRING); 
 
@@ -447,14 +447,86 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 //Example:  PUT http://hero.50.16.238.24.xip.io/api/v1/model/1
                 //Updates supplied data for a model id and then returns the updated model entry in JSON
 
-                //TODO: Make UPDATE model PUT route
-                //TODO: Make PUT route only work for Admins and the user himself
-                $query = "UPDATE gallery set foo=bar, baz=bam WHERE id = ?";
-                $uid = filter_var($mid, FILTER_SANITIZE_NUMBER_INT);
+                //TODO: Figure out why i have to do this.  Something is wierd.
+                $request = $app->getInstance()->request();
+                $body = $request->getBody();
+                parse_str($body,$put);
 
+                $model_id = filter_var($mid, FILTER_SANITIZE_NUMBER_INT);
+                $model_name = filter_var(                   $put['model_name'], FILTER_SANITIZE_STRING);
+                $model_data = filter_var(                   $put['model_data'], FILTER_SANITIZE_STRING);
+                $model_story = filter_var(                  $put['model_story'], FILTER_SANITIZE_STRING);
+                $model_short_desc = filter_var(             $put['model_short_desc'], FILTER_SANITIZE_STRING);
+                $model_category = filter_var(               $put['model_category'], FILTER_SANITIZE_STRING);
+                $model_type = filter_var(                   $put['model_type'], FILTER_SANITIZE_STRING);
+                $model_url = filter_var(                    $put['model_url'], FILTER_SANITIZE_STRING);
+                $model_attachment = filter_var(             $put['model_attachment'], FILTER_SANITIZE_STRING);
+                $photo_render = filter_var(                 $put['photo_render'], FILTER_SANITIZE_STRING);
+                $photo_inspiration = filter_var(            $put['photo_inspiration'], FILTER_SANITIZE_STRING);
+                $photo_thumbnail = filter_var(              $put['photo_thumbnail'], FILTER_SANITIZE_STRING);
+                $flag_chirality = filter_var(               $put['flag_chirality'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_nsfw_sex = filter_var(                $put['flag_nsfw_sex'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_nsfw_violence = filter_var(           $put['flag_nsfw_violence'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_nsfw_other = filter_var(              $put['flag_nsfw_other'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_deleted = filter_var(                 $put['flag_deleted'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_hidden = filter_var(                  $put['flag_hidden'], FILTER_SANITIZE_NUMBER_INT);
+                $flag_private = filter_var(                 $put['flag_private'], FILTER_SANITIZE_NUMBER_INT);
+                $date_updated = time();
+
+                //TODO: Make PUT route only work for Admins and the user himself
+                $query = "UPDATE models set `model_name`=:model_name, 
+                                            `model_data`=:model_data, 
+                                            `model_story`=:model_story,
+                                            `model_short_desc`=:model_short_desc,
+                                            `model_category`=:model_category,
+                                            `model_type`=:model_type,
+                                            `model_url`=:model_url, 
+                                            `model_attachment`=:model_attachment, 
+                                            `photo_render`=:photo_render,
+                                            `photo_inspiration`=:photo_inspiration,
+                                            `photo_thumbnail`=:photo_thumbnail,
+                                            `flag_chirality`=:flag_chirality,
+                                            `flag_nsfw_sex`=:flag_nsfw_sex,
+                                            `flag_nsfw_violence`=:flag_nsfw_violence,
+                                            `flag_nsfw_other`=:flag_nsfw_other,
+                                            `flag_deleted`=:flag_deleted,
+                                            `flag_hidden`=:flag_hidden,
+                                            `flag_private`=:flag_private,
+                                            `date_updated`= :date_updated
+                                            WHERE id = :model_id";
+                
+                $stmt = $pdo->prepare($query);
+                $stmt->bindValue(":model_name",        $model_name);
+                $stmt->bindValue(":model_data",        $model_data);
+                $stmt->bindValue(":model_story",       $model_story);
+                $stmt->bindValue(":model_short_desc",  $model_short_desc);
+                $stmt->bindValue(":model_category",    $model_category);
+                $stmt->bindValue(":model_type",        $model_type);
+                $stmt->bindValue(":model_url",         $model_url);
+                $stmt->bindValue(":model_attachment",  $model_attachment);
+                $stmt->bindValue(":photo_render",      $photo_render);
+                $stmt->bindValue(":photo_inspiration", $photo_inspiration);
+                $stmt->bindValue(":photo_thumbnail",   $photo_thumbnail);
+                $stmt->bindValue(":flag_chirality",    $flag_chirality);
+                $stmt->bindValue(":flag_nsfw_sex",     (int)$flag_nsfw_sex,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_nsfw_violence",(int)$flag_nsfw_violence,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_nsfw_other",   (int)$flag_nsfw_other,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_deleted",      (int)$flag_deleted,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_hidden",       (int)$flag_hidden,PDO::PARAM_INT);
+                $stmt->bindValue(":flag_private",      (int)$flag_private,PDO::PARAM_INT);
+                $stmt->bindValue(":date_updated",      (int)$date_updated,PDO::PARAM_INT);
+                $stmt->bindValue(":model_id",          (int)$model_id, PDO::PARAM_INT);
+                $stmt->execute();
+
+                //TODO: make this handle not being successful
                 $model = array();
-                $model["item"] = "Not Yet Implemented: PUT user update";
+                $model["result"] = "success";
                 $model = json_encode($model);
+
+                $arr = $stmt->errorInfo();
+                print_r($arr);
+                //print_r($stmt->debugDumpParams());
+
                 $app->response->setBody($model); 
             }
         );
@@ -462,16 +534,15 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
             '/model',
             function () use ($app,$pdo,$config,$session) {
                 // [[HOST]]/api/v1/model
-                //Example:  POST http://hero.50.16.238.24.xip.io/api/v1/model
+                //Example:  POST http://hero.50.16.238.24.xip.io/api/v1/figure
                 //Creates a new model with the supplied data and then returns the new item in JSON
+                //This route doesn't take any parameters and only creates a stub entry that is updated or later deleted
 
-                //TODO: Make CREATE model POST route
-                //TODO: Check for dupilclate model data urls
+                $query = "INSERT INTO models (`user_id`,`date_created`,`date_updated`,`flag_hidden`,`flag_private`) VALUES (0,'UNIX_TIMESTAMP(now())','UNIX_TIMESTAMP(now())',1,1);";
+                $stmt = $pdo->prepare($query);
+                $result = $stmt->execute();
 
-                $query = "INSERT INTO model VALUES() FIELDS();";
-
-                $model = array();
-                $model["item"] = "Not Yet Implemented: POST model create";
+                $model = array("id" => $pdo->lastInsertID() );
                 $model = json_encode($model);
                 $app->response->setBody($model); 
             }
@@ -485,7 +556,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete model DEL route
                 //TODO: Make sure only admins and users themselves can delete model items
-                $query = "UPDATE model set flag_deleted = 1 WHERE id = ?";
+                $query = "UPDATE model set flag_deleted = true WHERE id = ?";
 
                 $model = array();
                 $model["item"] = "Not Yet Implemented: DEL model delete";
@@ -508,7 +579,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT * FROM figures WHERE user_id = ? AND flag_deleted is null";
+                $query = "SELECT * FROM figures WHERE user_id = ? AND flag_deleted is false";
                 $uid = filter_var($uid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -535,7 +606,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT * FROM figures WHERE flag_featured = 1 AND flag_deleted is null";
+                $query = "SELECT * FROM figures WHERE flag_featured = 1 AND flag_deleted is false";
                 $uid = filter_var($uid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -570,7 +641,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $list .= ($word2)? "|".$word2 : "";
                 $list .= ($word3)? "|".$word3 : "";
 
-                $query = "SELECT * FROM figures WHERE figure_story REGEXP :list OR figure_description REGEXP :list OR figure_automatic_description REGEXP :list AND flag_deleted is null";
+                $query = "SELECT * FROM figures WHERE figure_story REGEXP :list OR figure_description REGEXP :list OR figure_automatic_description REGEXP :list AND flag_deleted is false";
                 $stmt = $pdo->prepare($query);
                 $stmt->bindValue(":list",$list);
                 $stmt->execute();
@@ -601,7 +672,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 //TODO: make it so you don't get hidden figures unless you're an admin
                 //TODO: make this work with UTF-8  http://hero.50.16.238.24.xip.io/api/v1/figure/16
 
-                $query = "SELECT id, user_id, figure_name, photo_render, photo_thumbnail, date_created, date_updated, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM figures WHERE flag_deleted is null ORDER BY date_created DESC LIMIT :num";
+                $query = "SELECT id, user_id, figure_name, photo_render, photo_thumbnail, date_created, date_updated, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM figures WHERE flag_deleted is false ORDER BY date_created DESC LIMIT :num";
                 $num = filter_var($num, FILTER_SANITIZE_NUMBER_INT);  
                 
 
@@ -783,7 +854,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete figure DEL route
                 //TODO: Make sure only admins and users themselves can delete figure items
-                $query = "UPDATE figure set flag_deleted = 1 WHERE id = ?";
+                $query = "UPDATE figure set flag_deleted = true WHERE id = ?";
 
                 $figure = array();
                 $figure["item"] = "Not Yet Implemented: DEL figure delete";
@@ -812,7 +883,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $list .= ($word2)? "|".$word2 : "";
                 $list .= ($word3)? "|".$word3 : "";
 
-                $query = "SELECT * FROM tags WHERE tag_hint REGEXP :list OR tag_label REGEXP :list OR tag_synonyms REGEXP :list AND flag_deleted is null";
+                $query = "SELECT * FROM tags WHERE tag_hint REGEXP :list OR tag_label REGEXP :list OR tag_synonyms REGEXP :list AND flag_deleted is false";
                 $stmt = $pdo->prepare($query);
                 $stmt->bindValue(":list",$list);
                 $stmt->execute();
@@ -848,7 +919,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                     }
                 */
 
-                $query = "SELECT * FROM tags WHERE id = ? AND flag_deleted is null";
+                $query = "SELECT * FROM tags WHERE id = ? AND flag_deleted is false";
                 $type = filter_var($tid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -871,7 +942,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 //Gets all of the data for a tags in the tag type and outputs json
 
 
-                $query = "SELECT * FROM tags WHERE tag_type = ? AND flag_deleted is null";
+                $query = "SELECT * FROM tags WHERE tag_type = ? AND flag_deleted is false";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);   
 
                 $stmt = $pdo->prepare($query);
@@ -962,7 +1033,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete tags DEL route
                 //TODO: Make sure only admins and users themselves can delete tags items
-                $query = "UPDATE tags set flag_deleted = 1 WHERE id = ?";
+                $query = "UPDATE tags set flag_deleted = true WHERE id = ?";
 
                 $tags = array();
                 $tags["item"] = "Not Yet Implemented: DEL tags delete";
@@ -1089,7 +1160,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete figure_tags DEL route
                 //TODO: Make sure only admins and users themselves can delete figure_tags items
-                $query = "DELETE FROM figure_tags set flag_deleted = 1 WHERE id = ? AND id = ?";
+                $query = "DELETE FROM figure_tags set flag_deleted = true WHERE id = ? AND id = ?";
 
                 $figure_tags = array();
                 $figure_tags["item"] = "Not Yet Implemented: DEL figure_tags delete";
@@ -1193,7 +1264,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete model_tags DEL route
                 //TODO: Make sure only admins and users themselves can delete model_tags items
-                $query = "DELETE FROM model_tags set flag_deleted = 1 WHERE id = ? AND id = ?";
+                $query = "DELETE FROM model_tags set flag_deleted = true WHERE id = ? AND id = ?";
 
                 $model_tags = array();
                 $model_tags["item"] = "Not Yet Implemented: DEL model_tags delete";
@@ -1223,7 +1294,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                 $list .= ($word2)? "|".$word2 : "";
                 $list .= ($word3)? "|".$word3 : "";
 
-                $query = "SELECT * FROM tags WHERE tag_hint REGEXP :list OR tag_label REGEXP :list OR tag_synonyms REGEXP :list AND flag_deleted is null";
+                $query = "SELECT * FROM tags WHERE tag_hint REGEXP :list OR tag_label REGEXP :list OR tag_synonyms REGEXP :list AND flag_deleted is false";
                 $stmt = $pdo->prepare($query);
                 $stmt->bindValue(":list",$list);
                 $stmt->execute();
@@ -1257,7 +1328,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
                     }
                 */
 
-                $query = "SELECT * FROM tags WHERE id = ? AND flag_deleted is null";
+                $query = "SELECT * FROM tags WHERE id = ? AND flag_deleted is false";
                 $type = filter_var($tid, FILTER_SANITIZE_NUMBER_INT);   
 
                 $stmt = $pdo->prepare($query);
@@ -1348,7 +1419,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete tags DEL route
                 //TODO: Make sure only admins and users themselves can delete tags items
-                $query = "UPDATE tags set flag_deleted = 1 WHERE id = ?";
+                $query = "UPDATE tags set flag_deleted = true WHERE id = ?";
 
                 $tags = array();
                 $tags["item"] = "Not Yet Implemented: DEL tags delete";
@@ -1480,7 +1551,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 //TODO: Make delete figure_likes DEL route
                 //TODO: Make sure only admins and users themselves can delete figure_likes items
-                $query = "DELETE FROM figure_likes set flag_deleted = 1 WHERE id = ? AND id = ?";
+                $query = "DELETE FROM figure_likes set flag_deleted = true WHERE id = ? AND id = ?";
 
                 $figure_likes = array();
                 $figure_likes["item"] = "Not Yet Implemented: DEL figure_likes delete";
@@ -1506,7 +1577,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM model_presets WHERE flag_deleted is null ORDER BY preset_type,preset_category,ordinality";
+                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM model_presets WHERE flag_deleted is false ORDER BY preset_type,preset_category,ordinality";
                 
                 $stmt = $pdo->prepare($query);
                 $stmt->execute();
@@ -1547,7 +1618,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM model_presets WHERE preset_type = ? AND preset_category = ? AND flag_deleted is null ORDER By ordinality";
+                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM model_presets WHERE preset_type = ? AND preset_category = ? AND flag_deleted is false ORDER By ordinality";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);
                 $category = filter_var($category, FILTER_SANITIZE_STRING); 
 
@@ -1581,7 +1652,7 @@ $app->group('/api/v1', function () use ($app,$pdo,$config,$session) {
 
                 */
 
-                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models_presets WHERE preset_type = ? AND preset_category = ? AND flag_deleted is null";
+                $query = "SELECT id, user_id, preset_name, preset_short_desc, preset_category, preset_type, photo_render, photo_thumbnail, flag_nsfw_sex, flag_nsfw_violence, flag_nsfw_other FROM models_presets WHERE preset_type = ? AND preset_category = ? AND flag_deleted is false";
                 $type = filter_var($type, FILTER_SANITIZE_STRING);
                 $category = filter_var($category, FILTER_SANITIZE_STRING); 
 

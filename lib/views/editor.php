@@ -1,3 +1,17 @@
+<style type="text/css">
+	body {
+		overflow: hidden;
+		color: #000;
+		background-color: #000;
+		margin: 0px;
+	}
+
+	.bg-inverse-custom { margin-top:  auto; }
+	.container {max-width: 100%; width: 1140px;}
+
+	
+</style>
+
 <div class="bg-inverse text-center center-vertically" role="banner">
   <div class="editor-container">
 	<div id="threejs-demo"> </div>
@@ -7,9 +21,6 @@
 
 
 <script>
-var loader = {};
-loader.count = 0;
-
 var bodyMap = {};  //an object with a persistent rendering of the current model configuration as defined in the UI
 var modelMap = {};  //an object iwth a persistent list of the models available for each attachment / category
 modelMap.presets = {};  //object that contains the presets data
@@ -52,41 +63,11 @@ folders = [];
 figure.id = <?php echo $figure_id; ?>;
 user.id = <?php echo $user_id; ?>;
 
-
-function dataURItoBlob(dataURI) {
-    // convert base64/URLEncoded data component to raw binary data held in a string
-    var byteString;
-    if (dataURI.split(',')[0].indexOf('base64') >= 0)
-        byteString = atob(dataURI.split(',')[1]);
-    else
-        byteString = unescape(dataURI.split(',')[1]);
-
-    // separate out the mime component
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-    // write the bytes of the string to a typed array
-    var ia = new Uint8Array(byteString.length);
-    for (var i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-
-    return new Blob([ia], {type:mimeString});
-}
-
 //gets encrypted magic form data for uploading images and models
 $.get("/api/v1/uploads",function(data){
 	s3FormDetails = data;
 },"json");
 
-var uilog = function(msg) {
-	var el = $("#uiconsole");
-	el.val ( el.val() + "\n" + msg);
-	console.log(msg);
-};
-var clearuilog = function() {
-	var el = $("#uiconsole");
-	el.val("");
-};
 
 figure.create = function(){
 
@@ -360,17 +341,7 @@ var getPresets = function() {
 	});
 };
 
-loader.show = function(){
-	$("#loadingDiv").show();
-	loader.count++;
-};
-loader.hide = function(){
-	loader.count--;
-  	if (loader.count <= 0) {
-  		$("#loadingDiv").hide();
-  		loader.count = 0;	
-  	}
-};
+
 
 $(document).ready( function(){
 
@@ -1165,55 +1136,3 @@ $(document).ready( function(){
 <!-- Load the FileUpload Plugin (more info @ https://github.com/blueimp/jQuery-File-Upload) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.5.7/jquery.fileupload.js"></script>
-
-
-<style type="text/css">
-	body {
-		overflow: hidden;
-		color: #000;
-		background-color: #000;
-		margin: 0px;
-	}
-
-	.bg-inverse-custom { margin-top:  auto; }
-	.container {max-width: 100%; width: 1140px;}
-
-	.text-white {color: #fff;}
-	.dg {margin-top: 5%;}
-	.section-footer { display:  none;}
-
-	h5 {font-weight: normal;}
-	.card, .card-header:first-child, .nav-tabs .nav-link  {border: none; border-radius: 0;}
-	
-	#loadingDiv {background-color: rgba(125, 125, 125, 0.7); height: 100%;left: 0;position: absolute;text-align: center;top: 0;width: 100%;}
-
-	#body-accordion-container { top: 15%; left:  1%; position: absolute; padding: 0; }
-	#editor-accordion { top: 15%; right:  1%; position: absolute; }
-	.nav-tabs .nav-link {background-color: rgba(125, 125, 125, 0.7)}
-
-	#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000; }
-	#body-accordion-container ul.nav, #editor-accordion ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
-	#body-accordion-container ul.nav li, #editor-accordion ul.nav li {display: inline-block; float: none;}
-	#body-accordion-container .card, #editor-accordion .card {background-color:  #7B7B73; }
-	#body-accordion-container .card .label, #editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
-	#body-accordion-container .card .scroll, #editor-accordion .card .scroll {max-height: 200px; overflow: scroll; }
-	#body-accordion-container .card .mini-select, #editor-accordion .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
-	#body-accordion-container .card .mini-select .label, #editor-accordion .card .mini-select .label {white-space: normal;}
-	#body-accordion-container .card .mini-select.hidden, #editor-accordion .card .mini-select.hidden { display:none;}
-	#body-accordion-container .card .mini-select:hover, #editor-accordion .card .mini-select:hover { background: #ccc; }
-	#body-accordion-container .card .card-header, #editor-accordion .card-header { padding: 0.1rem 1.25rem; margin-bottom: 0px}
-	#body-accordion-container .card .card-header h5, #editor-accordion .card-header h5 { margin: 0 !important;}
-	#body-accordion-container .card .card-header a, #editor-accordion .card-header a { display: block; padding: 0.1rem 1.25rem; margin: -0.1rem -1.25rem; border: none; outline: none;}
-	#body-accordion-container .ui-selected, #editor-accordion .ui-selected {box-shadow: 0px 0px 5px #fff; }
-	#body-accordion-container .ui-selected:after, #editor-accordion .ui-selected:after  {
-		background: rgba(0, 0, 0, 0) url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjM2My4wMjVweCIgaGVpZ2h0PSIzNjMuMDI0cHgiIHZpZXdCb3g9IjAgMCAzNjMuMDI1IDM2My4wMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2My4wMjUgMzYzLjAyNDsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggc3R5bGU9ImZpbGw6IzAzMDMwMzsiIGQ9Ik0xODEuNTEyLDM2My4wMjRDODEuNDMsMzYzLjAyNCwwLDI4MS42MDEsMCwxODEuNTEzQzAsODEuNDI0LDgxLjQzLDAsMTgxLjUxMiwwDQoJCQkJYzEwMC4wODMsMCwxODEuNTEzLDgxLjQyNCwxODEuNTEzLDE4MS41MTNDMzYzLjAyNSwyODEuNjAxLDI4MS41OTUsMzYzLjAyNCwxODEuNTEyLDM2My4wMjR6IE0xODEuNTEyLDExLjcxDQoJCQkJQzg3Ljg4LDExLjcxLDExLjcxLDg3Ljg4NiwxMS43MSwxODEuNTEzczc2LjE3LDE2OS44MDIsMTY5LjgwMiwxNjkuODAyYzkzLjYzMywwLDE2OS44MDMtNzYuMTc1LDE2OS44MDMtMTY5LjgwMg0KCQkJCVMyNzUuMTQ1LDExLjcxLDE4MS41MTIsMTEuNzF6Ii8+DQoJCTwvZz4NCgk8L2c+DQoJPGc+DQoJCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAzMDM7IiBwb2ludHM9IjE0Ny45NTcsMjU4LjkzNSA4My4wNjgsMTk0LjA0NiA5MS4zNDgsMTg1Ljc2NyAxNDcuOTU3LDI0Mi4zNzUgMjcxLjE3MSwxMTkuMTY2IA0KCQkJMjc5LjQ1MSwxMjcuNDQ1IAkJIi8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat scroll 0 0 / contain ;content: "";display: block;height: 50%;left: 25%;position: absolute;top: 15%;width: 50%;}
-	
-	.footer { background-color: rgba(245, 245, 245, 0.5); bottom: 0; height: 60px; position: absolute; width: 100%; padding-top: 5px;}
-	.footer .input-group .form-control {z-index: 1000000000; background-color: rgba(245, 245, 245, 0.25);}
-
-	.figure-photo {width: 96%;}
-
-	textarea { background-color: #ccc; border: medium none; font-size: 10px; height: 10em; margin-bottom: 10px; margin-top: -5px; padding: 3px; width: 100%;}
-	#status-box {bottom: 8%;height: 125px;left: 1%;position: absolute;width: 254px;}
-	#status-box textarea {background-color: rgba(245, 245, 245, 0.5); font-family: monospace;}
-</style>

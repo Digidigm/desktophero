@@ -37,6 +37,7 @@
 
         
         <script src="/vendor/jquery/jquery.min.js"></script>
+        <script src="/js/utilities.js"></script>
         <link href="/css/style.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -63,6 +64,9 @@
               <ul class="nav navbar-nav float-right">
                 <li class="nav-item nav-item-toggable">
                   <a class="nav-link" href="/editor/">Make Your Hero</a>
+                </li>
+                 <li class="nav-item nav-item-toggable">
+                  <a class="nav-link" href="/models/">Contribute Models</a>
                 </li>
                 <li class="nav-item nav-item-toggable">
                   <a class="nav-link" href="/#about">About DesktopHero</a>
@@ -257,6 +261,9 @@
 
         <!--Feature Specific Scripts -->
         <script src="/js/login.js"></script>
+
+        <!--Utilities -->
+
         
 
     </body>
