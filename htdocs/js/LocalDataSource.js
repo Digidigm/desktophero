@@ -41,14 +41,14 @@ LocalDataSource.prototype = {
 		this.meshes = {};
 
 		// Fake data for now.
-		this.meshes['left arm'] = new MeshMetadata('left arm', 'stockto2', 'Default', 'arm', ['cool', 'great']);
-		this.meshes['right arm'] = new MeshMetadata('right arm', 'stockto2', 'Default', 'arm', ['cool', 'great']);
-		this.meshes['torso'] = new MeshMetadata('torso', 'stockto2', 'Default', 'torso', ['cool', 'great']);
-		this.meshes['hat'] = new MeshMetadata('hat', 'stockto2', 'Default', 'hat', ['cool', 'monkey']);
-		this.meshes['head'] = new MeshMetadata('head', 'stockto2', 'Default', 'head', ['cool', 'great']);
-		this.meshes['tentacle'] = new MeshMetadata('tentacle', 'stockto2', 'Default', 'arm', ['cool', 'great']);
-		this.meshes['neck'] = new MeshMetadata('neck', 'stockto2', 'Default', 'neck', ['cool', 'great']);
-		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'Default', 'weapon', ['cool', 'great']);
+		this.meshes['left arm'] = new MeshMetadata('left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['right arm'] = new MeshMetadata('right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['torso'] = new MeshMetadata('torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
+		this.meshes['hat'] = new MeshMetadata('hat', 'stockto2', 'default', 'hat', ['cool', 'monkey']);
+		this.meshes['head'] = new MeshMetadata('head', 'stockto2', 'default', 'head', ['cool', 'great']);
+		this.meshes['tentacle'] = new MeshMetadata('tentacle', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['neck'] = new MeshMetadata('neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
+		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']);
 
 		this.meshesRefreshedEvent.notify(this.meshes);
 	},

@@ -12,3 +12,8 @@ THREE.Bone.prototype.rotateOnWorldAxis = function(axis, radians) {
     this.matrix = rotWorldMatrix;
     this.rotation.setFromRotationMatrix(this.matrix);
 }
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};

@@ -17,28 +17,31 @@ SceneModel.boneGroupsToLoad = ['left arm',
 SceneModel.initialPose = 'amazing pose';
 
 SceneModel.prototype = {
-	getAvailableMeshes: function(type){
+	getAvailableMeshes: function(){
 		var allMeshes = [];
 		for (var libraryName in this.libraries.dict){
 			var library = this.libraries.get(libraryName);
 			var meshes = library.getMeshes();
 			for (var meshName in meshes){
 				meshMetadata = meshes[meshName];
-				if (meshMetadata.type === type){
-					allMeshes.push(meshMetadata);
-				}
+				allMeshes.push(meshMetadata);
 			}
 		}
 		return allMeshes;
 	},
 
-	addMesh(boneGroupName, libraryName, meshName, material){
+	addMesh(boneGroupName, libraryName, meshName){
 		var defaultMaterial = self.materials["default"];
 		var boneGroup = this.character.boneGroups.get(boneGroupName);
 		this.libraries.get(libraryName).fetchMesh(meshName, function(name, mesh){
 			mesh.material = new THREE.MeshFaceMaterial([defaultMaterial]);
 			boneGroup.addMesh(name, mesh);
 		});
+	},
+
+	removeMesh(boneGroupName, libraryName, meshName){
+		var boneGroup = this.character.boneGroups.get(boneGroupName);
+		boneGroup.removeMesh(libraryName, meshName);
 	},
 
 	getAvailablePoses: function(){

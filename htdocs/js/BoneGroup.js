@@ -72,6 +72,10 @@ BoneGroup.prototype = {
 		}
 	},
 
+	removeMesh: function (libraryName, meshName){
+		console.log("remove mesh");
+	},
+
 	attachToBone: function(parentBoneGroupName, parentBoneName, parentBone){
 		parentBone.add(this.skeleton.bones[0]);
 		this.parentBoneGroupName = parentBoneGroupName;

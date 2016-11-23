@@ -71,6 +71,10 @@ SceneView.prototype = {
 		this.model.materials.default = this.model.materials.metallic;
 
 		this.initLights();
+
+		this.populateTabs();
+		this.libraryPopulateMeshes();
+		this.libraryPopulatePoses();
 	},
 
 	initLights: function(){
@@ -164,6 +168,16 @@ SceneView.prototype = {
 			sphere.visible = this.boneHandlesVisible;
 			this.scene.add(sphere);
 		}
+
+		var boneGroupId = boneGroupName.replaceAll(' ', '_');
+		this.meshesTabAddBoneGroup(boneGroupId, boneGroupName);
+		this.poseTabAddBoneGroup(boneGroupId, boneGroupName);
+		this.boneGroupsTabAddBoneGroup(boneGroupId, boneGroupName);
+
+		for (var meshName in boneGroup.meshes.dict){
+			//TODO: add icon as well.
+			this.meshesTabAddMesh(boneGroupId, meshName);
+		}
 		
 	},
 
@@ -178,6 +192,9 @@ SceneView.prototype = {
 
 		var mesh = boneGroup.meshes.get(meshName);
 		this.scene.add(mesh);
+
+		var boneGroupId = boneGroup.name.replaceAll(' ', '_');
+		this.meshesTabAddMesh(boneGroupId, meshName);
 	},
 
 	toggleBoneHandlesVisible: function(){
@@ -315,6 +332,173 @@ SceneView.prototype = {
 
 			}
 		}
+	},
+
+	populateTabs: function(){
+		var boneGroups = this.model.character.boneGroups.dict;
+		for (var boneGroupName in boneGroups){
+			var boneGroup = boneGroups[boneGroupName];
+			var boneGroupId = boneGroupName.replaceAll(' ', '_');
+			this.meshesTabAddBoneGroup(boneGroupId, boneGroupName);
+			this.poseTabAddBoneGroup(boneGroupId, boneGroupName);
+
+			for (var meshName in boneGroup.meshes.dict){
+				//TODO: add icon as well.
+				this.meshesTabAddMesh(boneGroupId, meshName, "stuff.png");
+			}
+		}
+	},
+
+	meshesTabAddBoneGroup: function(boneGroupId, boneGroupName){
+		var div = document.createElement('div');
+		boneGroupId = "meshes-tab-" + boneGroupId;
+		div.className = "panel card clearfix"
+		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupId + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + boneGroupId + '-data" aria-expanded="false" aria-controls="' + boneGroupId + '-data"> ' + boneGroupName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + boneGroupId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupId + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+		libraryPane = document.getElementById("body-accordion");
+		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+
+		// Add the '+' button
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-mesh-bone-group", boneGroupName);
+		div.setAttribute("add-mesh-button", "stuff");
+		div.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Add-circular-button-thin-symbol.svg/2000px-Add-circular-button-thin-symbol.svg.png" style="width:40px;height:40px;" alt="other stuff">\
+			<span class="label"> Add Mesh\
+		</span>';
+
+		document.getElementById(boneGroupId + '-data').children[0].appendChild(div);
+	},
+
+	meshesTabAddMesh: function(boneGroupId, meshName, iconUrl){
+		//TODO: Add icon
+		boneGroupId = "meshes-tab-" + boneGroupId;
+
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("meshes-tab-mesh", "stuff");
+		div.setAttribute("data-mesh-bone-group", boneGroupId);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + meshName + '\
+		</span>';
+
+		libraryPane = document.getElementById(boneGroupId + '-data').children[0];
+		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+	},
+
+	poseTabAddBoneGroup: function(boneGroupId, boneGroupName){
+		var div = document.createElement('div');
+		boneGroupId = "pose-tab-" + boneGroupId;
+		div.className = "panel card clearfix"
+		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupId + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + boneGroupId + '-data" aria-expanded="false" aria-controls="' + boneGroupId + '-data"> ' + boneGroupName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + boneGroupId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupId + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+
+		libraryPane = document.getElementById("pose-accordion");
+		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+	},
+
+	poseTabAddPose: function(boneGroupId, poseName, iconUrl){
+		//TODO: Add icon
+		boneGroupId = "pose-tab-" + boneGroupId;
+
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("pose-tab-pose", "stuff");
+		div.setAttribute("data-pose-bone-group", boneGroupId);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + poseName + '\
+		</span>';
+
+		document.getElementById(boneGroupId + '-data').children[0].appendChild(div);
+	},
+
+	boneGroupsTabAddBoneGroup: function(boneGroupId, boneGroupName){
+		var div = document.createElement('div');
+		boneGroupId = "bone-groups-tab-" + boneGroupId;
+		div.className = "panel card clearfix"
+		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupId + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + boneGroupId + '-data" aria-expanded="false" aria-controls="' + boneGroupId + '-data"> ' + boneGroupName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + boneGroupId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupId + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+
+		libraryPane = document.getElementById("bones-accordion");
+		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+	},
+
+	libraryPopulateMeshes: function(){
+		var metadata = model.getAvailableMeshes();
+		for (var i = 0; i < metadata.length; i++){
+			var meshMetadata = metadata[i];
+			var type = meshMetadata.type;
+			var element = document.getElementById(type);
+			if (element === null){
+				this.libraryAddType(type);
+			}
+
+			this.libraryAddMesh(type, meshMetadata);
+		}
+	},
+
+	libraryPopulatePoses: function(){
+		this.libraryAddType('Poses');
+		var dict = model.getAvailablePoses();
+		for (var library in dict){
+			for (i = 0; i < library.length; i++){
+				this.libraryAddMesh('Poses', library[i]);
+			}
+		}
+	},
+
+	libraryAddType: function(type){
+		var div = document.createElement('div');
+		div.className = "panel card clearfix";
+		div.innerHTML = '<div class="card-header" role="tab" id="' + type + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + type + '-data" aria-expanded="false" aria-controls="' + type + '-data"> ' + type + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + type + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + type + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+		document.getElementById("editor-accordion").appendChild(div);
+	}, 
+
+	libraryAddMesh: function(type, meshMetadata){
+		//TODO: Add icon
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3"
+		div.setAttribute("data-mesh-id", "TODO")
+		div.setAttribute("data-mesh-library", meshMetadata.library);
+		div.setAttribute("data-mesh-mesh-name", meshMetadata.name);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + meshMetadata.name + '\
+		</span>';
+
+		document.getElementById(type + '-data').children[0].appendChild(div);
 	}
 };
 
@@ -323,7 +507,7 @@ function onMouseDown(event){
 	//make it so i can still pull up the JS console by using shift-right-click
 	//make it so you can click on UI
 	//TODO: Test this in multiple browsers
-	var target = event.originalEvent || event.originalTarget;
+	/*var target = event.originalEvent || event.originalTarget;
 	if (event.shiftKey || ! $(target.srcElement || target.originalTarget).is('canvas') ) {
 
 		//if you hold down shift or cick on anything other than the canvas do the normal thing
@@ -333,7 +517,7 @@ function onMouseDown(event){
 
 		//if you're holding down shift or you click on a canvas element, don't do the normal thin
 		event.preventDefault();
-	}
+	}*/
 
 	if (event.button === 0){
 		view.onLeftClick(event.clientX, event.clientY, event);
