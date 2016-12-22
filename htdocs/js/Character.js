@@ -6,8 +6,19 @@ function Character(){
 }
 
 Character.prototype = {
-	addBoneGroup: function(name, boneGroup){
-		this.boneGroups.put(name, boneGroup);
+	addBoneGroup: function(boneGroup){
+		this.boneGroups.put(boneGroup.uid, boneGroup);
+	},
+
+	removeBoneGroup: function(uid){
+		// TODO: Check/fix this
+		for (var boneGroupUid in this.boneGroups.dict){
+			boneGroup = this.boneGroups.get(boneGroupUid);
+			if (boneGroup.parentBoneGroupUid === uid){
+				boneGroup.unattach();
+			}
+		}
+		this.boneGroups.remove(uid);
 	},
 
 	getCurrentPose: function(){
@@ -24,8 +35,8 @@ Character.prototype = {
 		for (var i = 0; i < pose.poseBones.length; i++){
 			var poseBone = pose.poseBones[i];
 
-			for (var boneGroupName in this.boneGroups.dict){
-				var boneGroup = this.boneGroups.get(boneGroupName);
+			for (var boneGroupUid in this.boneGroups.dict){
+				var boneGroup = this.boneGroups.get(boneGroupUid);
 
 				for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
 					var bone = boneGroup.skeleton.bones[j];

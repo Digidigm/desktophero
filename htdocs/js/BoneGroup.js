@@ -1,4 +1,5 @@
 function BoneGroup(name, libraryName, skeleton){
+	this.uid = createUid();
 	this.name = name;
 	this.libraryName = libraryName; // Keeps track of where this bone group is found, for saving characters.
 	this.skeleton = skeleton;
@@ -6,7 +7,7 @@ function BoneGroup(name, libraryName, skeleton){
 	this.currentPose;
 	this.attachPoints = {};
 
-	this.parentBoneGroupName; // Used when saving character.
+	this.parentBoneGroupUid; // Used when saving character.
 	this.parentBoneName; // Used when saving character.
 	this.parentBone = null;
 
@@ -20,7 +21,7 @@ function BoneGroup(name, libraryName, skeleton){
 
 BoneGroup.prototype = {
 	addMesh: function (meshName, mesh){
-		console.log('Adding mesh "' + meshName + '" bone group "' + this.name + '".');
+		console.log('Adding mesh "' + meshName + '" to bone group "' + this.name + '".');
 
 		var bone0 = this.skeleton.bones[0];
 
@@ -54,9 +55,9 @@ BoneGroup.prototype = {
 
 		if (this.parentBone != null){
 			// Restore bone parent.
-			this.attachToBone(this.parentBoneGroupName, 
-								this.parentBoneName, 
-								this.parentBone); 
+			this.attachToBone(this.parentBoneGroupUid,
+								this.parentBoneName,
+								this.parentBone);
 			// Restore previous position, rotation, scale.
 			bone0.position.x = position.x;
 			bone0.position.y = position.y;
@@ -76,9 +77,9 @@ BoneGroup.prototype = {
 		console.log("remove mesh");
 	},
 
-	attachToBone: function(parentBoneGroupName, parentBoneName, parentBone){
+	attachToBone: function(parentBoneGroupUid, parentBoneName, parentBone){
 		parentBone.add(this.skeleton.bones[0]);
-		this.parentBoneGroupName = parentBoneGroupName;
+		this.parentBoneGroupUid = parentBoneGroupUid;
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
 	},
@@ -103,7 +104,7 @@ BoneGroup.prototype = {
 			name: this.name,
 			libraryName: this.libraryName,
 			meshes: this.meshes.dict,
-			parentBoneGroupName: this.parentBoneGroupName,
+			parentBoneGroupUid: this.parentBoneGroupUid,
 			parentBoneName: this.parentBoneName
 		};
 	}

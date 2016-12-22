@@ -165,20 +165,20 @@ figure.screenCap = function(cb){
 	//Take a screencap of the model for our purposes
 	var data =  dataURItoBlob( window.view.renderer.domElement.toDataURL("image/png") );
 	//var data =  window.view.renderer.domElement.toDataURL("image/png");
-    var __file_key = "captures/"+ user.id + "." + figure.id + "screencap.png";
+	var __file_key = "captures/"+ user.id + "." + figure.id + "screencap.png";
 
-    //setup the form with the magic input
-    var formData = new FormData();
-    formData.append('key', __file_key);
-    formData.append('AWSAccessKeyId', s3FormDetails.AWSAccessKeyId);
-    formData.append('acl', s3FormDetails.acl);
-    formData.append('policy', s3FormDetails.policy);
-    formData.append('signature', s3FormDetails.signature);
-    formData.append('Content-Type', "image/png");
-    formData.append('success_action_redirect', s3FormDetails.success_action_redirect);
-    formData.append('file', data);
+	//setup the form with the magic input
+	var formData = new FormData();
+	formData.append('key', __file_key);
+	formData.append('AWSAccessKeyId', s3FormDetails.AWSAccessKeyId);
+	formData.append('acl', s3FormDetails.acl);
+	formData.append('policy', s3FormDetails.policy);
+	formData.append('signature', s3FormDetails.signature);
+	formData.append('Content-Type', "image/png");
+	formData.append('success_action_redirect', s3FormDetails.success_action_redirect);
+	formData.append('file', data);
 
-    //send it off to S3
+	//send it off to S3
 	$.ajax({
 		url: s3FormDetails.url,
 		type: "POST",
@@ -348,15 +348,15 @@ $(document).ready( function(){
 	//we know there's going to be at least a few seconds of loading.  this will prevent flicker while the scene renders\
 	//TODO Make this sensitive to the onLoadComplete handler from three.js or whatever it's called
 	loader.show();
-	setTimeout(function(){ loader.hide(); }, 8000);
+	setTimeout(function(){ loader.hide(); }, 400);
 
 	//ATTACH SPINNERS TO AJAX EVENTS
 	$(document)
 	  .ajaxSend(function () {
-	    	loader.show();
+			loader.show();
 	  })
 	  .ajaxComplete(function () {
-	  		loader.hide();
+			loader.hide();
 	});
 
 	//keep it all using the REST apis rather than a combination of internal and external functions
@@ -400,17 +400,98 @@ $(document).ready( function(){
 	//GET ALL POSES
 	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
 
+	// ##################################################################
 
-	setGlobalPose = function(){
-		$("#editor-accordion").show();
+	showSelectDialogBox = function(title, options, inputPlaceholder, onResult){
+		swal({
+		 title: title,
+		 input: 'select',
+		 inputOptions: options,
+		 animation: false,
+		 inputPlaceholder: inputPlaceholder,
+		 showCancelButton: true,
+		 inputValidator: function (value) {
+		   return new Promise(function (resolve, reject) {
+			 if (value !== '') {
+			   resolve()
+			 } else {
+			   reject('Select a value.')
+			 }
+		   });
+		}
+		}).then(onResult);
 	};
 
+	clickedAttachBoneGroup = function(boneGroupId, boneGroupName){
+		boneGroupName = boneGroupName.replaceAll('_', ' ');
+		options = {};
+		attachPoints = model.getAvailableAttachPoints();
+		for (var boneGroup in attachPoints){
+			for (var i in attachPoints[boneGroup]){
+				attachPoint = attachPoints[boneGroup][i];
+				id = boneGroup + ';' + attachPoint;
+				label = boneGroup + ' (' + attachPoint.substring(1) + ')';
+				options[id] = label;
+			}
+		}
+
+		var onResult = function(result){
+			tokens = result.split(';');
+			boneGroup = tokens[0];
+			attachPoint = tokens[1];
+			model.attachBoneGroup(boneGroupName, boneGroup, attachPoint);
+		};
+
+		showSelectDialogBox('Attach Bone Group "' + boneGroupName + '"',
+							options,
+							'Select Attach Point',
+							onResult);
+	};
+
+	clickedRemoveBoneGroup = function(boneGroupId, boneGroupName){
+		model.removeBoneGroup(boneGroupName.replaceAll('_', ' '));
+	};
+
+	setGlobalPose = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").hide();
+		$("#pose-library").show();
+	};
+
+	addBoneGroup = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").show();
+		$("#pose-library").hide();
+	};
+
+	clickedMeshTab = function(){
+		$("#bone-library").hide();
+		$("#pose-library").hide();
+	};
+
+	clickedPoseTab = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").hide();
+	};
+
+	clickedBoneGroupsTab = function(){
+		$("#mesh-library").hide();
+		$("#pose-library").hide();
+	};
+
+	clickedSettingsTab = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").hide();
+		$("#pose-library").hide();
+	};
 	selectedBoneGroup = null;
 	// Add mesh button
 	$("#body-accordion").on("click",".mini-select[add-mesh-button]", function(e){
-		var boneGroupId = $(this).data("mesh-bone-group");
-		selectedBoneGroup = boneGroupId;
-		$("#editor-accordion").show();
+		var boneGroupUid = $(this).data("mesh-bone-group");
+		selectedBoneGroup = boneGroupUid;
+		$("#mesh-library").show();
+		$("#bone-library").hide();
+		$("#pose-library").hide();
 	});
 
 	// Click meshes tab mesh
@@ -420,7 +501,7 @@ $(document).ready( function(){
 	});
 
 	// Click library mesh
-	$("#editor-accordion").on("click",".mini-select[data-mesh-id]", function(e){
+	$("#mesh-library").on("click",".mini-select[data-mesh-id]", function(e){
 		var mid = $(this).data("mesh-id");
 		var library = $(this).data("mesh-library");
 		var meshName = $(this).data("mesh-mesh-name");
@@ -428,15 +509,35 @@ $(document).ready( function(){
 			model.addMesh(selectedBoneGroup, library, meshName);
 			selectedBoneGroup = null;
 		}
-		$("#editor-accordion").hide();
-		
-		//console.log( modelMap.mids[mid] );
+		$("#mesh-library").hide();
 	});
 
-	$("#editor-accordion").hide(); // Library hidden until 'Add <something>' button clicked
+	// Click library pose
+	$("#pose-library").on("click",".mini-select[data-pose-id]", function(e){
+		var mid = $(this).data("pose-id");
+		var library = $(this).data("pose-library");
+		var poseName = $(this).data("pose-pose-name");
+		model.loadPose(library, poseName);
+	});
+
+	// Click library bone group
+	$("#bone-library").on("click",".mini-select[data-bone-id]", function(e){
+		var mid = $(this).data("bone-id");
+		var library = $(this).data("bone-library");
+		var boneGroupName = $(this).data("bone-bone-name");
+		model.addBoneGroup(library, boneGroupName);
+		
+		$("#bone-library").hide();
+	});
+
+
+	// Library hidden until 'Add <something>' button clicked
+	$("#mesh-library").hide();
+	$("#pose-library").hide();
+	$("#bone-library").hide(); 
 
 	//DO SOMETHING IF YOU CLICK A FILTER
-	$("#editor-accordion").on("click",".mini-select[data-tag-id]", function(e){
+	$("#mesh-library").on("click",".mini-select[data-tag-id]", function(e){
 
 		//Tag ID of the filter is recorded on the element
 		var tid = $(this).data("tag-id");
@@ -481,39 +582,39 @@ $(document).ready( function(){
 
 			// Show warning message if your leaving the page during an upload.
 			window.onbeforeunload = function () {
-                return 'You have unsaved changes.';
-            };
+				return 'You have unsaved changes.';
+			};
 
-            // Give the file which is being uploaded it's current content-type (It doesn't retain it otherwise)
-            // and give it a unique name (so it won't overwrite anything already on s3).
-            var file = data.files[0];
-            var folder = $(this).data('folder');
+			// Give the file which is being uploaded it's current content-type (It doesn't retain it otherwise)
+			// and give it a unique name (so it won't overwrite anything already on s3).
+			var file = data.files[0];
+			var folder = $(this).data('folder');
 
-            __file_key = folder +"/"+ user.id + "." + Date.now() + '.' + file.name;
+			__file_key = folder +"/"+ user.id + "." + Date.now() + '.' + file.name;
 
-            data.formData = {
-            	"AWSAccessKeyId" : s3FormDetails.AWSAccessKeyId,
-            	"acl" : s3FormDetails.acl,
-            	"policy" : s3FormDetails.policy,
-            	"signature" : s3FormDetails.signature,
-            	'key' : __file_key,
+			data.formData = {
+				"AWSAccessKeyId" : s3FormDetails.AWSAccessKeyId,
+				"acl" : s3FormDetails.acl,
+				"policy" : s3FormDetails.policy,
+				"signature" : s3FormDetails.signature,
+				'key' : __file_key,
 				'Content-Type' : file.type,
 				'success_action_redirect' : s3FormDetails.success_action_redirect
 			};
 
-            // Actually submit to form to S3.
-            data.submit();
+			// Actually submit to form to S3.
+			data.submit();
 
-            // Show the progress bar
-            // Uses the file size as a unique identifier
-            var bar = $('<div class="progress" data-mod="'+file.size+'"><div class="bar"></div></div>');
-            $('.progress-bar-area').append(bar);
-            bar.slideDown('fast');
+			// Show the progress bar
+			// Uses the file size as a unique identifier
+			var bar = $('<div class="progress" data-mod="'+file.size+'"><div class="bar"></div></div>');
+			$('.progress-bar-area').append(bar);
+			bar.slideDown('fast');
 
 		},
 		progress: function(e, data) {
 			var percent = Math.round((data.loaded / data.total) * 100);
-            $('.progress[data-mod="'+data.files[0].size+'"] .bar').css('width', percent + '%').html(percent+'%');
+			$('.progress[data-mod="'+data.files[0].size+'"] .bar').css('width', percent + '%').html(percent+'%');
 		},
 		fail: function (e, data) {
 			window.onbeforeunload = null;
@@ -523,15 +624,15 @@ $(document).ready( function(){
 		done: function (e, data) {
 			window.onbeforeunload = null;
 
-	        // Upload Complete, show information about the upload in a textarea
-	        // from here you can do what you want as the file is on S3
-	        // e.g. save reference to your server using another ajax call or log it, etc.
-	        var original = data.files[0];
-	        var property = $(this).data('for');
-	        var type = $(this).data('upload');
-	        figure[property] = s3FormDetails.url + "/" + __file_key;
-	        figure.update();
-	       	uilog(type + " Uploaded: " + original.name + " [" + original.size +"bytes]");
+			// Upload Complete, show information about the upload in a textarea
+			// from here you can do what you want as the file is on S3
+			// e.g. save reference to your server using another ajax call or log it, etc.
+			var original = data.files[0];
+			var property = $(this).data('for');
+			var type = $(this).data('upload');
+			figure[property] = s3FormDetails.url + "/" + __file_key;
+			figure.update();
+			uilog(type + " Uploaded: " + original.name + " [" + original.size +"bytes]");
 		}
 	});
 });
@@ -542,10 +643,10 @@ $(document).ready( function(){
 	<div class="panel with-nav-tabs panel-primary">
 		<div class="panel-heading">
 				<ul class="nav nav-tabs">
-					<li class="nav-item"><a href="#tab1primary" class="nav-link active" data-toggle="tab">Meshes</a></li>
-					<li class="nav-item"><a href="#tab2primary" class="nav-link" data-toggle="tab">Pose</a></li>
-					<li class="nav-item"><a href="#tab3primary" class="nav-link" data-toggle="tab">Bone Groups</a></li>
-					<li class="nav-item"><a href="#tab4primary" class="nav-link" data-toggle="tab"><span class="icon-thunderbolt"></span></a></li>
+					<li class="nav-item"><a href="#tab1primary" class="nav-link active" data-toggle="tab" onclick="clickedMeshTab()">Meshes</a></li>
+					<li class="nav-item"><a href="#tab2primary" class="nav-link" data-toggle="tab" onclick="clickedPoseTab()">Pose</a></li>
+					<li class="nav-item"><a href="#tab3primary" class="nav-link" data-toggle="tab" onclick="clickedBoneGroupsTab()">Bone Groups</a></li>
+					<li class="nav-item"><a href="#tab4primary" class="nav-link" data-toggle="tab" onclick="clickedSettingsTab()"><span class="icon-thunderbolt"></span></a></li>
 					<!--TODO: Figure out what the COG icon is -->
 				</ul>
 		</div>
@@ -562,12 +663,13 @@ $(document).ready( function(){
 						<div class="panel card clearfix">
 							<div class="card-header" role="tab" id="pose-tab-global-poses">
 								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-tab-global-poses-data" aria-expanded="false" aria-controls="pose-tab-global-poses-data"> Global Poses </a>
+									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-tab-global-poses-data" aria-expanded="false" aria-controls="pose-tab-global-poses-data"> Main Poses: </a>
 								</h5>
 							</div>
 							<div id="pose-tab-global-poses-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-tab-global-poses">
 								<div class="card-block">
-						        	<button type="button" class="btn btn-secondary btn-sm" onclick="setGlobalPose()">Set</button>
+									<label id=current-pose-label>None Selected</label>
+									<button type="button" class="btn btn-secondary btn-sm" onclick="setGlobalPose()">Set</button>
 								</div>
 							</div>
 						</div>
@@ -576,7 +678,7 @@ $(document).ready( function(){
 				<div class="tab-pane" id="tab3primary">
 					<div id="bones-accordion" role="tablist" aria-multiselectable="true">
 						<!-- Will be populated by SceneView.js -->
-			        	<button class="btn btn-secondary btn-sm" type="button" onclick="alert('hi')">Add Bone Group</button>
+						<button class="btn btn-secondary btn-sm" type="button" onclick="addBoneGroup()">Add Bone Group</button>
 					</div>
 				</div>
 				<div class="tab-pane" id="tab4primary">
@@ -662,10 +764,10 @@ $(document).ready( function(){
 									
 									<label>Inspiration Photo</label>
 									<form enctype='multipart/form-data' id='inspiration-upload' data-folder="inspiration" data-upload="image" data-for="photo_inspiration">
-                						<input type="file" name="file" multiple>
-                					</form>
+										<input type="file" name="file" multiple>
+									</form>
 
-                					<img data-photo='photo_inspiration' class='figure-photo'>
+									<img data-photo='photo_inspiration' class='figure-photo'>
 								</div>
 							</div>
 						</div>
@@ -693,22 +795,28 @@ $(document).ready( function(){
 
 
 
-<div id="editor-accordion" class="col-md-3" role="tablist" aria-multiselectable="true">
-	<h2 class="text-white"> Library </h2>
+<div id="mesh-library" class="col-md-3" role="tablist" aria-multiselectable="true">
+	<h2 class="text-white"> Mesh Library </h2>
+</div>
+<div id="pose-library" class="col-md-3" role="tablist" aria-multiselectable="true">
+	<h2 class="text-white"> Pose Library </h2>
+</div>
+<div id="bone-library" class="col-md-3" role="tablist" aria-multiselectable="true">
+	<h2 class="text-white"> Bone Group Library </h2>
 </div>
 
 <div id='status-box'>
 	<h5 class='text-white float-left'>Console</h5>
 	<!-- Progress Bars to show upload completion percentage -->
-    <div class="progress-bar-area float-right"></div>
-    <form method="POST" enctype="multipart/form-data" class="direct-upload hidden">
-        <!--filled by JS as needed -->
-    </form>
+	<div class="progress-bar-area float-right"></div>
+	<form method="POST" enctype="multipart/form-data" class="direct-upload hidden">
+		<!--filled by JS as needed -->
+	</form>
 
-    <!-- This area will be filled with our results (mainly for debugging) -->
-    <div>
-        <textarea id="uiconsole"></textarea>
-    </div>
+	<!-- This area will be filled with our results (mainly for debugging) -->
+	<div>
+		<textarea id="uiconsole"></textarea>
+	</div>
 </div>
 
 <div id='loadingDiv'>
@@ -716,14 +824,14 @@ $(document).ready( function(){
 </div>
 
 <footer class="footer">
-  	<div class="container">
-    	<div class="input-group input-group-lg">
-  			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
-  			<span class="input-group-btn">
-        		<button class="btn btn-secondary" type="button" onclick="figure.save()">Save Figure</button>
-      		</span>
+	<div class="container">
+		<div class="input-group input-group-lg">
+			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" onclick="figure.save()">Save Figure</button>
+			</span>
 		</div>
-  	</div>  	
+	</div>  	
 </footer>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
@@ -753,3 +861,6 @@ $(document).ready( function(){
 <!-- Load the FileUpload Plugin (more info @ https://github.com/blueimp/jQuery-File-Upload) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.5.7/jquery.fileupload.js"></script>
+
+<script src="/js/sweetalert2.min.js"></script>
+<link rel="stylesheet" href="/css/sweetalert2.min.css">

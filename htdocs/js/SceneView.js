@@ -75,6 +75,7 @@ SceneView.prototype = {
 		this.populateTabs();
 		this.libraryPopulateMeshes();
 		this.libraryPopulatePoses();
+		this.libraryPopulateBoneGroups();
 	},
 
 	initLights: function(){
@@ -113,10 +114,10 @@ SceneView.prototype = {
 
 		for (var i = 0; i < this.boneHandles.length; i++){
 			var boneHandle = this.boneHandles[i];
-			var boneGroupName = boneHandle.boneGroupName;
+			var boneGroupUid = boneHandle.boneGroupUid;
 			var boneIndex = boneHandle.boneIndex;
 
-			var boneGroup = this.model.character.boneGroups.get(boneGroupName);
+			var boneGroup = this.model.character.boneGroups.get(boneGroupUid);
 			var bone = boneGroup.skeleton.bones[boneIndex];
 
 			var globalBonePosition = new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld);
@@ -147,9 +148,9 @@ SceneView.prototype = {
 		this.model.character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
 	},
 
-	onBoneGroupAdded: function(character, boneGroupName){
+	onBoneGroupAdded: function(character, boneGroupUid){
 		console.log("Bone group added!");
-		var boneGroup = character.boneGroups.get(boneGroupName);
+		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 
 		var randomColor = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
@@ -160,41 +161,63 @@ SceneView.prototype = {
 				continue;
 			}
 
-			var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
-			sphere.boneGroupName = boneGroupName;
-			sphere.boneIndex = i;
-			this.boneHandles.push(sphere);
+			var boneHandle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
+			boneHandle.boneGroupUid = boneGroupUid;
+			boneHandle.boneIndex = i;
+			this.boneHandles.push(boneHandle);
 
-			sphere.visible = this.boneHandlesVisible;
-			this.scene.add(sphere);
+			boneHandle.visible = this.boneHandlesVisible;
+			this.scene.add(boneHandle);
 		}
 
-		var boneGroupId = boneGroupName.replaceAll(' ', '_');
-		this.meshesTabAddBoneGroup(boneGroupId, boneGroupName);
-		this.poseTabAddBoneGroup(boneGroupId, boneGroupName);
-		this.boneGroupsTabAddBoneGroup(boneGroupId, boneGroupName);
+		this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
+		//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
+		this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
 
 		for (var meshName in boneGroup.meshes.dict){
 			//TODO: add icon as well.
-			this.meshesTabAddMesh(boneGroupId, meshName);
+			this.meshesTabAddMesh(boneGroupUid, meshName);
 		}
 		
 	},
 
-	onBoneGroupRemoved: function(character, boneGroupName){
+	onBoneGroupRemoved: function(character, boneGroupUid){
 		console.log("Bone group removed!");
-		// TODO: Remove meshes from scene.
-		// TODO: Remove bone listeners?
+
+		// Remove from three.js scene
+		var boneGroupsToRemove = [];
+		for (var i in this.scene.children){
+			var sceneElement = this.scene.children[i];
+			if (sceneElement.boneGroupUid === boneGroupUid){
+				boneGroupsToRemove.push(sceneElement);
+			}
+		}
+		for (var i in boneGroupsToRemove){
+			var element = boneGroupsToRemove[i];
+			this.scene.remove(element);
+		}
+
+		// Remove boneHandle entries.
+		var toRemove = [];
+		for (var i = 0; i < this.boneHandles.length; i++){
+			if (this.boneHandles[i].boneGroupUid === boneGroupUid){
+				toRemove.push(i);
+			}
+		}
+		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
+			var index = toRemove[i];
+			this.boneHandles.splice(index, 1);
+		}
 	},
 
 	onMeshAdded: function(boneGroup, meshName){
 		console.log("Mesh " + meshName + " added to bone group " + boneGroup.name + ".");
 
 		var mesh = boneGroup.meshes.get(meshName);
+		mesh.boneGroupUid = boneGroup.uid;
 		this.scene.add(mesh);
 
-		var boneGroupId = boneGroup.name.replaceAll(' ', '_');
-		this.meshesTabAddMesh(boneGroupId, meshName);
+		this.meshesTabAddMesh(boneGroup.uid, meshName);
 	},
 
 	toggleBoneHandlesVisible: function(){
@@ -274,7 +297,7 @@ SceneView.prototype = {
 		var closestBone = null, closestDistance = null;
 		for (var i = 0; i < intersections.length; i++){
 			var boneHandle = intersections[i].object;
-			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupName);
+			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
 			var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
 			if (bone.name.startsWith("#")){
 				continue;
@@ -336,30 +359,29 @@ SceneView.prototype = {
 
 	populateTabs: function(){
 		var boneGroups = this.model.character.boneGroups.dict;
-		for (var boneGroupName in boneGroups){
-			var boneGroup = boneGroups[boneGroupName];
-			var boneGroupId = boneGroupName.replaceAll(' ', '_');
-			this.meshesTabAddBoneGroup(boneGroupId, boneGroupName);
-			this.poseTabAddBoneGroup(boneGroupId, boneGroupName);
+		for (var boneGroupUid in boneGroups){
+			var boneGroup = boneGroups[boneGroupUid];
+			this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
+			//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
 
 			for (var meshName in boneGroup.meshes.dict){
 				//TODO: add icon as well.
-				this.meshesTabAddMesh(boneGroupId, meshName, "stuff.png");
+				this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
 			}
 		}
 	},
 
-	meshesTabAddBoneGroup: function(boneGroupId, boneGroupName){
+	meshesTabAddBoneGroup: function(boneGroupUid, boneGroupName){
 		var div = document.createElement('div');
-		boneGroupId = "meshes-tab-" + boneGroupId;
-		div.className = "panel card clearfix"
-		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupId + '">\
+		elementUid = "meshes-tab-" + boneGroupUid;
+		div.className = "panel card clearfix";
+		div.innerHTML = '<div class="card-header" role="tab" id="' + elementUid + '">\
 				<h5>\
 					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + boneGroupId + '-data" aria-expanded="false" aria-controls="' + boneGroupId + '-data"> ' + boneGroupName + ' </a>\
+						href="#' + elementUid + '-data" aria-expanded="false" aria-controls="' + elementUid + '-data"> ' + boneGroupName + ' </a>\
 				</h5>\
 			</div>\
-			<div id="' + boneGroupId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupId + '">\
+			<div id="' + elementUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementUid + '">\
 				<div class="card-block">\
 				</div>\
 			</div>';
@@ -369,42 +391,42 @@ SceneView.prototype = {
 		// Add the '+' button
 		var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
-		div.setAttribute("data-mesh-bone-group", boneGroupName);
+		div.setAttribute("data-mesh-bone-group", boneGroupUid);
 		div.setAttribute("add-mesh-button", "stuff");
 		div.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Add-circular-button-thin-symbol.svg/2000px-Add-circular-button-thin-symbol.svg.png" style="width:40px;height:40px;" alt="other stuff">\
 			<span class="label"> Add Mesh\
 		</span>';
 
-		document.getElementById(boneGroupId + '-data').children[0].appendChild(div);
+		document.getElementById(elementUid + '-data').children[0].appendChild(div);
 	},
 
-	meshesTabAddMesh: function(boneGroupId, meshName, iconUrl){
+	meshesTabAddMesh: function(boneGroupUid, meshName, iconUrl){
 		//TODO: Add icon
-		boneGroupId = "meshes-tab-" + boneGroupId;
+		boneGroupUid = "meshes-tab-" + boneGroupUid;
 
 		var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
 		div.setAttribute("meshes-tab-mesh", "stuff");
-		div.setAttribute("data-mesh-bone-group", boneGroupId);
+		div.setAttribute("data-mesh-bone-group", boneGroupUid);
 		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
 			<span class="label">' + meshName + '\
 		</span>';
 
-		libraryPane = document.getElementById(boneGroupId + '-data').children[0];
+		libraryPane = document.getElementById(boneGroupUid + '-data').children[0];
 		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
 	},
 
-	poseTabAddBoneGroup: function(boneGroupId, boneGroupName){
+	poseTabAddBoneGroup: function(boneGroupUid, boneGroupName){
 		var div = document.createElement('div');
-		boneGroupId = "pose-tab-" + boneGroupId;
-		div.className = "panel card clearfix"
-		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupId + '">\
+		boneGroupUid = "pose-tab-" + boneGroupUid;
+		div.className = "panel card clearfix";
+		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupUid + '">\
 				<h5>\
 					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + boneGroupId + '-data" aria-expanded="false" aria-controls="' + boneGroupId + '-data"> ' + boneGroupName + ' </a>\
+						href="#' + boneGroupUid + '-data" aria-expanded="false" aria-controls="' + boneGroupUid + '-data"> ' + boneGroupName + ' </a>\
 				</h5>\
 			</div>\
-			<div id="' + boneGroupId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupId + '">\
+			<div id="' + boneGroupUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupUid + '">\
 				<div class="card-block">\
 				</div>\
 			</div>';
@@ -413,35 +435,45 @@ SceneView.prototype = {
 		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
 	},
 
-	poseTabAddPose: function(boneGroupId, poseName, iconUrl){
+	poseTabAddPose: function(boneGroupUid, poseName, iconUrl){
 		//TODO: Add icon
-		boneGroupId = "pose-tab-" + boneGroupId;
+		boneGroupUid = "pose-tab-" + boneGroupUid;
 
 		var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
 		div.setAttribute("pose-tab-pose", "stuff");
-		div.setAttribute("data-pose-bone-group", boneGroupId);
+		div.setAttribute("data-pose-bone-group", boneGroupUid);
 		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
 			<span class="label">' + poseName + '\
 		</span>';
 
-		document.getElementById(boneGroupId + '-data').children[0].appendChild(div);
+		document.getElementById(boneGroupUid + '-data').children[0].appendChild(div);
 	},
 
-	boneGroupsTabAddBoneGroup: function(boneGroupId, boneGroupName){
+	boneGroupsTabAddBoneGroup: function(boneGroupUid, boneGroupName){
 		var div = document.createElement('div');
-		boneGroupId = "bone-groups-tab-" + boneGroupId;
-		div.className = "panel card clearfix"
-		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupId + '">\
+		elementId = "bone-groups-tab-" + boneGroupUid;
+		div.className = "panel card clearfix";
+		console.log('beansAAA')
+		console.log('aaa' + boneGroupUid + 'aaa')
+		console.log('aaa' + boneGroupName + 'aaa')
+		console.log('beansBBB')
+		div.innerHTML = '<div class="card-header" role="tab" id="' + elementId + '">\
 				<h5>\
 					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + boneGroupId + '-data" aria-expanded="false" aria-controls="' + boneGroupId + '-data"> ' + boneGroupName + ' </a>\
+						href="#' + elementId + '-data" aria-expanded="false" aria-controls="' + elementId + '-data"> ' + boneGroupName + ' </a>\
 				</h5>\
 			</div>\
-			<div id="' + boneGroupId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupId + '">\
+			<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
 				<div class="card-block">\
+					<label id=' + elementId + '-bone-attach-label>Unattached</label>\
+					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + elementId + '\',\'' + boneGroupUid + '\')>Attach To...</button>\
+				</div>\
+				<div class="card-block">\
+					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + elementId + '\',\'' + boneGroupUid + '\')>Remove</button>\
 				</div>\
 			</div>';
+		console.log(div.innerHTML);
 
 		libraryPane = document.getElementById("bones-accordion");
 		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
@@ -451,54 +483,101 @@ SceneView.prototype = {
 		var metadata = model.getAvailableMeshes();
 		for (var i = 0; i < metadata.length; i++){
 			var meshMetadata = metadata[i];
-			var type = meshMetadata.type;
-			var element = document.getElementById(type);
+			var category = meshMetadata.type;
+			var element = document.getElementById(category + "-mesh-category");
 			if (element === null){
-				this.libraryAddType(type);
+				this.libraryAddCategory("mesh-library", category, category + "-mesh-category");
 			}
 
-			this.libraryAddMesh(type, meshMetadata);
+			this.libraryAddMesh(category, meshMetadata);
 		}
 	},
 
 	libraryPopulatePoses: function(){
-		this.libraryAddType('Poses');
+		this.libraryAddCategory("pose-library", 'Poses', 'poses-pose-category');
 		var dict = model.getAvailablePoses();
-		for (var library in dict){
-			for (i = 0; i < library.length; i++){
-				this.libraryAddMesh('Poses', library[i]);
+		for (var libraryName in dict){
+			var poseMetadatas = dict[libraryName];
+			for (var i = 0; i < poseMetadatas.length; i++){
+				var poseMetadata = poseMetadatas[i];
+				this.libraryAddPose('poses', poseMetadata);
 			}
 		}
 	},
 
-	libraryAddType: function(type){
+	libraryPopulateBoneGroups: function(){
+		var dict = model.getAvailableBoneGroups();
+		for (var libraryName in dict){
+			var libraryMetadatas = dict[libraryName];
+			for (var i = 0; i < libraryMetadatas.length; i++){
+				var boneGroupMetadata = libraryMetadatas[i];
+				var category = boneGroupMetadata.type;
+				var element = document.getElementById(category + "-bone-category");
+				if (element === null){
+					this.libraryAddCategory("bone-library", category, category + "-bone-category");
+				}
+
+				this.libraryAddBoneGroup(category, boneGroupMetadata);
+			}
+		}
+	},
+
+	libraryAddCategory: function(libraryName, categoryName, categoryId){
 		var div = document.createElement('div');
 		div.className = "panel card clearfix";
-		div.innerHTML = '<div class="card-header" role="tab" id="' + type + '">\
+		div.innerHTML = '<div class="card-header" role="tab" id="' + categoryId + '">\
 				<h5>\
 					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + type + '-data" aria-expanded="false" aria-controls="' + type + '-data"> ' + type + ' </a>\
+						href="#' + categoryId + '-data" aria-expanded="false" aria-controls="' + categoryId + '-data"> ' + categoryName + ' </a>\
 				</h5>\
 			</div>\
-			<div id="' + type + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + type + '">\
+			<div id="' + categoryId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + categoryId + '">\
 				<div class="card-block">\
 				</div>\
 			</div>';
-		document.getElementById("editor-accordion").appendChild(div);
+		document.getElementById(libraryName).appendChild(div);
 	}, 
 
-	libraryAddMesh: function(type, meshMetadata){
+	libraryAddMesh: function(category, meshMetadata){
 		//TODO: Add icon
 		var div = document.createElement('div');
-		div.className = "mini-select col-md-3"
-		div.setAttribute("data-mesh-id", "TODO")
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-mesh-id", "TODO");
 		div.setAttribute("data-mesh-library", meshMetadata.library);
 		div.setAttribute("data-mesh-mesh-name", meshMetadata.name);
 		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
 			<span class="label">' + meshMetadata.name + '\
 		</span>';
 
-		document.getElementById(type + '-data').children[0].appendChild(div);
+		document.getElementById(category + '-mesh-category-data').children[0].appendChild(div);
+	},
+
+	libraryAddPose: function(category, poseMetadata){
+		//TODO: Add icon
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-pose-id", "TODO");
+		div.setAttribute("data-pose-library", poseMetadata.library);
+		div.setAttribute("data-pose-pose-name", poseMetadata.name);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + poseMetadata.name + '\
+		</span>';
+
+		document.getElementById(category + '-pose-category-data').children[0].appendChild(div);
+	},
+
+	libraryAddBoneGroup: function(category, boneMetadata){
+		//TODO: Add icon
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-bone-id", "TODO");
+		div.setAttribute("data-bone-library", boneMetadata.library);
+		div.setAttribute("data-bone-bone-name", boneMetadata.name);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + boneMetadata.name + '\
+		</span>';
+
+		document.getElementById(category + '-bone-category-data').children[0].appendChild(div);
 	}
 };
 

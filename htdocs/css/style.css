@@ -173,24 +173,60 @@ h5 {font-weight: normal;}
 #loadingDiv {background-color: rgba(125, 125, 125, 0.7); height: 100%;left: 0;position: absolute;text-align: center;top: 0;width: 100%;}
 
 #body-accordion-container { top: 15%; left:  1%; position: absolute; padding: 0; }
-#editor-accordion { top: 15%; right:  1%; position: absolute; }
+#mesh-library { top: 15%; right:  1%; position: absolute; }
+#pose-library { top: 15%; right:  1%; position: absolute; }
+#bone-library { top: 15%; right:  1%; position: absolute; }
 .nav-tabs .nav-link {background-color: rgba(125, 125, 125, 0.7)}
 
-#body-accordion-container .nav-tabs .nav-link, #editor-accordion .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000; }
-#body-accordion-container ul.nav, #editor-accordion ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
-#body-accordion-container ul.nav li, #editor-accordion ul.nav li {display: inline-block; float: none;}
-#body-accordion-container .card, #editor-accordion .card {background-color: rgba(125, 125, 125, 0.7) }
-#body-accordion-container .card .label, #editor-accordion .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
-#body-accordion-container .card .scroll, #editor-accordion .card .scroll {max-height: 200px; overflow: scroll; }
-#body-accordion-container .card .mini-select, #editor-accordion .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
-#body-accordion-container .card .mini-select .label, #editor-accordion .card .mini-select .label {white-space: normal;}
-#body-accordion-container .card .mini-select.hidden, #editor-accordion .card .mini-select.hidden { display:none;}
-#body-accordion-container .card .mini-select:hover, #editor-accordion .card .mini-select:hover { background: #ccc; }
-#body-accordion-container .card .card-header, #editor-accordion .card-header { padding: 0.1rem 1.25rem; margin-bottom: 0px}
-#body-accordion-container .card .card-header h5, #editor-accordion .card-header h5 { margin: 0 !important;}
-#body-accordion-container .card .card-header a, #editor-accordion .card-header a { display: block; padding: 0.1rem 1.25rem; margin: -0.1rem -1.25rem; border: none; outline: none;}
-#body-accordion-container .ui-selected, #editor-accordion .ui-selected {box-shadow: 0px 0px 5px #fff; }
-#body-accordion-container .ui-selected:after, #editor-accordion .ui-selected:after  {
+#body-accordion-container .nav-tabs .nav-link, #mesh-library .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000; }
+#body-accordion-container ul.nav, #mesh-library ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
+#body-accordion-container ul.nav li, #mesh-library ul.nav li {display: inline-block; float: none;}
+#body-accordion-container .card, #mesh-library .card {background-color: rgba(125, 125, 125, 0.7) }
+#body-accordion-container .card .label, #mesh-library .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
+#body-accordion-container .card .scroll, #mesh-library .card .scroll {max-height: 200px; overflow: scroll; }
+#body-accordion-container .card .mini-select, #mesh-library .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
+#body-accordion-container .card .mini-select .label, #mesh-library .card .mini-select .label {white-space: normal;}
+#body-accordion-container .card .mini-select.hidden, #mesh-library .card .mini-select.hidden { display:none;}
+#body-accordion-container .card .mini-select:hover, #mesh-library .card .mini-select:hover { background: #ccc; }
+#body-accordion-container .card .card-header, #mesh-library .card-header { padding: 0.1rem 1.25rem; margin-bottom: 0px}
+#body-accordion-container .card .card-header h5, #mesh-library .card-header h5 { margin: 0 !important;}
+#body-accordion-container .card .card-header a, #mesh-library .card-header a { display: block; padding: 0.1rem 1.25rem; margin: -0.1rem -1.25rem; border: none; outline: none;}
+#body-accordion-container .ui-selected, #mesh-library .ui-selected {box-shadow: 0px 0px 5px #fff; }
+#body-accordion-container .ui-selected:after, #mesh-library .ui-selected:after  {
+    background: rgba(0, 0, 0, 0) url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjM2My4wMjVweCIgaGVpZ2h0PSIzNjMuMDI0cHgiIHZpZXdCb3g9IjAgMCAzNjMuMDI1IDM2My4wMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2My4wMjUgMzYzLjAyNDsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggc3R5bGU9ImZpbGw6IzAzMDMwMzsiIGQ9Ik0xODEuNTEyLDM2My4wMjRDODEuNDMsMzYzLjAyNCwwLDI4MS42MDEsMCwxODEuNTEzQzAsODEuNDI0LDgxLjQzLDAsMTgxLjUxMiwwDQoJCQkJYzEwMC4wODMsMCwxODEuNTEzLDgxLjQyNCwxODEuNTEzLDE4MS41MTNDMzYzLjAyNSwyODEuNjAxLDI4MS41OTUsMzYzLjAyNCwxODEuNTEyLDM2My4wMjR6IE0xODEuNTEyLDExLjcxDQoJCQkJQzg3Ljg4LDExLjcxLDExLjcxLDg3Ljg4NiwxMS43MSwxODEuNTEzczc2LjE3LDE2OS44MDIsMTY5LjgwMiwxNjkuODAyYzkzLjYzMywwLDE2OS44MDMtNzYuMTc1LDE2OS44MDMtMTY5LjgwMg0KCQkJCVMyNzUuMTQ1LDExLjcxLDE4MS41MTIsMTEuNzF6Ii8+DQoJCTwvZz4NCgk8L2c+DQoJPGc+DQoJCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAzMDM7IiBwb2ludHM9IjE0Ny45NTcsMjU4LjkzNSA4My4wNjgsMTk0LjA0NiA5MS4zNDgsMTg1Ljc2NyAxNDcuOTU3LDI0Mi4zNzUgMjcxLjE3MSwxMTkuMTY2IA0KCQkJMjc5LjQ1MSwxMjcuNDQ1IAkJIi8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat scroll 0 0 / contain ;content: "";display: block;height: 50%;left: 25%;position: absolute;top: 15%;width: 50%;}
+
+#body-accordion-container .nav-tabs .nav-link, #pose-library .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000; }
+#body-accordion-container ul.nav, #pose-library ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
+#body-accordion-container ul.nav li, #pose-library ul.nav li {display: inline-block; float: none;}
+#body-accordion-container .card, #pose-library .card {background-color: rgba(125, 125, 125, 0.7) }
+#body-accordion-container .card .label, #pose-library .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
+#body-accordion-container .card .scroll, #pose-library .card .scroll {max-height: 200px; overflow: scroll; }
+#body-accordion-container .card .mini-select, #pose-library .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
+#body-accordion-container .card .mini-select .label, #pose-library .card .mini-select .label {white-space: normal;}
+#body-accordion-container .card .mini-select.hidden, #pose-library .card .mini-select.hidden { display:none;}
+#body-accordion-container .card .mini-select:hover, #pose-library .card .mini-select:hover { background: #ccc; }
+#body-accordion-container .card .card-header, #pose-library .card-header { padding: 0.1rem 1.25rem; margin-bottom: 0px}
+#body-accordion-container .card .card-header h5, #pose-library .card-header h5 { margin: 0 !important;}
+#body-accordion-container .card .card-header a, #pose-library .card-header a { display: block; padding: 0.1rem 1.25rem; margin: -0.1rem -1.25rem; border: none; outline: none;}
+#body-accordion-container .ui-selected, #pose-library .ui-selected {box-shadow: 0px 0px 5px #fff; }
+#body-accordion-container .ui-selected:after, #pose-library .ui-selected:after  {
+    background: rgba(0, 0, 0, 0) url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjM2My4wMjVweCIgaGVpZ2h0PSIzNjMuMDI0cHgiIHZpZXdCb3g9IjAgMCAzNjMuMDI1IDM2My4wMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2My4wMjUgMzYzLjAyNDsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggc3R5bGU9ImZpbGw6IzAzMDMwMzsiIGQ9Ik0xODEuNTEyLDM2My4wMjRDODEuNDMsMzYzLjAyNCwwLDI4MS42MDEsMCwxODEuNTEzQzAsODEuNDI0LDgxLjQzLDAsMTgxLjUxMiwwDQoJCQkJYzEwMC4wODMsMCwxODEuNTEzLDgxLjQyNCwxODEuNTEzLDE4MS41MTNDMzYzLjAyNSwyODEuNjAxLDI4MS41OTUsMzYzLjAyNCwxODEuNTEyLDM2My4wMjR6IE0xODEuNTEyLDExLjcxDQoJCQkJQzg3Ljg4LDExLjcxLDExLjcxLDg3Ljg4NiwxMS43MSwxODEuNTEzczc2LjE3LDE2OS44MDIsMTY5LjgwMiwxNjkuODAyYzkzLjYzMywwLDE2OS44MDMtNzYuMTc1LDE2OS44MDMtMTY5LjgwMg0KCQkJCVMyNzUuMTQ1LDExLjcxLDE4MS41MTIsMTEuNzF6Ii8+DQoJCTwvZz4NCgk8L2c+DQoJPGc+DQoJCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAzMDM7IiBwb2ludHM9IjE0Ny45NTcsMjU4LjkzNSA4My4wNjgsMTk0LjA0NiA5MS4zNDgsMTg1Ljc2NyAxNDcuOTU3LDI0Mi4zNzUgMjcxLjE3MSwxMTkuMTY2IA0KCQkJMjc5LjQ1MSwxMjcuNDQ1IAkJIi8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat scroll 0 0 / contain ;content: "";display: block;height: 50%;left: 25%;position: absolute;top: 15%;width: 50%;}
+
+#body-accordion-container .nav-tabs .nav-link, #bone-library .nav-tabs .nav-link {padding: 0.5em; font-size: 0.9em; text-transform: capitalize; float: none; color: #000; }
+#body-accordion-container ul.nav, #bone-library ul.nav {white-space: nowrap; overflow-x: scroll; overflow-y: hidden;}
+#body-accordion-container ul.nav li, #bone-library ul.nav li {display: inline-block; float: none;}
+#body-accordion-container .card, #bone-library .card {background-color: rgba(125, 125, 125, 0.7) }
+#body-accordion-container .card .label, #bone-library .card .label {margin-bottom: 0; padding: 0 !important; width: 100%; font-size: 0.8em;}
+#body-accordion-container .card .scroll, #bone-library .card .scroll {max-height: 200px; overflow: scroll; }
+#body-accordion-container .card .mini-select, #bone-library .card .mini-select { cursor:  pointer; transition:  background-color 0.5s ease;  background-color: transparent; padding: 10px 10px 0 10px;}
+#body-accordion-container .card .mini-select .label, #bone-library .card .mini-select .label {white-space: normal;}
+#body-accordion-container .card .mini-select.hidden, #bone-library .card .mini-select.hidden { display:none;}
+#body-accordion-container .card .mini-select:hover, #bone-library .card .mini-select:hover { background: #ccc; }
+#body-accordion-container .card .card-header, #bone-library .card-header { padding: 0.1rem 1.25rem; margin-bottom: 0px}
+#body-accordion-container .card .card-header h5, #bone-library .card-header h5 { margin: 0 !important;}
+#body-accordion-container .card .card-header a, #bone-library .card-header a { display: block; padding: 0.1rem 1.25rem; margin: -0.1rem -1.25rem; border: none; outline: none;}
+#body-accordion-container .ui-selected, #bone-library .ui-selected {box-shadow: 0px 0px 5px #fff; }
+#body-accordion-container .ui-selected:after, #bone-library .ui-selected:after  {
     background: rgba(0, 0, 0, 0) url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgd2lkdGg9IjM2My4wMjVweCIgaGVpZ2h0PSIzNjMuMDI0cHgiIHZpZXdCb3g9IjAgMCAzNjMuMDI1IDM2My4wMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2My4wMjUgMzYzLjAyNDsiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPGc+DQoJCTxnPg0KCQkJPHBhdGggc3R5bGU9ImZpbGw6IzAzMDMwMzsiIGQ9Ik0xODEuNTEyLDM2My4wMjRDODEuNDMsMzYzLjAyNCwwLDI4MS42MDEsMCwxODEuNTEzQzAsODEuNDI0LDgxLjQzLDAsMTgxLjUxMiwwDQoJCQkJYzEwMC4wODMsMCwxODEuNTEzLDgxLjQyNCwxODEuNTEzLDE4MS41MTNDMzYzLjAyNSwyODEuNjAxLDI4MS41OTUsMzYzLjAyNCwxODEuNTEyLDM2My4wMjR6IE0xODEuNTEyLDExLjcxDQoJCQkJQzg3Ljg4LDExLjcxLDExLjcxLDg3Ljg4NiwxMS43MSwxODEuNTEzczc2LjE3LDE2OS44MDIsMTY5LjgwMiwxNjkuODAyYzkzLjYzMywwLDE2OS44MDMtNzYuMTc1LDE2OS44MDMtMTY5LjgwMg0KCQkJCVMyNzUuMTQ1LDExLjcxLDE4MS41MTIsMTEuNzF6Ii8+DQoJCTwvZz4NCgk8L2c+DQoJPGc+DQoJCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAzMDM7IiBwb2ludHM9IjE0Ny45NTcsMjU4LjkzNSA4My4wNjgsMTk0LjA0NiA5MS4zNDgsMTg1Ljc2NyAxNDcuOTU3LDI0Mi4zNzUgMjcxLjE3MSwxMTkuMTY2IA0KCQkJMjc5LjQ1MSwxMjcuNDQ1IAkJIi8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=") no-repeat scroll 0 0 / contain ;content: "";display: block;height: 50%;left: 25%;position: absolute;top: 15%;width: 50%;}
 
 .footer { background-color: rgba(245, 245, 245, 0.5); bottom: 0; height: 60px; position: absolute; width: 100%; padding-top: 5px;}
