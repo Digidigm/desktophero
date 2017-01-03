@@ -1,4 +1,5 @@
 function BoneGroup(name, libraryName, skeleton){
+	this.uid = createUid();
 	this.name = name;
 	this.libraryName = libraryName; // Keeps track of where this bone group is found, for saving characters.
 	this.skeleton = skeleton;
@@ -6,7 +7,10 @@ function BoneGroup(name, libraryName, skeleton){
 	this.currentPose;
 	this.attachPoints = {};
 
-	this.parentBoneGroupName; // Used when saving character.
+	this.attachedEvent = new Event(this);
+	this.unattachedEvent = new Event(this);
+
+	this.parentBoneGroupUid; // Used when saving character.
 	this.parentBoneName; // Used when saving character.
 	this.parentBone = null;
 
@@ -20,7 +24,7 @@ function BoneGroup(name, libraryName, skeleton){
 
 BoneGroup.prototype = {
 	addMesh: function (meshName, mesh){
-		console.log('Adding mesh "' + meshName + '" bone group "' + this.name + '".');
+		console.log('Adding mesh "' + meshName + '" to bone group "' + this.name + '".');
 
 		var bone0 = this.skeleton.bones[0];
 
@@ -41,9 +45,9 @@ BoneGroup.prototype = {
 			bone0.rotation.y = 0;
 			bone0.rotation.z = 0;
 
-			bone0.scale.x = 0;
-			bone0.scale.y = 0;
-			bone0.scale.z = 0;
+			bone0.scale.x = 1;
+			bone0.scale.y = 1;
+			bone0.scale.z = 1;
 		}
 
 		mesh.children = [];
@@ -54,9 +58,9 @@ BoneGroup.prototype = {
 
 		if (this.parentBone != null){
 			// Restore bone parent.
-			this.attachToBone(this.parentBoneGroupName, 
-								this.parentBoneName, 
-								this.parentBone); 
+			this.attachToBone(this.parentBoneGroupUid,
+								this.parentBoneName,
+								this.parentBone);
 			// Restore previous position, rotation, scale.
 			bone0.position.x = position.x;
 			bone0.position.y = position.y;
@@ -72,11 +76,17 @@ BoneGroup.prototype = {
 		}
 	},
 
-	attachToBone: function(parentBoneGroupName, parentBoneName, parentBone){
+	removeMesh: function (meshName){
+		this.meshes.remove(meshName);
+	},
+
+	attachToBone: function(parentBoneGroupUid, parentBoneName, parentBone){
 		parentBone.add(this.skeleton.bones[0]);
-		this.parentBoneGroupName = parentBoneGroupName;
+		this.parentBoneGroupUid = parentBoneGroupUid;
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
+
+		this.attachedEvent.notify(parentBoneGroupUid);
 	},
 
 	unattach: function(){
@@ -91,7 +101,9 @@ BoneGroup.prototype = {
 		bone0.position.x = 0;
 		bone0.position.y = 0;
 		bone0.position.z = 0;
-		bone0.updateMatrixWorld()
+		bone0.updateMatrixWorld();
+
+		this.unattachedEvent.notify();
 	},
 
 	toJSON: function(){
@@ -99,7 +111,7 @@ BoneGroup.prototype = {
 			name: this.name,
 			libraryName: this.libraryName,
 			meshes: this.meshes.dict,
-			parentBoneGroupName: this.parentBoneGroupName,
+			parentBoneGroupUid: this.parentBoneGroupUid,
 			parentBoneName: this.parentBoneName
 		};
 	}

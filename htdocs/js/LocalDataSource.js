@@ -8,8 +8,8 @@ function LocalDataSource(name, directoryURL){
 	this.posesDirectory = directoryURL + '/poses';
 	this.boneGroupsDirectory = directoryURL + '/bone groups';
 	this.meshes = new ObservableDict();
-	this.poses = new ObservableList();
-	this.boneGroups = new ObservableList();
+	this.poses = new ObservableDict();
+	this.boneGroups = new ObservableDict();
 
 	// Events
 	this.meshesRefreshedEvent = new Event(this);
@@ -38,39 +38,42 @@ LocalDataSource.prototype = {
 	},
 
 	refreshMeshesList: function(){
-		this.meshes = {};
+		this.meshes = new ObservableDict();
 
 		// Fake data for now.
-		this.meshes['left arm'] = new MeshMetadata('left arm', 'stockto2', 'Default', 'arm', ['cool', 'great']);
-		this.meshes['right arm'] = new MeshMetadata('right arm', 'stockto2', 'Default', 'arm', ['cool', 'great']);
-		this.meshes['torso'] = new MeshMetadata('torso', 'stockto2', 'Default', 'torso', ['cool', 'great']);
-		this.meshes['hat'] = new MeshMetadata('hat', 'stockto2', 'Default', 'hat', ['cool', 'monkey']);
-		this.meshes['head'] = new MeshMetadata('head', 'stockto2', 'Default', 'head', ['cool', 'great']);
-		this.meshes['tentacle'] = new MeshMetadata('tentacle', 'stockto2', 'Default', 'arm', ['cool', 'great']);
-		this.meshes['neck'] = new MeshMetadata('neck', 'stockto2', 'Default', 'neck', ['cool', 'great']);
-		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'Default', 'weapon', ['cool', 'great']);
+		this.meshes['left arm'] = new MeshMetadata('left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['right arm'] = new MeshMetadata('right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['torso'] = new MeshMetadata('torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
+		this.meshes['hat'] = new MeshMetadata('hat', 'stockto2', 'default', 'hat', ['cool', 'monkey']);
+		this.meshes['head'] = new MeshMetadata('head', 'stockto2', 'default', 'head', ['cool', 'great']);
+		this.meshes['tentacle'] = new MeshMetadata('tentacle', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['neck'] = new MeshMetadata('neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
+		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']);
 
 		this.meshesRefreshedEvent.notify(this.meshes);
 	},
 
 	refreshPosesList: function(){
-		this.poses.clear();
+		this.poses = new ObservableDict();
 		// Fake data for now.
-		this.poses.addAll(['amazing pose', 'awesome pose', 'cool pose']);
+		this.poses.put('amazing pose', new PoseMetadata('amazing pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
+		this.poses.put('awesome pose', new PoseMetadata('awesome pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
+		this.poses.put('cool pose', new PoseMetadata('cool pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
+
 		this.posesRefreshedEvent.notify(this.poses);
 	},
 
 	refreshBoneGroupsList: function(){
-		this.boneGroups.clear();
+		this.boneGroups = new ObservableDict();
 		// Fake data for now.
-		this.boneGroups.addAll(['left arm',
-								'right arm',
-								'torso',
-								'hat',
-								'head',
-								'tentacle',
-								'neck',
-								'handheld']);
+		this.boneGroups.put('left arm', new PoseMetadata('left arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('right arm', new PoseMetadata('right arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('torso', new PoseMetadata('torso', 'stockto2', 'default', 'torso', ['cool', 'great']));
+		this.boneGroups.put('head', new PoseMetadata('head', 'stockto2', 'default', 'head', ['cool', 'great']));
+		this.boneGroups.put('tentacle', new PoseMetadata('tentacle', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('neck', new PoseMetadata('neck', 'stockto2', 'default', 'neck', ['cool', 'great']));
+		this.boneGroups.put('handheld', new PoseMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']));
+
 		this.boneGroupsRefreshedEvent.notify(this.boneGroups);
 	},
 
@@ -81,7 +84,7 @@ LocalDataSource.prototype = {
 			materials[0].skinning = true;
 
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
-			mesh.name = name;
+			mesh.meshName = name;
 			mesh.libraryName = self.name;
 
 			mesh.frustumCulled = false;
@@ -101,22 +104,38 @@ LocalDataSource.prototype = {
 		});
 	},
 
-	fetchBoneGroup: function(meshName, callback){
+	fetchBoneGroup: function(boneGroupName, callback){
 		var self = this;
-		var filename = this.boneGroupsDirectory + '/' + meshName + '.js';
+		var filename = this.boneGroupsDirectory + '/' + boneGroupName + '.js';
 		LocalDataSource.loader.load(filename, function(geometry, materials){
 			// Get skeleton out of geometry.
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
 			var skeleton = mesh.skeleton;
 
 			// Construct new bone group with skeleton.
-			var boneGroup = new BoneGroup(meshName, self.name, skeleton);
-			callback(meshName, boneGroup);
+			var boneGroup = new BoneGroup(boneGroupName, self.name, skeleton);
+			callback(boneGroup);
 		});
 	}
 }
 
 function MeshMetadata(name, author, library, type, tags){
+	this.name = name;
+	this.author = author;
+	this.library = library;
+	this.type = type;
+	this.tags = tags;
+}
+
+function PoseMetadata(name, author, library, type, tags){
+	this.name = name;
+	this.author = author;
+	this.library = library;
+	this.type = type;
+	this.tags = tags;
+}
+
+function BoneGroupMetadata(name, author, library, type, tags){
 	this.name = name;
 	this.author = author;
 	this.library = library;

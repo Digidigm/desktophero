@@ -165,20 +165,20 @@ figure.screenCap = function(cb){
 	//Take a screencap of the model for our purposes
 	var data =  dataURItoBlob( window.view.renderer.domElement.toDataURL("image/png") );
 	//var data =  window.view.renderer.domElement.toDataURL("image/png");
-    var __file_key = "captures/"+ user.id + "." + figure.id + "screencap.png";
+	var __file_key = "captures/"+ user.id + "." + figure.id + "screencap.png";
 
-    //setup the form with the magic input
-    var formData = new FormData();
-    formData.append('key', __file_key);
-    formData.append('AWSAccessKeyId', s3FormDetails.AWSAccessKeyId);
-    formData.append('acl', s3FormDetails.acl);
-    formData.append('policy', s3FormDetails.policy);
-    formData.append('signature', s3FormDetails.signature);
-    formData.append('Content-Type', "image/png");
-    formData.append('success_action_redirect', s3FormDetails.success_action_redirect);
-    formData.append('file', data);
+	//setup the form with the magic input
+	var formData = new FormData();
+	formData.append('key', __file_key);
+	formData.append('AWSAccessKeyId', s3FormDetails.AWSAccessKeyId);
+	formData.append('acl', s3FormDetails.acl);
+	formData.append('policy', s3FormDetails.policy);
+	formData.append('signature', s3FormDetails.signature);
+	formData.append('Content-Type', "image/png");
+	formData.append('success_action_redirect', s3FormDetails.success_action_redirect);
+	formData.append('file', data);
 
-    //send it off to S3
+	//send it off to S3
 	$.ajax({
 		url: s3FormDetails.url,
 		type: "POST",
@@ -348,15 +348,15 @@ $(document).ready( function(){
 	//we know there's going to be at least a few seconds of loading.  this will prevent flicker while the scene renders\
 	//TODO Make this sensitive to the onLoadComplete handler from three.js or whatever it's called
 	loader.show();
-	setTimeout(function(){ loader.hide(); }, 8000);
+	setTimeout(function(){ loader.hide(); }, 400);
 
 	//ATTACH SPINNERS TO AJAX EVENTS
 	$(document)
 	  .ajaxSend(function () {
-	    	loader.show();
+			loader.show();
 	  })
 	  .ajaxComplete(function () {
-	  		loader.hide();
+			loader.hide();
 	});
 
 	//keep it all using the REST apis rather than a combination of internal and external functions
@@ -400,20 +400,147 @@ $(document).ready( function(){
 	//GET ALL POSES
 	getTabbedItems("/api/v1/model/by/pose/pose","editor-poses-data","pose");
 
-	//DO SOMETHING IF YOU CLICK ON A MODEL
-	$("#editor-accordion").on("click",".mini-select[data-model-id]", function(e){
-		var mid = $(this).data("model-id");
-		alert("You clicked model: " + mid );
-		//console.log( modelMap.mids[mid] );
+	// ##################################################################
 
-		$(this).toggleClass("ui-selected");
+	showSelectDialogBox = function(title, options, inputPlaceholder, onResult){
+		swal({
+		 title: title,
+		 input: 'select',
+		 inputOptions: options,
+		 animation: false,
+		 inputPlaceholder: inputPlaceholder,
+		 showCancelButton: true,
+		 inputValidator: function (value) {
+		   return new Promise(function (resolve, reject) {
+			 if (value !== '') {
+			   resolve()
+			 } else {
+			   reject('Select a value.')
+			 }
+		   });
+		}
+		}).then(onResult);
+	};
 
-		//TODO: call a function that affects the scene, add or remove the model from the figure
-		//TODO: call a function that updates the current bodyMap
+	clickedAttachBoneGroup = function(boneGroupUid, boneGroupNameUnderscored){
+		boneGroupName = boneGroupNameUnderscored.replaceAll('_', ' ');
+		options = {};
+		attachPoints = model.getAvailableAttachPoints();
+		for (var toBoneGroupUid in attachPoints){
+			var boneGroupName = model.character.boneGroups.get(toBoneGroupUid).name;
+			for (var i in attachPoints[toBoneGroupUid]){
+				attachPoint = attachPoints[toBoneGroupUid][i];
+				id = toBoneGroupUid + ';' + attachPoint;
+				label = boneGroupName + ' (' + attachPoint.substring(1) + ')';
+				options[id] = label;
+			}
+		}
+
+		var onResult = function(result){
+			tokens = result.split(';');
+			toBoneGroupUid = tokens[0];
+			attachPoint = tokens[1];
+			model.attachBoneGroup(boneGroupUid, toBoneGroupUid, attachPoint);
+		};
+
+		showSelectDialogBox('Attach Bone Group "' + boneGroupName + '"',
+							options,
+							'Select Attach Point',
+							onResult);
+	};
+
+	clickedRemoveBoneGroup = function(boneGroupId){
+		model.removeBoneGroup(boneGroupId);
+	};
+
+
+	setGlobalPose = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").hide();
+		$("#pose-library").show();
+	};
+
+	addBoneGroup = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").show();
+		$("#pose-library").hide();
+	};
+
+	clickedMeshTab = function(){
+		$("#bone-library").hide();
+		$("#pose-library").hide();
+	};
+
+	clickedPoseTab = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").hide();
+	};
+
+	clickedBoneGroupsTab = function(){
+		$("#mesh-library").hide();
+		$("#pose-library").hide();
+	};
+
+	clickedSettingsTab = function(){
+		$("#mesh-library").hide();
+		$("#bone-library").hide();
+		$("#pose-library").hide();
+	};
+	selectedBoneGroup = null;
+	// Add mesh button
+	$("#body-accordion").on("click",".mini-select[add-mesh-button]", function(e){
+		var boneGroupUid = $(this).data("mesh-bone-group");
+		selectedBoneGroup = boneGroupUid;
+		$("#mesh-library").show();
+		$("#bone-library").hide();
+		$("#pose-library").hide();
 	});
 
+	// Click meshes tab mesh
+	$("#body-accordion").on("dblclick",".mini-select[meshes-tab-mesh]", function(e){
+		var boneGroupId = $(this).data("mesh-bone-group");
+		var meshName =  $(this).data("mesh-name");
+		model.removeMesh(boneGroupId, meshName);
+	});
+
+	// Click library mesh
+	$("#mesh-library").on("click",".mini-select[data-mesh-id]", function(e){
+		var mid = $(this).data("mesh-id");
+		var library = $(this).data("mesh-library");
+		var meshName = $(this).data("mesh-mesh-name");
+		if (selectedBoneGroup !== null){
+			model.addMesh(selectedBoneGroup, library, meshName);
+			selectedBoneGroup = null;
+		}
+		$("#mesh-library").hide();
+	});
+
+	// Click library pose
+	$("#pose-library").on("click",".mini-select[data-pose-id]", function(e){
+		var mid = $(this).data("pose-id");
+		var library = $(this).data("pose-library");
+		var poseName = $(this).data("pose-pose-name");
+		model.loadPose(library, poseName);
+	});
+
+	// Click library bone group
+	$("#bone-library").on("click",".mini-select[data-bone-id]", function(e){
+		var mid = $(this).data("bone-id");
+		var library = $(this).data("bone-library");
+		var boneGroupName = $(this).data("bone-bone-name");
+		model.addBoneGroup(library, boneGroupName);
+		
+		$("#bone-library").hide();
+	});
+
+
+	// Library hidden until 'Add <something>' button clicked
+	$("#mesh-library").hide();
+	$("#pose-library").hide();
+	$("#bone-library").hide(); 
+
 	//DO SOMETHING IF YOU CLICK A FILTER
-	$("#editor-accordion").on("click",".mini-select[data-tag-id]", function(e){
+	$("#mesh-library").on("click",".mini-select[data-tag-id]", function(e){
 
 		//Tag ID of the filter is recorded on the element
 		var tid = $(this).data("tag-id");
@@ -458,39 +585,39 @@ $(document).ready( function(){
 
 			// Show warning message if your leaving the page during an upload.
 			window.onbeforeunload = function () {
-                return 'You have unsaved changes.';
-            };
+				return 'You have unsaved changes.';
+			};
 
-            // Give the file which is being uploaded it's current content-type (It doesn't retain it otherwise)
-            // and give it a unique name (so it won't overwrite anything already on s3).
-            var file = data.files[0];
-            var folder = $(this).data('folder');
+			// Give the file which is being uploaded it's current content-type (It doesn't retain it otherwise)
+			// and give it a unique name (so it won't overwrite anything already on s3).
+			var file = data.files[0];
+			var folder = $(this).data('folder');
 
-            __file_key = folder +"/"+ user.id + "." + Date.now() + '.' + file.name;
+			__file_key = folder +"/"+ user.id + "." + Date.now() + '.' + file.name;
 
-            data.formData = {
-            	"AWSAccessKeyId" : s3FormDetails.AWSAccessKeyId,
-            	"acl" : s3FormDetails.acl,
-            	"policy" : s3FormDetails.policy,
-            	"signature" : s3FormDetails.signature,
-            	'key' : __file_key,
+			data.formData = {
+				"AWSAccessKeyId" : s3FormDetails.AWSAccessKeyId,
+				"acl" : s3FormDetails.acl,
+				"policy" : s3FormDetails.policy,
+				"signature" : s3FormDetails.signature,
+				'key' : __file_key,
 				'Content-Type' : file.type,
 				'success_action_redirect' : s3FormDetails.success_action_redirect
 			};
 
-            // Actually submit to form to S3.
-            data.submit();
+			// Actually submit to form to S3.
+			data.submit();
 
-            // Show the progress bar
-            // Uses the file size as a unique identifier
-            var bar = $('<div class="progress" data-mod="'+file.size+'"><div class="bar"></div></div>');
-            $('.progress-bar-area').append(bar);
-            bar.slideDown('fast');
+			// Show the progress bar
+			// Uses the file size as a unique identifier
+			var bar = $('<div class="progress" data-mod="'+file.size+'"><div class="bar"></div></div>');
+			$('.progress-bar-area').append(bar);
+			bar.slideDown('fast');
 
 		},
 		progress: function(e, data) {
 			var percent = Math.round((data.loaded / data.total) * 100);
-            $('.progress[data-mod="'+data.files[0].size+'"] .bar').css('width', percent + '%').html(percent+'%');
+			$('.progress[data-mod="'+data.files[0].size+'"] .bar').css('width', percent + '%').html(percent+'%');
 		},
 		fail: function (e, data) {
 			window.onbeforeunload = null;
@@ -500,15 +627,15 @@ $(document).ready( function(){
 		done: function (e, data) {
 			window.onbeforeunload = null;
 
-	        // Upload Complete, show information about the upload in a textarea
-	        // from here you can do what you want as the file is on S3
-	        // e.g. save reference to your server using another ajax call or log it, etc.
-	        var original = data.files[0];
-	        var property = $(this).data('for');
-	        var type = $(this).data('upload');
-	        figure[property] = s3FormDetails.url + "/" + __file_key;
-	        figure.update();
-	       	uilog(type + " Uploaded: " + original.name + " [" + original.size +"bytes]");
+			// Upload Complete, show information about the upload in a textarea
+			// from here you can do what you want as the file is on S3
+			// e.g. save reference to your server using another ajax call or log it, etc.
+			var original = data.files[0];
+			var property = $(this).data('for');
+			var type = $(this).data('upload');
+			figure[property] = s3FormDetails.url + "/" + __file_key;
+			figure.update();
+			uilog(type + " Uploaded: " + original.name + " [" + original.size +"bytes]");
 		}
 	});
 });
@@ -519,10 +646,10 @@ $(document).ready( function(){
 	<div class="panel with-nav-tabs panel-primary">
 		<div class="panel-heading">
 				<ul class="nav nav-tabs">
-					<li class="nav-item"><a href="#tab1primary" class="nav-link active" data-toggle="tab">Meshes</a></li>
-					<li class="nav-item"><a href="#tab2primary" class="nav-link" data-toggle="tab">Poses</a></li>
-					<li class="nav-item"><a href="#tab3primary" class="nav-link" data-toggle="tab">Bones</a></li>
-					<li class="nav-item"><a href="#tab4primary" class="nav-link" data-toggle="tab"><span class="icon-thunderbolt"></span></a></li>
+					<li class="nav-item"><a href="#tab1primary" class="nav-link active" data-toggle="tab" onclick="clickedMeshTab()">Meshes</a></li>
+					<li class="nav-item"><a href="#tab2primary" class="nav-link" data-toggle="tab" onclick="clickedPoseTab()">Pose</a></li>
+					<li class="nav-item"><a href="#tab3primary" class="nav-link" data-toggle="tab" onclick="clickedBoneGroupsTab()">Bone Groups</a></li>
+					<li class="nav-item"><a href="#tab4primary" class="nav-link" data-toggle="tab" onclick="clickedSettingsTab()"><span class="icon-thunderbolt"></span></a></li>
 					<!--TODO: Figure out what the COG icon is -->
 				</ul>
 		</div>
@@ -530,201 +657,22 @@ $(document).ready( function(){
 			<div class="tab-content">
 				<div class="tab-pane in active" id="tab1primary">
 					<div id="body-accordion" role="tablist" aria-multiselectable="true">
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-heads">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-head-data" aria-expanded="false" aria-controls="body-head-data"> Head </a>
-								</h5>
-							</div>
-							<div id="body-head-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-head">
-								<div class="card-block">
-								 <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#body-head-data","head"); -->
-								</div>
-							</div>
-						</div>
-						
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-arms">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-arms-data" aria-expanded="false" aria-controls="body-arms-data"> Arms </a>
-								</h5>
-							</div>
-							<div id="body-arms-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-arms">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/arms/mesh","body-arms-data","arms"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-hands">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-hands-data" aria-expanded="false" aria-controls="body-hands-data"> Hands &amp; Items </a>
-								</h5>
-							</div>
-							<div id="body-hands-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-hands">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/hands/mesh","body-hands-data","hands"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-chests">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-chests-data" aria-expanded="false" aria-controls="body-chests-data"> Upper Body </a>
-								</h5>
-							</div>
-							<div id="body-chests-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-chests">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/chests/mesh","body-chests-data","chests"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-legs">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-legs-data" aria-expanded="false" aria-controls="body-legs-data"> Lower Body </a>
-								</h5>
-							</div>
-							<div id="body-legs-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-legs">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/legs/mesh","body-legs-data","legs"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-feet">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-feet-data" aria-expanded="false" aria-controls="body-feet-data"> Feet &amp; Footware </a>
-								</h5>
-							</div>
-							<div id="body-feet-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-feet">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/feet/mesh","body-feet-data","feet"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="body-base">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#body-accordion" href="#body-bases-data" aria-expanded="false" aria-controls="body-bases-data"> Base </a>
-								</h5>
-							</div>
-							<div id="body-bases-data" class="collapse scroll" role="tabpanel" aria-labelledby="body-bases">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/base/mesh","body-bases-data","base"); -->
-								</div>
-							</div>
-						</div>
+						<!-- Will be populated by SceneView.js -->
 					</div>
 				</div>
 				<div class="tab-pane" id="tab2primary">
 					<div id="pose-accordion" role="tablist" aria-multiselectable="true">
-
+						<!-- Global Poses category -->
 						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-figure">
+							<div class="card-header" role="tab" id="pose-tab-global-poses">
 								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-figure-data" aria-expanded="false" aria-controls="pose-figure-data"> Whole Figure </a>
+									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-tab-global-poses-data" aria-expanded="false" aria-controls="pose-tab-global-poses-data"> Pose </a>
 								</h5>
 							</div>
-							<div id="pose-figure-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-figure">
+							<div id="pose-tab-global-poses-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-tab-global-poses">
 								<div class="card-block">
-								 <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#pose-head-data","head"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-heads">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-head-data" aria-expanded="false" aria-controls="pose-head-data"> Head </a>
-								</h5>
-							</div>
-							<div id="pose-head-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-head">
-								<div class="card-block">
-								 <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#pose-head-data","head"); -->
-								</div>
-							</div>
-						</div>
-						
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-arms">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-arms-data" aria-expanded="false" aria-controls="pose-arms-data"> Arms </a>
-								</h5>
-							</div>
-							<div id="pose-arms-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-arms">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/arms/mesh","pose-arms-data","arms"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-hands">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-hands-data" aria-expanded="false" aria-controls="pose-hands-data"> Hands &amp; Items </a>
-								</h5>
-							</div>
-							<div id="pose-hands-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-hands">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/hands/mesh","pose-hands-data","hands"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-chests">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-chests-data" aria-expanded="false" aria-controls="pose-chests-data"> Upper Body </a>
-								</h5>
-							</div>
-							<div id="pose-chests-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-chests">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/chests/mesh","pose-chests-data","chests"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-legs">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-legs-data" aria-expanded="false" aria-controls="pose-legs-data"> Lower Body </a>
-								</h5>
-							</div>
-							<div id="pose-legs-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-legs">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/legs/mesh","pose-legs-data","legs"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-feet">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-feet-data" aria-expanded="false" aria-controls="pose-feet-data"> Feet &amp; Footware </a>
-								</h5>
-							</div>
-							<div id="pose-feet-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-feet">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/feet/mesh","pose-feet-data","feet"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-base">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-bases-data" aria-expanded="false" aria-controls="pose-bases-data"> Base </a>
-								</h5>
-							</div>
-							<div id="pose-bases-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-bases">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/base/mesh","pose-bases-data","base"); -->
+									<label id=current-pose-label>Current Pose: None</label>
+									<button type="button" class="btn btn-secondary btn-sm" onclick="setGlobalPose()">Set Pose</button>
 								</div>
 							</div>
 						</div>
@@ -732,96 +680,8 @@ $(document).ready( function(){
 				</div>
 				<div class="tab-pane" id="tab3primary">
 					<div id="bones-accordion" role="tablist" aria-multiselectable="true">
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-heads">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-head-data" aria-expanded="false" aria-controls="bones-head-data"> Head </a>
-								</h5>
-							</div>
-							<div id="bones-head-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-head">
-								<div class="card-block">
-								 <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#bones-head-data","head"); -->
-								</div>
-							</div>
-						</div>
-						
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-arms">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-arms-data" aria-expanded="false" aria-controls="bones-arms-data"> Arms </a>
-								</h5>
-							</div>
-							<div id="bones-arms-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-arms">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/arms/mesh","bones-arms-data","arms"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-hands">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-hands-data" aria-expanded="false" aria-controls="bones-hands-data"> Hands &amp; Items </a>
-								</h5>
-							</div>
-							<div id="bones-hands-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-hands">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/hands/mesh","bones-hands-data","hands"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-chests">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-chests-data" aria-expanded="false" aria-controls="bones-chests-data"> Upper Body </a>
-								</h5>
-							</div>
-							<div id="bones-chests-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-chests">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/chests/mesh","bones-chests-data","chests"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-legs">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-legs-data" aria-expanded="false" aria-controls="bones-legs-data"> Lower Body </a>
-								</h5>
-							</div>
-							<div id="bones-legs-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-legs">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/legs/mesh","bones-legs-data","legs"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-feet">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-feet-data" aria-expanded="false" aria-controls="bones-feet-data"> Feet &amp; Footware </a>
-								</h5>
-							</div>
-							<div id="bones-feet-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-feet">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/feet/mesh","bones-feet-data","feet"); -->
-								</div>
-							</div>
-						</div>
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="bones-base">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#bones-accordion" href="#bones-bases-data" aria-expanded="false" aria-controls="bones-bases-data"> Base </a>
-								</h5>
-							</div>
-							<div id="bones-bases-data" class="collapse scroll" role="tabpanel" aria-labelledby="bones-bases">
-								<div class="card-block">
-								<!-- getTabbedItems("/api/v1/model/by/base/mesh","bones-bases-data","base"); -->
-								</div>
-							</div>
-						</div>
+						<!-- Will be populated by SceneView.js -->
+						<button class="btn btn-secondary btn-sm" type="button" onclick="addBoneGroup()">Add Bone Group</button>
 					</div>
 				</div>
 				<div class="tab-pane" id="tab4primary">
@@ -907,10 +767,10 @@ $(document).ready( function(){
 									
 									<label>Inspiration Photo</label>
 									<form enctype='multipart/form-data' id='inspiration-upload' data-folder="inspiration" data-upload="image" data-for="photo_inspiration">
-                						<input type="file" name="file" multiple>
-                					</form>
+										<input type="file" name="file" multiple>
+									</form>
 
-                					<img data-photo='photo_inspiration' class='figure-photo'>
+									<img data-photo='photo_inspiration' class='figure-photo'>
 								</div>
 							</div>
 						</div>
@@ -938,160 +798,28 @@ $(document).ready( function(){
 
 
 
-<div id="editor-accordion" class="col-md-3" role="tablist" aria-multiselectable="true">
-	<h2 class="text-white"> Library </h2>
-		<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-genre">
-			<h5>
-				<a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-genre-data" aria-expanded="true" aria-controls="editor-genre-data"> Genre Filter </a>
-			</h5>
-		</div>
-		<div id="editor-genre-data" class="collapse active scroll" role="tabpanel" aria-labelledby="editor-genre">
-			<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#editor-genre-data"); -->
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-presets">
-			<h5>
-				<a data-toggle="collapse" data-parent="#editor-accordion" href="#editor-presets-data" aria-expanded="false" aria-controls="editor-presets-data"> Figure Characteristics </a>
-			</h5>
-		</div>
-		<div id="editor-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-presets">
-			<!--Filled by AJAX: getPresets(); -->
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-heads">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-head-data" aria-expanded="false" aria-controls="editor-head-data"> Heads </a>
-			</h5>
-		</div>
-		<div id="editor-head-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-head">
-			<div class="card-block">
-			 <!-- FILLED BY AJAX: getTabbedItems("/api/v1/model/by/head/mesh","#editor-head-data","head"); -->
-			</div>
-		</div>
-	</div>
-	
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-arms">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-arms-data" aria-expanded="false" aria-controls="editor-arms-data"> Arms </a>
-			</h5>
-		</div>
-		<div id="editor-arms-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-arms">
-			<div class="card-block">
-			<!-- getTabbedItems("/api/v1/model/by/arms/mesh","editor-arms-data","arms"); -->
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-hands">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-hands-data" aria-expanded="false" aria-controls="editor-hands-data"> Hands &amp; Items </a>
-			</h5>
-		</div>
-		<div id="editor-hands-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-hands">
-			<div class="card-block">
-			<!-- getTabbedItems("/api/v1/model/by/hands/mesh","editor-hands-data","hands"); -->
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-chests">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-chests-data" aria-expanded="false" aria-controls="editor-chests-data"> Upper Body </a>
-			</h5>
-		</div>
-		<div id="editor-chests-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-chests">
-			<div class="card-block">
-			<!-- getTabbedItems("/api/v1/model/by/chests/mesh","editor-chests-data","chests"); -->
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-legs">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-legs-data" aria-expanded="false" aria-controls="editor-legs-data"> Lower Body </a>
-			</h5>
-		</div>
-		<div id="editor-legs-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-legs">
-			<div class="card-block">
-			<!-- getTabbedItems("/api/v1/model/by/legs/mesh","editor-legs-data","legs"); -->
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-feet">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-feet-data" aria-expanded="false" aria-controls="editor-feet-data"> Feet &amp; Footware </a>
-			</h5>
-		</div>
-		<div id="editor-feet-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-feet">
-			<div class="card-block">
-			<!-- getTabbedItems("/api/v1/model/by/feet/mesh","editor-feet-data","feet"); -->
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-base">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-bases-data" aria-expanded="false" aria-controls="editor-bases-data"> Bases </a>
-			</h5>
-		</div>
-		<div id="editor-bases-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-bases">
-			<div class="card-block">
-			<!-- getTabbedItems("/api/v1/model/by/base/mesh","editor-bases-data","base"); -->
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-poses">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-poses-data" aria-expanded="false" aria-controls="editor-poses-data"> Poses </a>
-			</h5>
-		</div>
-		<div id="editor-poses-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-poses">
-			<div class="card-block">
-			List of Figure Poses
-			</div>
-		</div>
-	</div>
-
-	<div class="panel card clearfix">
-		<div class="card-header" role="tab" id="editor-print">
-			<h5>
-				<a class="collapsed" data-toggle="collapse" data-parent="#editor-accordion" href="#editor-print-data" aria-expanded="false" aria-controls="editor-print-data"> Size, Print, Material </a>
-			</h5>
-		</div>
-		<div id="editor-print-data" class="collapse scroll" role="tabpanel" aria-labelledby="editor-print">
-			<div class="card-block">
-				Size, Print, Material
-			</div>
-		</div>
-	</div>
+<div id="mesh-library" class="col-md-3" role="tablist" aria-multiselectable="true">
+	<h2 class="text-white"> Mesh Library </h2>
+</div>
+<div id="pose-library" class="col-md-3" role="tablist" aria-multiselectable="true">
+	<h2 class="text-white"> Pose Library </h2>
+</div>
+<div id="bone-library" class="col-md-3" role="tablist" aria-multiselectable="true">
+	<h2 class="text-white"> Bone Group Library </h2>
 </div>
 
 <div id='status-box'>
 	<h5 class='text-white float-left'>Console</h5>
 	<!-- Progress Bars to show upload completion percentage -->
-    <div class="progress-bar-area float-right"></div>
-    <form method="POST" enctype="multipart/form-data" class="direct-upload hidden">
-        <!--filled by JS as needed -->
-    </form>
+	<div class="progress-bar-area float-right"></div>
+	<form method="POST" enctype="multipart/form-data" class="direct-upload hidden">
+		<!--filled by JS as needed -->
+	</form>
 
-    <!-- This area will be filled with our results (mainly for debugging) -->
-    <div>
-        <textarea id="uiconsole"></textarea>
-    </div>
+	<!-- This area will be filled with our results (mainly for debugging) -->
+	<div>
+		<textarea id="uiconsole"></textarea>
+	</div>
 </div>
 
 <div id='loadingDiv'>
@@ -1099,14 +827,14 @@ $(document).ready( function(){
 </div>
 
 <footer class="footer">
-  	<div class="container">
-    	<div class="input-group input-group-lg">
-  			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
-  			<span class="input-group-btn">
-        		<button class="btn btn-secondary" type="button" onclick="figure.save()">Save Figure</button>
-      		</span>
+	<div class="container">
+		<div class="input-group input-group-lg">
+			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" type="button" onclick="figure.save()">Save Figure</button>
+			</span>
 		</div>
-  	</div>  	
+	</div>  	
 </footer>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
@@ -1136,3 +864,6 @@ $(document).ready( function(){
 <!-- Load the FileUpload Plugin (more info @ https://github.com/blueimp/jQuery-File-Upload) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.5.7/jquery.fileupload.js"></script>
+
+<script src="/js/sweetalert2.min.js"></script>
+<link rel="stylesheet" href="/css/sweetalert2.min.css">

@@ -3,18 +3,30 @@ function Character(){
 	this.boneGroups = new ObservableDict(this);
 
 	this.nameChangedEvent = new Event(this);
+	this.poseChangedEvent = new Event(this);
 }
 
 Character.prototype = {
-	addBoneGroup: function(name, boneGroup){
-		this.boneGroups.put(name, boneGroup);
+	addBoneGroup: function(boneGroup){
+		this.boneGroups.put(boneGroup.uid, boneGroup);
+	},
+
+	removeBoneGroup: function(uid){
+		// TODO: Check/fix this
+		for (var boneGroupUid in this.boneGroups.dict){
+			boneGroup = this.boneGroups.get(boneGroupUid);
+			if (boneGroup.parentBoneGroupUid === uid){
+				boneGroup.unattach();
+			}
+		}
+		this.boneGroups.remove(uid);
 	},
 
 	getCurrentPose: function(){
 		return Pose.toPose(this.boneGroups);
 	},
 
-	loadPose: function(jsonString){
+	loadPose: function(poseName, jsonString){
 		var pose = Pose.fromJson(jsonString);
 
 		// Find all bones in the character bone groups that have the same name
@@ -24,8 +36,8 @@ Character.prototype = {
 		for (var i = 0; i < pose.poseBones.length; i++){
 			var poseBone = pose.poseBones[i];
 
-			for (var boneGroupName in this.boneGroups.dict){
-				var boneGroup = this.boneGroups.get(boneGroupName);
+			for (var boneGroupUid in this.boneGroups.dict){
+				var boneGroup = this.boneGroups.get(boneGroupUid);
 
 				for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
 					var bone = boneGroup.skeleton.bones[j];
@@ -46,6 +58,7 @@ Character.prototype = {
 				}
 			}
 		}
+		this.poseChangedEvent.notify(poseName);
 	},
 
 	getName: function(){

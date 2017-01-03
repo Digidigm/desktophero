@@ -34,7 +34,6 @@
         <!-- TODO: Build landio with the alpha6+ version of bootstrap so you don't have to include both -->
         <link rel="stylesheet" href="/css/bootstrap.min.css">
         <link rel="stylesheet" href="/css/landio.css">
-
         
         <script src="/vendor/jquery/jquery.min.js"></script>
         <script src="/js/utilities.js"></script>
