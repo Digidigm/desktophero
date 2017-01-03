@@ -24,7 +24,7 @@ THREE.STLExporter.prototype = {
 
 			scene.traverse( function ( object ) {
 
-				if ( object instanceof THREE.Mesh ) {
+				if ( object instanceof THREE.Mesh && object.includeInExport !== false) {
 
 					var geometry = object.geometry;
 					var matrixWorld = object.matrixWorld;

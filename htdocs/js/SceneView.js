@@ -189,6 +189,7 @@ SceneView.prototype = {
 			var boneHandle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
 			boneHandle.boneGroupUid = boneGroupUid;
 			boneHandle.boneIndex = i;
+			boneHandle.includeInExport = false;
 			this.boneHandles.push(boneHandle);
 
 			boneHandle.visible = this.boneHandlesVisible;
