@@ -45,9 +45,9 @@ BoneGroup.prototype = {
 			bone0.rotation.y = 0;
 			bone0.rotation.z = 0;
 
-			bone0.scale.x = 0;
-			bone0.scale.y = 0;
-			bone0.scale.z = 0;
+			bone0.scale.x = 1;
+			bone0.scale.y = 1;
+			bone0.scale.z = 1;
 		}
 
 		mesh.children = [];
