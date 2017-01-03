@@ -3,6 +3,7 @@ function Character(){
 	this.boneGroups = new ObservableDict(this);
 
 	this.nameChangedEvent = new Event(this);
+	this.poseChangedEvent = new Event(this);
 }
 
 Character.prototype = {
@@ -25,7 +26,7 @@ Character.prototype = {
 		return Pose.toPose(this.boneGroups);
 	},
 
-	loadPose: function(jsonString){
+	loadPose: function(poseName, jsonString){
 		var pose = Pose.fromJson(jsonString);
 
 		// Find all bones in the character bone groups that have the same name
@@ -57,6 +58,7 @@ Character.prototype = {
 				}
 			}
 		}
+		this.poseChangedEvent.notify(poseName);
 	},
 
 	getName: function(){

@@ -47,7 +47,7 @@ SceneModel.prototype = {
 		boneGroup.removeMesh(meshName);
 
 		// Remove entry under meshes tab.
-		
+
 	},
 
 	getAvailablePoses: function(){
@@ -127,7 +127,7 @@ SceneModel.prototype = {
 	loadPose: function(libraryName, poseName){
 		var self = this;
 		self.libraries.get(libraryName).fetchPose(poseName, function(poseJson){
-			self.character.loadPose(poseJson);
+			self.character.loadPose(poseName, poseJson);
 		});
 	},
 
@@ -232,7 +232,7 @@ SceneModel.prototype = {
 		// Load initial pose.
 		dataSource = this.libraries.get('default');
 		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
-			self.character.loadPose(jsonPose);
+			self.character.loadPose(SceneModel.initialPose, jsonPose);
 		});
 	}
 };

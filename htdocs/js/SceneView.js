@@ -66,9 +66,11 @@ SceneView.prototype = {
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 
-		this.model.materials.metallic = Materials.createReflectiveMaterial( new THREE.Color(0.75, 0.75, 0.7), 0.4, this.cubeMap);
-		this.model.materials.clay = Materials.createReflectiveMaterial( 	new THREE.Color(0.5, 0.4, 0.5), 0.02,  this.cubeMap);
+		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), 0.4, this.cubeMap);
+		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
+
+		this.model.character.poseChangedEvent.addListener(this, this.onPoseChanged);
 
 		this.initLights();
 
@@ -253,6 +255,11 @@ SceneView.prototype = {
 		}
 
 		this.meshesTabRemoveMesh(boneGroup.uid, meshName);
+	},
+
+	onPoseChanged: function(character, poseName){
+		poseNameLabel = document.getElementById('current-pose-label');
+		poseNameLabel.innerText = 'Current Pose: ' + poseName;
 	},
 
 	toggleBoneHandlesVisible: function(){

@@ -666,13 +666,13 @@ $(document).ready( function(){
 						<div class="panel card clearfix">
 							<div class="card-header" role="tab" id="pose-tab-global-poses">
 								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-tab-global-poses-data" aria-expanded="false" aria-controls="pose-tab-global-poses-data"> Main Poses: </a>
+									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-tab-global-poses-data" aria-expanded="false" aria-controls="pose-tab-global-poses-data"> Pose </a>
 								</h5>
 							</div>
 							<div id="pose-tab-global-poses-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-tab-global-poses">
 								<div class="card-block">
-									<label id=current-pose-label>None Selected</label>
-									<button type="button" class="btn btn-secondary btn-sm" onclick="setGlobalPose()">Set</button>
+									<label id=current-pose-label>Current Pose: None</label>
+									<button type="button" class="btn btn-secondary btn-sm" onclick="setGlobalPose()">Set Pose</button>
 								</div>
 							</div>
 						</div>
