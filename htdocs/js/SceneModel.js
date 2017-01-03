@@ -88,7 +88,7 @@ SceneModel.prototype = {
 	},
 
 	removeBoneGroup: function(boneGroupUid){
-		self.character.removeBoneGroup(boneGroupUid)
+		self.character.removeBoneGroup(boneGroupUid);
 	},
 
 	getAvailableAttachPoints: function(){

@@ -449,9 +449,15 @@ $(document).ready( function(){
 							onResult);
 	};
 
-	clickedRemoveBoneGroup = function(boneGroupId, boneGroupName){
-		model.removeBoneGroup(boneGroupName.replaceAll('_', ' '));
+	clickedRemoveBoneGroup = function(boneGroupId){
+		model.removeBoneGroup(boneGroupId);
+		// Remove that bone group entry from the Mesh/Bone tabs
+		var tabEntry = document.getElementById('meshes-tab-' + boneGroupId).parentNode;
+		tabEntry.parentNode.removeChild(tabEntry);
+		tabEntry = document.getElementById('bone-groups-tab-' + boneGroupId).parentNode;
+		tabEntry.parentNode.removeChild(tabEntry);
 	};
+
 
 	setGlobalPose = function(){
 		$("#mesh-library").hide();

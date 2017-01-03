@@ -467,13 +467,10 @@ SceneView.prototype = {
 					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
 				</div>\
 				<div class="card-block">\
-					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + elementId + '\',\'' + boneGroupUid + '\')>Remove</button>\
+					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + boneGroupUid + '\')>Remove</button>\
 				</div>\
 			</div>';
 		div.innerHTML = html;
-		console.log(html);
-		console.log('========');
-		console.log(div.innerHTML);
 
 		libraryPane = document.getElementById("bones-accordion");
 		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
