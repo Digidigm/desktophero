@@ -107,7 +107,7 @@ SceneModel.prototype = {
 	attachBoneGroup: function(boneGroupUid, toBoneGroupUid, attachPointName){
 		var boneGroup = this.character.boneGroups.get(boneGroupUid);
 		var attachBone = this.character.boneGroups.get(toBoneGroupUid).attachPoints[attachPointName];
-		boneGroup.attachToBone(boneGroupUid, attachPointName, attachBone);
+		boneGroup.attachToBone(toBoneGroupUid, attachPointName, attachBone);
 	},
 
 	unattachBoneGroup: function(boneGroupUid){

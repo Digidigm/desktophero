@@ -152,6 +152,8 @@ SceneView.prototype = {
 		console.log("Bone group added!");
 		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);
+		boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
 
 		var randomColor = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
@@ -214,6 +216,19 @@ SceneView.prototype = {
 		tabEntry.parentNode.removeChild(tabEntry);
 		tabEntry = document.getElementById('bone-groups-tab-' + boneGroupUid).parentNode;
 		tabEntry.parentNode.removeChild(tabEntry);
+	},
+
+	onBoneGroupAttached: function(boneGroup, attachedToUid){
+		var boneGroupAttachedTo = model.character.boneGroups.get(attachedToUid);
+		var labelId = boneGroup.uid + "-bone-attach-label";
+		var label = document.getElementById(labelId);
+		label.innerText = 'Attached to: ' + boneGroupAttachedTo.name;
+	},
+
+	onBoneGroupUnattached: function(boneGroup){
+		var labelId = boneGroup.uid + "-bone-attach-label";
+		var label = document.getElementById(labelId);
+		label.innerText = 'Attached to: None';
 	},
 
 	onMeshAdded: function(boneGroup, meshName){
@@ -469,7 +484,7 @@ SceneView.prototype = {
 			</div>\
 			<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
 				<div class="card-block">\
-					<label id=' + elementId + '-bone-attach-label>Unattached</label>\
+					<label id=' + boneGroupUid + '-bone-attach-label>Attached to: None</label>\
 					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
 				</div>\
 				<div class="card-block">\

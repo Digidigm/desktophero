@@ -7,6 +7,9 @@ function BoneGroup(name, libraryName, skeleton){
 	this.currentPose;
 	this.attachPoints = {};
 
+	this.attachedEvent = new Event(this);
+	this.unattachedEvent = new Event(this);
+
 	this.parentBoneGroupUid; // Used when saving character.
 	this.parentBoneName; // Used when saving character.
 	this.parentBone = null;
@@ -82,6 +85,8 @@ BoneGroup.prototype = {
 		this.parentBoneGroupUid = parentBoneGroupUid;
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
+
+		this.attachedEvent.notify(parentBoneGroupUid);
 	},
 
 	unattach: function(){
@@ -96,7 +101,9 @@ BoneGroup.prototype = {
 		bone0.position.x = 0;
 		bone0.position.y = 0;
 		bone0.position.z = 0;
-		bone0.updateMatrixWorld()
+		bone0.updateMatrixWorld();
+
+		this.unattachedEvent.notify();
 	},
 
 	toJSON: function(){
