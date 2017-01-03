@@ -208,6 +208,12 @@ SceneView.prototype = {
 			var index = toRemove[i];
 			this.boneHandles.splice(index, 1);
 		}
+
+		// Remove bone group tab from the Mesh/Bone tabs
+		var tabEntry = document.getElementById('meshes-tab-' + boneGroupUid).parentNode;
+		tabEntry.parentNode.removeChild(tabEntry);
+		tabEntry = document.getElementById('bone-groups-tab-' + boneGroupUid).parentNode;
+		tabEntry.parentNode.removeChild(tabEntry);
 	},
 
 	onMeshAdded: function(boneGroup, meshName){
