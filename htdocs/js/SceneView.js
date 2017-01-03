@@ -31,6 +31,8 @@ function SceneView(model){
 	this.Y_AXIS = new THREE.Vector3(0,1,0);
 	this.Z_AXIS = new THREE.Vector3(0,0,1);
 
+	this.boneAxisHelper;
+
 	this.addModelListeners();
 
 }
@@ -70,7 +72,9 @@ SceneView.prototype = {
 		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 
-		this.model.character.poseChangedEvent.addListener(this, this.onPoseChanged);
+		this.boneAxisHelper = new THREE.AxisHelper(10);
+		this.scene.add(this.boneAxisHelper);
+		this.boneAxisHelper.visible = false;
 
 		this.initLights();
 
@@ -129,6 +133,22 @@ SceneView.prototype = {
 			boneHandle.position.z = globalBonePosition.z;
 		}
 
+		if (this.selectedBone != null){
+			var position = new THREE.Vector3();
+			var quaternion = new THREE.Quaternion();
+			var scale = new THREE.Vector3();
+			this.selectedBone.matrixWorld.decompose(position, quaternion, scale);
+			this.boneAxisHelper.position.set(position.x, position.y, position.z);
+			//this.boneAxisHelper.rotation.setFromQuaternion(quaternion);
+
+
+
+
+			/*var axisClone = this.X_AXIS.clone();
+			this.boneAxisHelper.rotation.setFromVector3(this.selectedBone.parent.getWorldRotation());
+			axisClone.applyEuler(this.selectedBone.rotation)
+			this.boneAxisHelper.rotation.setFromVector3(axisClone);*/
+		}
 	},
 
 	animate: function(){
@@ -308,32 +328,46 @@ SceneView.prototype = {
 		console.log("Rotation axis set to " + this.rotationAxis + ".");
 	},
 
-	getClickVector: function(mouseX, mouseY, camera, event){
+	getClickVector: function(mouseX, mouseY, camera){
 		var vector = new THREE.Vector3(
-			( event.clientX / window.innerWidth ) * 2 - 1,
-		  - ( event.clientY / window.innerHeight ) * 2 + 1,
+			( mouseX / window.innerWidth ) * 2 - 1,
+		  - ( mouseY / window.innerHeight ) * 2 + 1,
 			0.5
 		);
 		vector.unproject(camera);
 		return vector;
 	},
 
-	onLeftClick: function(mouseX, mouseY, event){
+	onLeftClick: function(mouseX, mouseY){
 		if (this.rotateMode){
 			this.finalizeBoneRotate();
 			return;
 		} 
 	},
 
-	onRightClick: function(mouseX, mouseY, event){
-		
+	onRightClick: function(mouseX, mouseY){
+		console.log('right click')
+
 		if (this.rotateMode){
 			this.cancelBoneRotate();
 			return;
 		}
 
-		var clickVector = this.getClickVector(mouseX, mouseY, this.camera, event);
+		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
+		console.log(clickVector);
 		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
+
+
+		var helper = new THREE.AxisHelper(20);
+		
+		var position = new THREE.Vector3();
+		var quaternion = new THREE.Quaternion();
+		var scale = new THREE.Vector3();
+		this.camera.matrixWorld.decompose(position, quaternion, scale);
+		helper.position.set(position.x, position.y, position.z);
+		helper.rotation.setFromQuaternion(this.camera.quaternion);
+		this.scene.add(helper);
+
 
 		var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
 		var closestBone = null, closestDistance = null;
@@ -350,7 +384,10 @@ SceneView.prototype = {
 			}
 		}
 		this.selectedBone = closestBone;
-		if (closestBone !== null){
+		if (closestBone == null){
+			this.boneAxisHelper.visible = false;
+		} else {
+			this.boneAxisHelper.visible = true;
 			console.log("Clicked on " + this.selectedBone.name);
 		}
 	},
@@ -359,9 +396,9 @@ SceneView.prototype = {
 		console.log("Middle click");
 	},
 
-	onMouseMove: function(event){
-		this.mouseX = event.clientX;
-		this.mouseY = event.clientY;
+	onMouseMove: function(mouseX, mouseY){
+		this.mouseX = mouseX;
+		this.mouseY = mouseY;
 
 		if (this.rotateMode){
 			var factor = 500.0;
@@ -369,7 +406,6 @@ SceneView.prototype = {
 			var dx = (this.mouseX - this.rotateOriginX);
 			var dy = (this.mouseY - this.rotateOriginY);
 			var delta = Math.sqrt(dx * dx + dy * dy);
-			console.log(delta);
 			if (this.mouseX < this.rotateOriginX){
 				delta *= -1;
 			}
@@ -379,22 +415,38 @@ SceneView.prototype = {
 			this.selectedBone.updateMatrix();
 
 			if (this.rotationAxis == 'X'){
+				//var quaternion = new THREE.Quaternion().setFromAxisAngle(this.X_AXIS, rotateAmount);
+				//this.selectedBone.rotation.setFromQuaternion(quaternion);
 				//this.selectedBone.rotateX(delta/factor);
-				this.selectedBone.rotateOnWorldAxis(this.X_AXIS, rotateAmount);
+				
+				var axisClone = this.X_AXIS.clone();
+				var rotation = this.selectedBone.parent.getWorldRotation()
+				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
+				axisClone.applyEuler(inverseRotation);
+				this.selectedBone.rotateOnWorldAxis(axisClone, rotateAmount);
 				//console.log("Rotate " + delta + " around X axis.");
 			} else if (this.rotationAxis == 'Y'){
 				//this.selectedBone.rotateY(delta/factor);
-				this.selectedBone.rotateOnWorldAxis(this.Y_AXIS, rotateAmount);
+				var axisClone = this.Y_AXIS.clone();
+				var rotation = this.selectedBone.parent.getWorldRotation()
+				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
+				axisClone.applyEuler(inverseRotation);
+				this.selectedBone.rotateOnWorldAxis(axisClone, rotateAmount);
 				//console.log("Rotate " + delta + " around Y axis.");
 			} else if (this.rotationAxis == 'Z'){
 				//this.selectedBone.rotateZ(delta/factor);
-				this.selectedBone.rotateOnWorldAxis(this.Z_AXIS, rotateAmount);
+				var axisClone = this.Z_AXIS.clone();
+				var rotation = this.selectedBone.parent.getWorldRotation()
+				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
+				axisClone.applyEuler(inverseRotation);
+				this.selectedBone.rotateOnWorldAxis(axisClone, rotateAmount);
 				//console.log("Rotate " + delta + " around Z axis.");
 			} else {
 				var cameraAxis = this.getClickVector(window.width/2, window.height/2, this.camera);
+				var rotation = this.selectedBone.parent.getWorldRotation()
+				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
+				cameraAxis.applyEuler(inverseRotation);
 				this.selectedBone.rotateOnWorldAxis(cameraAxis, rotateAmount);
-
-
 			}
 		}
 	},
@@ -655,8 +707,7 @@ function onMouseDown(event){
 }
 
 function onMouseMove(event){
-	//TODO: this was generating errors and was commented out
-	//view.onMouseMove(event.clientX, event.clientY);
+	view.onMouseMove(event.clientX, event.clientY);
 }
 
 function onKeyDown(event){
