@@ -8,11 +8,14 @@ function SceneModel(){
 
 	this.materials = {};
 }
-SceneModel.boneGroupsToLoad = ['left arm',
-							'right arm',
-							'torso',
-							'head',
-							'neck',
+SceneModel.boneGroupsToLoad = ['human male left arm',
+							'human male left hand',
+							'human male right arm',
+							'human male right hand',
+							'human male torso',
+							'human male legs',
+							'human male head',
+							'human male neck',
 							'handheld'];
 SceneModel.initialPose = 'amazing pose';
 
@@ -141,7 +144,7 @@ SceneModel.prototype = {
 		var self = this;
 		
 		var defaultDataSource = self.libraries.get('default');
-		var boneGroupsLeftToBeLoaded = 6;
+		var boneGroupsLeftToBeLoaded = 9;
 		var boneGroupUids = {}
 
 		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
@@ -162,7 +165,7 @@ SceneModel.prototype = {
 		var self = this;
 
 		var defaultDataSource = self.libraries.get('default');
-		var meshesLeftToBeLoaded = 6;
+		var meshesLeftToBeLoaded = 9;
 
 		var defaultMaterial = self.materials["default"];
 		// Attach meshes to bone groups.
@@ -192,27 +195,36 @@ SceneModel.prototype = {
 
 		self = this;
 
-		var headUid = boneGroupUids['head'];
+		var headUid = boneGroupUids['human male head'];
 		var head = self.character.boneGroups.get(headUid);
-		var neckUid = boneGroupUids['neck'];
+		var neckUid = boneGroupUids['human male neck'];
 		var neck = self.character.boneGroups.get(neckUid);
-		var torsoUid = boneGroupUids['torso'];
+		var torsoUid = boneGroupUids['human male torso'];
 		var torso = self.character.boneGroups.get(torsoUid);
-		var leftArmUid = boneGroupUids['left arm'];
+		var legsUid = boneGroupUids['human male legs'];
+		var legs = self.character.boneGroups.get(legsUid);
+		var leftArmUid = boneGroupUids['human male left arm'];
 		var leftArm = self.character.boneGroups.get(leftArmUid);
-		var rightArmUid = boneGroupUids['right arm'];
+		var leftHandUid = boneGroupUids['human male left hand'];
+		var leftHand = self.character.boneGroups.get(leftHandUid);
+		var rightArmUid = boneGroupUids['human male right arm'];
 		var rightArm = self.character.boneGroups.get(rightArmUid);
+		var rightHandUid = boneGroupUids['human male right hand'];
+		var rightHand = self.character.boneGroups.get(rightHandUid);
 		var handheldUid = boneGroupUids['handheld'];
 		var handheld = self.character.boneGroups.get(handheldUid);
 
 		neck.attachToBone(torsoUid, "#neck", torso.attachPoints["#neck"]);
 		leftArm.attachToBone(torsoUid, "#left arm", torso.attachPoints["#left arm"]);
+		leftHand.attachToBone(leftArmUid, "#hand", leftArm.attachPoints["#hand"]);
 		rightArm.attachToBone(torsoUid, "#right arm", torso.attachPoints["#right arm"]);
+		rightHand.attachToBone(rightArmUid, "#hand", rightArm.attachPoints["#hand"]);
 		head.attachToBone(neckUid, "#top", neck.attachPoints["#top"]);
-		handheld.attachToBone(leftArmUid, "#hand", leftArm.attachPoints["#hand"]);
+		handheld.attachToBone(leftHandUid, "#palm", leftHand.attachPoints["#palm"]);
+		torso.attachToBone(legsUid, "#pelvis", legs.attachPoints["#pelvis"]);
 
 		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
-		torso.skeleton.bones[0].position.y = 0;
+		legs.skeleton.bones[0].position.y = 0;
 
 		// Load initial pose.
 		dataSource = this.libraries.get('default');

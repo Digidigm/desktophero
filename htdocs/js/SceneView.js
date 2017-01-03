@@ -452,13 +452,10 @@ SceneView.prototype = {
 
 	boneGroupsTabAddBoneGroup: function(boneGroupUid, boneGroupName){
 		var div = document.createElement('div');
+		var boneGroupNameUnderscores = boneGroupName.replaceAll(' ', '__');
 		elementId = "bone-groups-tab-" + boneGroupUid;
 		div.className = "panel card clearfix";
-		console.log('beansAAA')
-		console.log('aaa' + boneGroupUid + 'aaa')
-		console.log('aaa' + boneGroupName + 'aaa')
-		console.log('beansBBB')
-		div.innerHTML = '<div class="card-header" role="tab" id="' + elementId + '">\
+		html = '<div class="card-header" role="tab" id="' + elementId + '">\
 				<h5>\
 					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
 						href="#' + elementId + '-data" aria-expanded="false" aria-controls="' + elementId + '-data"> ' + boneGroupName + ' </a>\
@@ -467,12 +464,15 @@ SceneView.prototype = {
 			<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
 				<div class="card-block">\
 					<label id=' + elementId + '-bone-attach-label>Unattached</label>\
-					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + elementId + '\',\'' + boneGroupUid + '\')>Attach To...</button>\
+					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
 				</div>\
 				<div class="card-block">\
 					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + elementId + '\',\'' + boneGroupUid + '\')>Remove</button>\
 				</div>\
 			</div>';
+		div.innerHTML = html;
+		console.log(html);
+		console.log('========');
 		console.log(div.innerHTML);
 
 		libraryPane = document.getElementById("bones-accordion");

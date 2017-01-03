@@ -422,24 +422,25 @@ $(document).ready( function(){
 		}).then(onResult);
 	};
 
-	clickedAttachBoneGroup = function(boneGroupId, boneGroupName){
-		boneGroupName = boneGroupName.replaceAll('_', ' ');
+	clickedAttachBoneGroup = function(boneGroupUid, boneGroupNameUnderscored){
+		boneGroupName = boneGroupNameUnderscored.replaceAll('_', ' ');
 		options = {};
 		attachPoints = model.getAvailableAttachPoints();
-		for (var boneGroup in attachPoints){
-			for (var i in attachPoints[boneGroup]){
-				attachPoint = attachPoints[boneGroup][i];
-				id = boneGroup + ';' + attachPoint;
-				label = boneGroup + ' (' + attachPoint.substring(1) + ')';
+		for (var toBoneGroupUid in attachPoints){
+			var boneGroupName = model.character.boneGroups.get(toBoneGroupUid).name;
+			for (var i in attachPoints[toBoneGroupUid]){
+				attachPoint = attachPoints[toBoneGroupUid][i];
+				id = toBoneGroupUid + ';' + attachPoint;
+				label = boneGroupName + ' (' + attachPoint.substring(1) + ')';
 				options[id] = label;
 			}
 		}
 
 		var onResult = function(result){
 			tokens = result.split(';');
-			boneGroup = tokens[0];
+			toBoneGroupUid = tokens[0];
 			attachPoint = tokens[1];
-			model.attachBoneGroup(boneGroupName, boneGroup, attachPoint);
+			model.attachBoneGroup(boneGroupUid, toBoneGroupUid, attachPoint);
 		};
 
 		showSelectDialogBox('Attach Bone Group "' + boneGroupName + '"',
