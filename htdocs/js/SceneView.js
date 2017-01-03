@@ -34,13 +34,18 @@ function SceneView(model){
 	this.boneAxisHelper;
 
 	this.addModelListeners();
+
 }
 
 SceneView.prototype = {
 	init: function(){
+
 		this.scene = new THREE.Scene();
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
-		this.renderer = new THREE.WebGLRenderer({antialias:true});
+		this.renderer = new THREE.WebGLRenderer({
+													antialias:true,
+													preserveDrawingBuffer   : true   // required to support .toDataURL()
+												});
 		
 		this.renderer.setClearColor(0x000033);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -63,8 +68,8 @@ SceneView.prototype = {
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 
-		this.model.materials.metallic = Materials.createReflectiveMaterial( new THREE.Color(0.75, 0.75, 0.7), 0.4, this.cubeMap);
-		this.model.materials.clay = Materials.createReflectiveMaterial( 	new THREE.Color(0.5, 0.4, 0.5), 0.02,  this.cubeMap);
+		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), 0.4, this.cubeMap);
+		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 
 		this.boneAxisHelper = new THREE.AxisHelper(10);
@@ -72,6 +77,11 @@ SceneView.prototype = {
 		this.boneAxisHelper.visible = false;
 
 		this.initLights();
+
+		this.populateTabs();
+		this.libraryPopulateMeshes();
+		this.libraryPopulatePoses();
+		this.libraryPopulateBoneGroups();
 	},
 
 	initLights: function(){
@@ -110,10 +120,10 @@ SceneView.prototype = {
 
 		for (var i = 0; i < this.boneHandles.length; i++){
 			var boneHandle = this.boneHandles[i];
-			var boneGroupName = boneHandle.boneGroupName;
+			var boneGroupUid = boneHandle.boneGroupUid;
 			var boneIndex = boneHandle.boneIndex;
 
-			var boneGroup = this.model.character.boneGroups.get(boneGroupName);
+			var boneGroup = this.model.character.boneGroups.get(boneGroupUid);
 			var bone = boneGroup.skeleton.bones[boneIndex];
 
 			var globalBonePosition = new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld);
@@ -122,6 +132,7 @@ SceneView.prototype = {
 			boneHandle.position.y = globalBonePosition.y;
 			boneHandle.position.z = globalBonePosition.z;
 		}
+
 		if (this.selectedBone != null){
 			var position = new THREE.Vector3();
 			var quaternion = new THREE.Quaternion();
@@ -159,10 +170,13 @@ SceneView.prototype = {
 		this.model.character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
 	},
 
-	onBoneGroupAdded: function(character, boneGroupName){
+	onBoneGroupAdded: function(character, boneGroupUid){
 		console.log("Bone group added!");
-		var boneGroup = character.boneGroups.get(boneGroupName);
+		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
+		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);
+		boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
 
 		var randomColor = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
@@ -172,28 +186,100 @@ SceneView.prototype = {
 				continue;
 			}
 
-			var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
-			sphere.boneGroupName = boneGroupName;
-			sphere.boneIndex = i;
-			this.boneHandles.push(sphere);
+			var boneHandle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
+			boneHandle.boneGroupUid = boneGroupUid;
+			boneHandle.boneIndex = i;
+			this.boneHandles.push(boneHandle);
 
-			sphere.visible = this.boneHandlesVisible;
-			this.scene.add(sphere);
+			boneHandle.visible = this.boneHandlesVisible;
+			this.scene.add(boneHandle);
+		}
+
+		this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
+		//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
+		this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
+
+		for (var meshName in boneGroup.meshes.dict){
+			//TODO: add icon as well.
+			this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
 		}
 		
 	},
 
-	onBoneGroupRemoved: function(character, boneGroupName){
+	onBoneGroupRemoved: function(character, boneGroupUid){
 		console.log("Bone group removed!");
-		// TODO: Remove meshes from scene.
-		// TODO: Remove bone listeners?
+
+		// Remove from three.js scene
+		var boneGroupsToRemove = [];
+		for (var i in this.scene.children){
+			var sceneElement = this.scene.children[i];
+			if (sceneElement.boneGroupUid === boneGroupUid){
+				boneGroupsToRemove.push(sceneElement);
+			}
+		}
+		for (var i in boneGroupsToRemove){
+			var element = boneGroupsToRemove[i];
+			this.scene.remove(element);
+		}
+
+		// Remove boneHandle entries.
+		var toRemove = [];
+		for (var i = 0; i < this.boneHandles.length; i++){
+			if (this.boneHandles[i].boneGroupUid === boneGroupUid){
+				toRemove.push(i);
+			}
+		}
+		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
+			var index = toRemove[i];
+			this.boneHandles.splice(index, 1);
+		}
+
+		// Remove bone group tab from the Mesh/Bone tabs
+		var tabEntry = document.getElementById('meshes-tab-' + boneGroupUid).parentNode;
+		tabEntry.parentNode.removeChild(tabEntry);
+		tabEntry = document.getElementById('bone-groups-tab-' + boneGroupUid).parentNode;
+		tabEntry.parentNode.removeChild(tabEntry);
+	},
+
+	onBoneGroupAttached: function(boneGroup, attachedToUid){
+		var boneGroupAttachedTo = model.character.boneGroups.get(attachedToUid);
+		var labelId = boneGroup.uid + "-bone-attach-label";
+		var label = document.getElementById(labelId);
+		label.innerText = 'Attached to: ' + boneGroupAttachedTo.name;
+	},
+
+	onBoneGroupUnattached: function(boneGroup){
+		var labelId = boneGroup.uid + "-bone-attach-label";
+		var label = document.getElementById(labelId);
+		label.innerText = 'Attached to: None';
 	},
 
 	onMeshAdded: function(boneGroup, meshName){
 		console.log("Mesh " + meshName + " added to bone group " + boneGroup.name + ".");
 
 		var mesh = boneGroup.meshes.get(meshName);
+		mesh.boneGroupUid = boneGroup.uid;
 		this.scene.add(mesh);
+
+		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
+	},
+
+	onMeshRemoved: function(boneGroup, meshName){
+		console.log("Mesh " + meshName + " removed from bone group " + boneGroup.name + ".");
+
+		for (var i in this.scene.children){
+			var sceneElement = this.scene.children[i];
+			if (sceneElement.meshName === meshName){
+				this.scene.remove(sceneElement);
+			}
+		}
+
+		this.meshesTabRemoveMesh(boneGroup.uid, meshName);
+	},
+
+	onPoseChanged: function(character, poseName){
+		poseNameLabel = document.getElementById('current-pose-label');
+		poseNameLabel.innerText = 'Current Pose: ' + poseName;
 	},
 
 	toggleBoneHandlesVisible: function(){
@@ -244,8 +330,8 @@ SceneView.prototype = {
 
 	getClickVector: function(mouseX, mouseY, camera){
 		var vector = new THREE.Vector3(
-			( event.clientX / window.innerWidth ) * 2 - 1,
-		  - ( event.clientY / window.innerHeight ) * 2 + 1,
+			( mouseX / window.innerWidth ) * 2 - 1,
+		  - ( mouseY / window.innerHeight ) * 2 + 1,
 			0.5
 		);
 		vector.unproject(camera);
@@ -260,6 +346,8 @@ SceneView.prototype = {
 	},
 
 	onRightClick: function(mouseX, mouseY){
+		console.log('right click')
+
 		if (this.rotateMode){
 			this.cancelBoneRotate();
 			return;
@@ -285,7 +373,7 @@ SceneView.prototype = {
 		var closestBone = null, closestDistance = null;
 		for (var i = 0; i < intersections.length; i++){
 			var boneHandle = intersections[i].object;
-			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupName);
+			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
 			var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
 			if (bone.name.startsWith("#")){
 				continue;
@@ -304,7 +392,7 @@ SceneView.prototype = {
 		}
 	},
 
-	onMiddleClick: function(mouseX, mouseY){
+	onMiddleClick: function(mouseX, mouseY, event){
 		console.log("Middle click");
 	},
 
@@ -361,18 +449,260 @@ SceneView.prototype = {
 				this.selectedBone.rotateOnWorldAxis(cameraAxis, rotateAmount);
 			}
 		}
+	},
+
+	populateTabs: function(){
+		var boneGroups = this.model.character.boneGroups.dict;
+		for (var boneGroupUid in boneGroups){
+			var boneGroup = boneGroups[boneGroupUid];
+			this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
+			//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
+
+			for (var meshName in boneGroup.meshes.dict){
+				//TODO: add icon as well.
+				this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
+			}
+		}
+	},
+
+	meshesTabAddBoneGroup: function(boneGroupUid, boneGroupName){
+		var div = document.createElement('div');
+		elementUid = "meshes-tab-" + boneGroupUid;
+		div.className = "panel card clearfix";
+		div.innerHTML = '<div class="card-header" role="tab" id="' + elementUid + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + elementUid + '-data" aria-expanded="false" aria-controls="' + elementUid + '-data"> ' + boneGroupName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + elementUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementUid + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+		tab = document.getElementById("body-accordion");
+		tab.insertBefore(div, tab.childNodes[0]);
+
+		// Add the '+' button
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-mesh-bone-group", boneGroupUid);
+		div.setAttribute("add-mesh-button", "stuff");
+		div.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Add-circular-button-thin-symbol.svg/2000px-Add-circular-button-thin-symbol.svg.png" style="width:40px;height:40px;" alt="other stuff">\
+			<span class="label"> Add Mesh\
+		</span>';
+
+		document.getElementById(elementUid + '-data').children[0].appendChild(div);
+	},
+
+	meshesTabAddMesh: function(boneGroupUid, meshName, iconUrl){
+		//TODO: Add icon
+		elementId = "meshes-tab-" + boneGroupUid;
+
+		var div = document.createElement('div');
+		div.id = boneGroupUid + "-" + meshName;
+		div.className = "mini-select col-md-3";
+		div.setAttribute("meshes-tab-mesh", "stuff");
+		div.setAttribute("data-mesh-name", meshName);
+		div.setAttribute("data-mesh-bone-group", boneGroupUid);
+		div.innerHTML = '<img src="' + iconUrl + '" alt="icon">\
+			<span class="label">' + meshName + '\
+		</span>';
+
+		tab = document.getElementById(elementId + '-data').children[0];
+		tab.insertBefore(div, tab.childNodes[0]);
+	},
+
+	meshesTabRemoveMesh: function(boneGroupUid, meshName){
+		elementId = boneGroupUid + "-" + meshName;
+		var tabEntry = document.getElementById(elementId);
+		tabEntry.parentNode.removeChild(tabEntry);
+	},
+
+	poseTabAddBoneGroup: function(boneGroupUid, boneGroupName){
+		var div = document.createElement('div');
+		boneGroupUid = "pose-tab-" + boneGroupUid;
+		div.className = "panel card clearfix";
+		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupUid + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + boneGroupUid + '-data" aria-expanded="false" aria-controls="' + boneGroupUid + '-data"> ' + boneGroupName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + boneGroupUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupUid + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+
+		tab = document.getElementById("pose-accordion");
+		tab.insertBefore(div, tab.childNodes[0]);
+	},
+
+	poseTabAddPose: function(boneGroupUid, poseName, iconUrl){
+		//TODO: Add icon
+		boneGroupUid = boneGroupUid + "-" + meshName;
+
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("pose-tab-pose", "stuff");
+		div.setAttribute("data-pose-bone-group", boneGroupUid);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + poseName + '\
+		</span>';
+
+		document.getElementById(boneGroupUid + '-data').children[0].appendChild(div);
+	},
+
+	boneGroupsTabAddBoneGroup: function(boneGroupUid, boneGroupName){
+		var div = document.createElement('div');
+		var boneGroupNameUnderscores = boneGroupName.replaceAll(' ', '__');
+		elementId = "bone-groups-tab-" + boneGroupUid;
+		div.className = "panel card clearfix";
+		html = '<div class="card-header" role="tab" id="' + elementId + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + elementId + '-data" aria-expanded="false" aria-controls="' + elementId + '-data"> ' + boneGroupName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
+				<div class="card-block">\
+					<label id=' + boneGroupUid + '-bone-attach-label>Attached to: None</label>\
+					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
+				</div>\
+				<div class="card-block">\
+					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + boneGroupUid + '\')>Remove</button>\
+				</div>\
+			</div>';
+		div.innerHTML = html;
+
+		libraryPane = document.getElementById("bones-accordion");
+		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+	},
+
+	libraryPopulateMeshes: function(){
+		var metadata = model.getAvailableMeshes();
+		for (var i = 0; i < metadata.length; i++){
+			var meshMetadata = metadata[i];
+			var category = meshMetadata.type;
+			var element = document.getElementById(category + "-mesh-category");
+			if (element === null){
+				this.libraryAddCategory("mesh-library", category, category + "-mesh-category");
+			}
+
+			this.libraryAddMesh(category, meshMetadata);
+		}
+	},
+
+	libraryPopulatePoses: function(){
+		this.libraryAddCategory("pose-library", 'Poses', 'poses-pose-category');
+		var dict = model.getAvailablePoses();
+		for (var libraryName in dict){
+			var poseMetadatas = dict[libraryName];
+			for (var i = 0; i < poseMetadatas.length; i++){
+				var poseMetadata = poseMetadatas[i];
+				this.libraryAddPose('poses', poseMetadata);
+			}
+		}
+	},
+
+	libraryPopulateBoneGroups: function(){
+		var dict = model.getAvailableBoneGroups();
+		for (var libraryName in dict){
+			var libraryMetadatas = dict[libraryName];
+			for (var i = 0; i < libraryMetadatas.length; i++){
+				var boneGroupMetadata = libraryMetadatas[i];
+				var category = boneGroupMetadata.type;
+				var element = document.getElementById(category + "-bone-category");
+				if (element === null){
+					this.libraryAddCategory("bone-library", category, category + "-bone-category");
+				}
+
+				this.libraryAddBoneGroup(category, boneGroupMetadata);
+			}
+		}
+	},
+
+	libraryAddCategory: function(libraryName, categoryName, categoryId){
+		var div = document.createElement('div');
+		div.className = "panel card clearfix";
+		div.innerHTML = '<div class="card-header" role="tab" id="' + categoryId + '">\
+				<h5>\
+					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+						href="#' + categoryId + '-data" aria-expanded="false" aria-controls="' + categoryId + '-data"> ' + categoryName + ' </a>\
+				</h5>\
+			</div>\
+			<div id="' + categoryId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + categoryId + '">\
+				<div class="card-block">\
+				</div>\
+			</div>';
+		document.getElementById(libraryName).appendChild(div);
+	}, 
+
+	libraryAddMesh: function(category, meshMetadata){
+		//TODO: Add icon
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-mesh-id", "TODO");
+		div.setAttribute("data-mesh-library", meshMetadata.library);
+		div.setAttribute("data-mesh-mesh-name", meshMetadata.name);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + meshMetadata.name + '\
+		</span>';
+
+		document.getElementById(category + '-mesh-category-data').children[0].appendChild(div);
+	},
+
+	libraryAddPose: function(category, poseMetadata){
+		//TODO: Add icon
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-pose-id", "TODO");
+		div.setAttribute("data-pose-library", poseMetadata.library);
+		div.setAttribute("data-pose-pose-name", poseMetadata.name);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + poseMetadata.name + '\
+		</span>';
+
+		document.getElementById(category + '-pose-category-data').children[0].appendChild(div);
+	},
+
+	libraryAddBoneGroup: function(category, boneMetadata){
+		//TODO: Add icon
+		var div = document.createElement('div');
+		div.className = "mini-select col-md-3";
+		div.setAttribute("data-bone-id", "TODO");
+		div.setAttribute("data-bone-library", boneMetadata.library);
+		div.setAttribute("data-bone-bone-name", boneMetadata.name);
+		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+			<span class="label">' + boneMetadata.name + '\
+		</span>';
+
+		document.getElementById(category + '-bone-category-data').children[0].appendChild(div);
 	}
 };
 
 function onMouseDown(event){
-	event.preventDefault();
+
+	//make it so i can still pull up the JS console by using shift-right-click
+	//make it so you can click on UI
+	//TODO: Test this in multiple browsers
+	/*var target = event.originalEvent || event.originalTarget;
+	if (event.shiftKey || ! $(target.srcElement || target.originalTarget).is('canvas') ) {
+
+		//if you hold down shift or cick on anything other than the canvas do the normal thing
+		console.log("don't prevent me");
+
+	} else {
+
+		//if you're holding down shift or you click on a canvas element, don't do the normal thin
+		event.preventDefault();
+	}*/
 
 	if (event.button === 0){
-		view.onLeftClick(event.clientX, event.clientY);
+		view.onLeftClick(event.clientX, event.clientY, event);
 	} else if (event.button == 1){
-		view.onMiddleClick(event.clientX, event.clientY);
+		view.onMiddleClick(event.clientX, event.clientY, event);
 	} else if (event.button == 2){
-		view.onRightClick(event.clientX, event.clientY);
+		view.onRightClick(event.clientX, event.clientY, event);
 	}
 }
 
@@ -381,7 +711,15 @@ function onMouseMove(event){
 }
 
 function onKeyDown(event){
-	var keynum;
+
+	//check to see if you're typing in a input or form field, if so skip this event
+	var target = event.target;
+	if ( $(target).is('input') || $(target).is('textarea') ) {
+		//continue bubling up the event chain, but don't do this method
+		return true;
+	}
+
+	var keynum;	
 
     if(window.event) { // IE                    
       keynum = event.keyCode;
@@ -397,6 +735,10 @@ function onKeyDown(event){
     	view.startBoneRotate();
     } else if ('XxYyZz'.indexOf(letter) != -1){
     	view.setRotationAxis(letter);
+    } else if (letter == "p" || letter == "P"){
+    	//TODO: Make this update the photo_render
+    	var dataUrl =  window.view.renderer.domElement.toDataURL("image/png");
+    	console.log(dataUrl);
     }
 }
 

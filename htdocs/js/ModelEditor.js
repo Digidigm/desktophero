@@ -6,7 +6,7 @@ function init(){
 	window.view.init();
 	window.view.animate();
 
-	window.model.initCharacter();
+	//window.model.initCharacter();
 
 	$("#editor").append(window.view.renderer.domElement);
 }

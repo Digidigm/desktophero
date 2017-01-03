@@ -33,17 +33,18 @@ $app->get(
     }
 );
 $app->get(
-    '/page2/?',
-    function () use ($app,$session){
-        ob_start();
-        ob_get_clean();
-
+    '/models(/:mid)/?',
+    function ($mid = 0) use ($app,$session){
+        
         $app->render(
             'layouts/main.php',
             array(
+                //TODO: make this the actual logged in user's id or 0 if you're logged out
+                'user_id' => 0,
                 'loggedin' => $session->get('loggedin'),
                 'template_dir' => BASE_PATH . "./views/",
-                'template' => 'page2'
+                'model_id' => $mid,
+                'template' => 'models'
             ) //array of parameters for template
         );
     }
@@ -56,6 +57,8 @@ $app->get(
             array(
                 //'componentjs' => "/components/twitterjs.php",
                 'loggedin' => $session->get('loggedin'),
+                //TODO: make this the actual logged in user's id or 0 if you're logged out
+                'user_id' => 0,
                 'template_dir' => BASE_PATH . "./views/",
                 'template' => 'editor',
                 'figure_id' => $fid
@@ -100,34 +103,6 @@ $app->get(
         session_unset();
         $app->deleteCookie("softpath_session");
         $app->redirect("/");
-    }
-);
-// POST route
-$app->post(
-    '/post',
-    function () {
-        echo 'This is a POST route';
-    }
-);
-
-// PUT route
-$app->put(
-    '/put',
-    function () {
-        echo 'This is a PUT route';
-    }
-);
-
-// PATCH route
-$app->patch('/patch', function () {
-    echo 'This is a PATCH route';
-});
-
-// DELETE route
-$app->delete(
-    '/delete',
-    function () {
-        echo 'This is a DELETE route';
     }
 );
 
