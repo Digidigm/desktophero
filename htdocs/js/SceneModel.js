@@ -38,13 +38,16 @@ SceneModel.prototype = {
 		var boneGroup = this.character.boneGroups.get(boneGroupUid);
 		this.libraries.get(libraryName).fetchMesh(meshName, function(name, mesh){
 			mesh.material = new THREE.MeshFaceMaterial([defaultMaterial]);
-			boneGroup.addMesh(boneGroupUid, mesh);
+			boneGroup.addMesh(meshName, mesh);
 		});
 	},
 
-	removeMesh(boneGroupUid, libraryName, meshName){
+	removeMesh(boneGroupUid, meshName){
 		var boneGroup = this.character.boneGroups.get(boneGroupUid);
-		boneGroup.removeMesh(libraryName, meshName);
+		boneGroup.removeMesh(meshName);
+
+		// Remove entry under meshes tab.
+		
 	},
 
 	getAvailablePoses: function(){
@@ -177,7 +180,7 @@ SceneModel.prototype = {
 				var boneGroupUid = boneGroupUids[name];
 				var boneGroup = self.character.boneGroups.get(boneGroupUid);
 				mesh.material = new THREE.MeshFaceMaterial([defaultMaterial]);
-				boneGroup.addMesh(boneGroupUid, mesh);
+				boneGroup.addMesh(name, mesh);
 				meshesLeftToBeLoaded -= 1;
 				if (meshesLeftToBeLoaded <= 0){
 					self.initMeshesAdded(boneGroupUids);

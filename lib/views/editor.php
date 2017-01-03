@@ -499,7 +499,8 @@ $(document).ready( function(){
 	// Click meshes tab mesh
 	$("#body-accordion").on("dblclick",".mini-select[meshes-tab-mesh]", function(e){
 		var boneGroupId = $(this).data("mesh-bone-group");
-		model.removeMesh(boneGroupId, "todo");
+		var meshName =  $(this).data("mesh-name");
+		model.removeMesh(boneGroupId, meshName);
 	});
 
 	// Click library mesh

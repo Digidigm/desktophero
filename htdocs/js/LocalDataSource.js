@@ -84,7 +84,7 @@ LocalDataSource.prototype = {
 			materials[0].skinning = true;
 
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
-			mesh.name = name;
+			mesh.meshName = name;
 			mesh.libraryName = self.name;
 
 			mesh.frustumCulled = false;

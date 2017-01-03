@@ -152,6 +152,7 @@ SceneView.prototype = {
 		console.log("Bone group added!");
 		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);
 		boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
 
@@ -178,7 +179,7 @@ SceneView.prototype = {
 
 		for (var meshName in boneGroup.meshes.dict){
 			//TODO: add icon as well.
-			this.meshesTabAddMesh(boneGroupUid, meshName);
+			this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
 		}
 		
 	},
@@ -238,7 +239,20 @@ SceneView.prototype = {
 		mesh.boneGroupUid = boneGroup.uid;
 		this.scene.add(mesh);
 
-		this.meshesTabAddMesh(boneGroup.uid, meshName);
+		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
+	},
+
+	onMeshRemoved: function(boneGroup, meshName){
+		console.log("Mesh " + meshName + " removed from bone group " + boneGroup.name + ".");
+
+		for (var i in this.scene.children){
+			var sceneElement = this.scene.children[i];
+			if (sceneElement.meshName === meshName){
+				this.scene.remove(sceneElement);
+			}
+		}
+
+		this.meshesTabRemoveMesh(boneGroup.uid, meshName);
 	},
 
 	toggleBoneHandlesVisible: function(){
@@ -406,8 +420,8 @@ SceneView.prototype = {
 				<div class="card-block">\
 				</div>\
 			</div>';
-		libraryPane = document.getElementById("body-accordion");
-		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+		tab = document.getElementById("body-accordion");
+		tab.insertBefore(div, tab.childNodes[0]);
 
 		// Add the '+' button
 		var div = document.createElement('div');
@@ -423,18 +437,26 @@ SceneView.prototype = {
 
 	meshesTabAddMesh: function(boneGroupUid, meshName, iconUrl){
 		//TODO: Add icon
-		boneGroupUid = "meshes-tab-" + boneGroupUid;
+		elementId = "meshes-tab-" + boneGroupUid;
 
 		var div = document.createElement('div');
+		div.id = boneGroupUid + "-" + meshName;
 		div.className = "mini-select col-md-3";
 		div.setAttribute("meshes-tab-mesh", "stuff");
+		div.setAttribute("data-mesh-name", meshName);
 		div.setAttribute("data-mesh-bone-group", boneGroupUid);
-		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+		div.innerHTML = '<img src="' + iconUrl + '" alt="icon">\
 			<span class="label">' + meshName + '\
 		</span>';
 
-		libraryPane = document.getElementById(boneGroupUid + '-data').children[0];
-		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+		tab = document.getElementById(elementId + '-data').children[0];
+		tab.insertBefore(div, tab.childNodes[0]);
+	},
+
+	meshesTabRemoveMesh: function(boneGroupUid, meshName){
+		elementId = boneGroupUid + "-" + meshName;
+		var tabEntry = document.getElementById(elementId);
+		tabEntry.parentNode.removeChild(tabEntry);
 	},
 
 	poseTabAddBoneGroup: function(boneGroupUid, boneGroupName){
@@ -452,13 +474,13 @@ SceneView.prototype = {
 				</div>\
 			</div>';
 
-		libraryPane = document.getElementById("pose-accordion");
-		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+		tab = document.getElementById("pose-accordion");
+		tab.insertBefore(div, tab.childNodes[0]);
 	},
 
 	poseTabAddPose: function(boneGroupUid, poseName, iconUrl){
 		//TODO: Add icon
-		boneGroupUid = "pose-tab-" + boneGroupUid;
+		boneGroupUid = boneGroupUid + "-" + meshName;
 
 		var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
