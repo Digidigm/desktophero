@@ -41,13 +41,24 @@ LocalDataSource.prototype = {
 		this.meshes = new ObservableDict();
 
 		// Fake data for now.
-		this.meshes['left arm'] = new MeshMetadata('left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['right arm'] = new MeshMetadata('right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['torso'] = new MeshMetadata('torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
-		this.meshes['hat'] = new MeshMetadata('hat', 'stockto2', 'default', 'hat', ['cool', 'monkey']);
-		this.meshes['head'] = new MeshMetadata('head', 'stockto2', 'default', 'head', ['cool', 'great']);
-		this.meshes['tentacle'] = new MeshMetadata('tentacle', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['neck'] = new MeshMetadata('neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
+		this.meshes['male left arm'] = new MeshMetadata('male left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['male right arm'] = new MeshMetadata('male right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['male left hand'] = new MeshMetadata('male left hand', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['male right hand'] = new MeshMetadata('male right hand', 'stockto2', 'default', 'arm', ['cool', 'great'])
+		this.meshes['male torso'] = new MeshMetadata('male torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
+		this.meshes['male head'] = new MeshMetadata('male head', 'stockto2', 'default', 'head', ['cool', 'great']);
+		this.meshes['male neck'] = new MeshMetadata('male neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
+		
+		this.meshes['female left arm'] = new MeshMetadata('female left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['female right arm'] = new MeshMetadata('female right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['female left hand'] = new MeshMetadata('female left hand', 'stockto2', 'default', 'arm', ['cool', 'great']);
+		this.meshes['female right hand'] = new MeshMetadata('female right hand', 'stockto2', 'default', 'arm', ['cool', 'great'])
+		this.meshes['female torso'] = new MeshMetadata('female torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
+		this.meshes['female head'] = new MeshMetadata('female head', 'stockto2', 'default', 'head', ['cool', 'great']);
+		this.meshes['female neck'] = new MeshMetadata('female neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
+
+		this.meshes['monkey goggles'] = new MeshMetadata('monkey goggles', 'stockto2', 'default', 'headgear', ['cool', 'great']);
+		this.meshes['platform'] = new MeshMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great']);
 		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']);
 
 		this.meshesRefreshedEvent.notify(this.meshes);
@@ -66,12 +77,23 @@ LocalDataSource.prototype = {
 	refreshBoneGroupsList: function(){
 		this.boneGroups = new ObservableDict();
 		// Fake data for now.
-		this.boneGroups.put('left arm', new PoseMetadata('left arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('right arm', new PoseMetadata('right arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('torso', new PoseMetadata('torso', 'stockto2', 'default', 'torso', ['cool', 'great']));
-		this.boneGroups.put('head', new PoseMetadata('head', 'stockto2', 'default', 'head', ['cool', 'great']));
-		this.boneGroups.put('tentacle', new PoseMetadata('tentacle', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('neck', new PoseMetadata('neck', 'stockto2', 'default', 'neck', ['cool', 'great']));
+		this.boneGroups.put('male left arm', new PoseMetadata('male left arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('male right arm', new PoseMetadata('male right arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('male left hand', new PoseMetadata('male left hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('male right hand', new PoseMetadata('male right hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('male torso', new PoseMetadata('male torso', 'stockto2', 'default', 'torso', ['cool', 'great']));
+		this.boneGroups.put('male head', new PoseMetadata('male head', 'stockto2', 'default', 'head', ['cool', 'great']));
+		this.boneGroups.put('male neck', new PoseMetadata('male neck', 'stockto2', 'default', 'head', ['cool', 'great']));
+
+		this.boneGroups.put('female left arm', new PoseMetadata('female left arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('female right arm', new PoseMetadata('female right arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('female left hand', new PoseMetadata('female left hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('female right hand', new PoseMetadata('female right hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
+		this.boneGroups.put('female torso', new PoseMetadata('female torso', 'stockto2', 'default', 'torso', ['cool', 'great']));
+		this.boneGroups.put('female head', new PoseMetadata('female head', 'stockto2', 'default', 'head', ['cool', 'great']));
+		this.boneGroups.put('female neck', new PoseMetadata('female neck', 'stockto2', 'default', 'head', ['cool', 'great']));
+
+		this.boneGroups.put('platform', new PoseMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great']));
 		this.boneGroups.put('handheld', new PoseMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']));
 
 		this.boneGroupsRefreshedEvent.notify(this.boneGroups);

@@ -2,20 +2,21 @@ function SceneModel(){
 	this.userSettings = new UserSettings();
 
 	this.libraries = new ObservableDict();
-	this.libraries.put("default", new LocalDataSource("default", "/testlib"));
+	this.libraries.put("default", new LocalDataSource("default", "/defaultlib"));
 
 	this.character = new Character();
 
 	this.materials = {};
 }
-SceneModel.boneGroupsToLoad = ['human male left arm',
-							'human male left hand',
-							'human male right arm',
-							'human male right hand',
-							'human male torso',
-							'human male legs',
-							'human male head',
-							'human male neck',
+SceneModel.boneGroupsToLoad = ['female left arm',
+							'female left hand',
+							'female right arm',
+							'female right hand',
+							'female torso',
+							'female legs',
+							'female head',
+							'female neck',
+							'platform',
 							'handheld'];
 SceneModel.initialPose = 'amazing pose';
 
@@ -147,8 +148,8 @@ SceneModel.prototype = {
 		var self = this;
 		
 		var defaultDataSource = self.libraries.get('default');
-		var boneGroupsLeftToBeLoaded = 9;
-		var boneGroupUids = {}
+		var boneGroupsLeftToBeLoaded = 10;
+		var boneGroupUids = {};
 
 		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
 			var name = SceneModel.boneGroupsToLoad[i];
@@ -168,7 +169,7 @@ SceneModel.prototype = {
 		var self = this;
 
 		var defaultDataSource = self.libraries.get('default');
-		var meshesLeftToBeLoaded = 9;
+		var meshesLeftToBeLoaded = 10;
 
 		var defaultMaterial = self.materials["default"];
 		// Attach meshes to bone groups.
@@ -198,22 +199,24 @@ SceneModel.prototype = {
 
 		self = this;
 
-		var headUid = boneGroupUids['human male head'];
+		var headUid = boneGroupUids['female head'];
 		var head = self.character.boneGroups.get(headUid);
-		var neckUid = boneGroupUids['human male neck'];
+		var neckUid = boneGroupUids['female neck'];
 		var neck = self.character.boneGroups.get(neckUid);
-		var torsoUid = boneGroupUids['human male torso'];
+		var torsoUid = boneGroupUids['female torso'];
 		var torso = self.character.boneGroups.get(torsoUid);
-		var legsUid = boneGroupUids['human male legs'];
+		var legsUid = boneGroupUids['female legs'];
 		var legs = self.character.boneGroups.get(legsUid);
-		var leftArmUid = boneGroupUids['human male left arm'];
+		var leftArmUid = boneGroupUids['female left arm'];
 		var leftArm = self.character.boneGroups.get(leftArmUid);
-		var leftHandUid = boneGroupUids['human male left hand'];
+		var leftHandUid = boneGroupUids['female left hand'];
 		var leftHand = self.character.boneGroups.get(leftHandUid);
-		var rightArmUid = boneGroupUids['human male right arm'];
+		var rightArmUid = boneGroupUids['female right arm'];
 		var rightArm = self.character.boneGroups.get(rightArmUid);
-		var rightHandUid = boneGroupUids['human male right hand'];
+		var rightHandUid = boneGroupUids['female right hand'];
 		var rightHand = self.character.boneGroups.get(rightHandUid);
+		var platformUid = boneGroupUids['platform'];
+		var platform = self.character.boneGroups.get(platformUid);
 		var handheldUid = boneGroupUids['handheld'];
 		var handheld = self.character.boneGroups.get(handheldUid);
 
@@ -224,7 +227,8 @@ SceneModel.prototype = {
 		rightHand.attachToBone(rightArmUid, "#hand", rightArm.attachPoints["#hand"]);
 		head.attachToBone(neckUid, "#top", neck.attachPoints["#top"]);
 		handheld.attachToBone(leftHandUid, "#palm", leftHand.attachPoints["#palm"]);
-		torso.attachToBone(legsUid, "#pelvis", legs.attachPoints["#pelvis"]);
+		torso.attachToBone(legsUid, "#top", legs.attachPoints["#top"]);
+		platform.attachToBone(legsUid, "#platform", legs.attachPoints["#platform"]);
 
 		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
 		legs.skeleton.bones[0].position.y = 0;
@@ -232,7 +236,7 @@ SceneModel.prototype = {
 		// Load initial pose.
 		dataSource = this.libraries.get('default');
 		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
-			self.character.loadPose(SceneModel.initialPose, jsonPose);
+		//	self.character.loadPose(SceneModel.initialPose, jsonPose);
 		});
 	}
 };

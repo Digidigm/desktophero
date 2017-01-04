@@ -102,6 +102,14 @@ SceneView.prototype = {
 		pointLight2.castShadow = true;
 		this.scene.add(pointLight2);
 
+		var pointLight3 = new THREE.SpotLight(0xffffdd);
+		pointLight3.position.y = 10;
+		pointLight3.position.z = 40;
+		pointLight3.position.x = -20;
+		pointLight3.castShadow = true;
+		pointLight.intensity = 0.15;
+		this.scene.add(pointLight3);
+
 		lightHelper = new THREE.Mesh( new THREE.SphereBufferGeometry(4, 8, 8), new THREE.MeshBasicMaterial({color: 0x00ff00}));
 		lightHelper.position.x = pointLight2.position.x;
 		lightHelper.position.y = pointLight2.position.y;
@@ -204,7 +212,6 @@ SceneView.prototype = {
 			//TODO: add icon as well.
 			this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
 		}
-		
 	},
 
 	onBoneGroupRemoved: function(character, boneGroupUid){

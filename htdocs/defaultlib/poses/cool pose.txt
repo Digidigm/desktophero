@@ -1,0 +1,264 @@
+{
+ "name": "cool pose",
+ "author": "default",
+ "library": "stockto2",
+ "type": "body",
+ "tags": [
+  "stuff",
+  "cool"
+ ],
+ "poseBones": [
+  {
+   "name": "right arm upper",
+   "position": {
+    "x": 0,
+    "y": 0.024797,
+    "z": 0.024797
+   },
+   "rotation": {
+    "x": -0.6,
+    "y": 1.7999999999999998,
+    "z": 1.2000000000000002
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "right arm forearm",
+   "position": {
+    "x": -1.16118,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 1.7999999999999998,
+    "z": -1.2
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "right hand palm",
+   "position": {
+    "x": -1.08279,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "right hand fingers",
+   "position": {
+    "x": -0.293429,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "left arm upper",
+   "position": {
+    "x": 0,
+    "y": 0.024797,
+    "z": 0.024797
+   },
+   "rotation": {
+    "x": 0.6,
+    "y": 0,
+    "z": -1.2
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "left arm forearm",
+   "position": {
+    "x": 1.16118,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": -0.6,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "left hand palm",
+   "position": {
+    "x": 1.08279,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "left hand fingers",
+   "position": {
+    "x": 0.293429,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "neck",
+   "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 1.2,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "head",
+   "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "handheld",
+   "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "torso bottom",
+   "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "torso middle",
+   "position": {
+    "x": 0,
+    "y": 0.53477,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  },
+  {
+   "name": "torso top",
+   "position": {
+    "x": 0,
+    "y": 0.467888,
+    "z": 0
+   },
+   "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+   },
+   "scale": {
+    "x": 1,
+    "y": 1,
+    "z": 1
+   }
+  }
+ ]
+}
