@@ -18,7 +18,8 @@ function SceneView(model){
 	this.boneHandles = [];
 	this.boneHandlesVisible = false;
 	this.selectedBone;
-	this.rotateMode = false;
+	this.editMode = 'none';
+	this.rotationBoneOrigin;
 	this.rotateOriginX;
 	this.rotateOriginY;
 
@@ -303,37 +304,37 @@ SceneView.prototype = {
 		}
 
 		console.log("Entering rotate mode.");
-		this.rotateMode = true;
+		this.editMode = 'rotate';
 		this.initialRotation = this.selectedBone.rotation.clone();
-		this.rotationAxis = null;
+		this.editAxis = null;
 
 		this.rotateOriginX = this.mouseX;
 		this.rotateOriginY = this.mouseY;
 	},
 
 	finalizeBoneRotate: function(){
-		this.rotateMode = false;
+		this.editMode = 'none';
 	},
 
 	cancelBoneRotate: function(){
 		this.selectedBone.rotation.setFromVector3(this.initialRotation);
-		this.rotateMode = false;
+		this.editMode = 'none';
 	},
 
-	setRotationAxis: function(axis){
-		if (!this.rotateMode){
-			console.error("Cannot set rotation axis, not in rotate mode.");
+	setEditAxis: function(axis){
+		if (this.editMode === 'none'){
+			console.error("Cannot set edit axis, not in any edit mode.");
 			return;
 		}
 
 		if (axis == 'X' || axis == 'x'){
-			this.rotationAxis = 'X';
+			this.editAxis = 'X';
 		} else if (axis == 'Y' || axis == 'y'){
-			this.rotationAxis = 'Y';
+			this.editAxis = 'Y';
 		} else if (axis == 'Z' || axis == 'z'){
-			this.rotationAxis = 'Z';
+			this.editAxis = 'Z';
 		}
-		console.log("Rotation axis set to " + this.rotationAxis + ".");
+		console.log("Edit axis set to " + this.editAxis + ".");
 	},
 
 	getClickVector: function(mouseX, mouseY, camera){
@@ -347,7 +348,7 @@ SceneView.prototype = {
 	},
 
 	onLeftClick: function(mouseX, mouseY){
-		if (this.rotateMode){
+		if (this.editMode === 'rotate'){
 			this.finalizeBoneRotate();
 			return;
 		} 
@@ -356,7 +357,7 @@ SceneView.prototype = {
 	onRightClick: function(mouseX, mouseY){
 		console.log('right click')
 
-		if (this.rotateMode){
+		if (this.editMode === 'rotate'){
 			this.cancelBoneRotate();
 			return;
 		}
@@ -392,11 +393,18 @@ SceneView.prototype = {
 			}
 		}
 		this.selectedBone = closestBone;
+
 		if (closestBone == null){
 			this.boneAxisHelper.visible = false;
 		} else {
 			this.boneAxisHelper.visible = true;
 			console.log("Clicked on " + this.selectedBone.name);
+			console.log(closestBone);
+
+			var globalBonePosition = new THREE.Vector3()
+			this.scene.updateMatrixWorld();
+			globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
+			this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
 		}
 	},
 
@@ -408,53 +416,40 @@ SceneView.prototype = {
 		this.mouseX = mouseX;
 		this.mouseY = mouseY;
 
-		if (this.rotateMode){
+		if (this.editMode == 'rotate'){
 			var factor = 500.0;
 
-			var dx = (this.mouseX - this.rotateOriginX);
-			var dy = (this.mouseY - this.rotateOriginY);
-			var delta = Math.sqrt(dx * dx + dy * dy);
-			if (this.mouseX < this.rotateOriginX){
-				delta *= -1;
-			}
+			var dx = (this.rotateOriginX - this.rotationBoneOrigin.x);
+			var dy = (this.rotateOriginY - this.rotationBoneOrigin.y);
+			var angle1 = Math.atan2(dy, dx);
 
-			var rotateAmount = delta / factor;
+			dx = (mouseX - this.rotationBoneOrigin.x);
+			dy = (mouseY - this.rotationBoneOrigin.y);
+			var angle2 = Math.atan2(dy, dx);
+
+			var combinedAngle = angle1 - angle2;
+
 			this.selectedBone.rotation.setFromVector3(this.initialRotation);
 			this.selectedBone.updateMatrix();
+			var rotation = this.selectedBone.parent.getWorldRotation()
+			var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
 
-			if (this.rotationAxis == 'X'){
-				//var quaternion = new THREE.Quaternion().setFromAxisAngle(this.X_AXIS, rotateAmount);
-				//this.selectedBone.rotation.setFromQuaternion(quaternion);
-				//this.selectedBone.rotateX(delta/factor);
-				
+			if (this.editAxis == 'X'){
 				var axisClone = this.X_AXIS.clone();
-				var rotation = this.selectedBone.parent.getWorldRotation()
-				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
 				axisClone.applyEuler(inverseRotation);
-				this.selectedBone.rotateOnWorldAxis(axisClone, rotateAmount);
-				//console.log("Rotate " + delta + " around X axis.");
-			} else if (this.rotationAxis == 'Y'){
-				//this.selectedBone.rotateY(delta/factor);
+				this.selectedBone.rotateOnWorldAxis(axisClone, combinedAngle);
+			} else if (this.editAxis == 'Y'){
 				var axisClone = this.Y_AXIS.clone();
-				var rotation = this.selectedBone.parent.getWorldRotation()
-				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
 				axisClone.applyEuler(inverseRotation);
-				this.selectedBone.rotateOnWorldAxis(axisClone, rotateAmount);
-				//console.log("Rotate " + delta + " around Y axis.");
-			} else if (this.rotationAxis == 'Z'){
-				//this.selectedBone.rotateZ(delta/factor);
+				this.selectedBone.rotateOnWorldAxis(axisClone, combinedAngle);
+			} else if (this.editAxis == 'Z'){
 				var axisClone = this.Z_AXIS.clone();
-				var rotation = this.selectedBone.parent.getWorldRotation()
-				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
 				axisClone.applyEuler(inverseRotation);
-				this.selectedBone.rotateOnWorldAxis(axisClone, rotateAmount);
-				//console.log("Rotate " + delta + " around Z axis.");
+				this.selectedBone.rotateOnWorldAxis(axisClone, combinedAngle);
 			} else {
 				var cameraAxis = this.getClickVector(window.width/2, window.height/2, this.camera);
-				var rotation = this.selectedBone.parent.getWorldRotation()
-				var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
 				cameraAxis.applyEuler(inverseRotation);
-				this.selectedBone.rotateOnWorldAxis(cameraAxis, rotateAmount);
+				this.selectedBone.rotateOnWorldAxis(cameraAxis, combinedAngle);
 			}
 		}
 	},
@@ -685,6 +680,28 @@ SceneView.prototype = {
 		</span>';
 
 		document.getElementById(category + '-bone-category-data').children[0].appendChild(div);
+	},
+
+	getScreenCoordinates: function(obj){
+
+		var vector = obj.clone();
+		var windowWidth = window.innerWidth;
+		var minWidth = 1280;
+
+		if(windowWidth < minWidth) {
+			windowWidth = minWidth;
+		}
+
+		var widthHalf = (windowWidth/2);
+		var heightHalf = (window.innerHeight/2);
+
+		vector.project(this.camera);
+
+		vector.x = ( vector.x * widthHalf ) + widthHalf;
+		vector.y = - ( vector.y * heightHalf ) + heightHalf;
+		vector.z = 0;
+
+		return vector;
 	}
 };
 
@@ -742,7 +759,7 @@ function onKeyDown(event){
     } else if (letter == 'R' || letter == 'r'){
     	view.startBoneRotate();
     } else if ('XxYyZz'.indexOf(letter) != -1){
-    	view.setRotationAxis(letter);
+    	view.setEditAxis(letter);
     } else if (letter == "p" || letter == "P"){
     	//TODO: Make this update the photo_render
     	var dataUrl =  window.view.renderer.domElement.toDataURL("image/png");
