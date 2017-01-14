@@ -29,3 +29,8 @@ local
 
 # Configuration files
 config
+
+#
+misc/*.js
+misc/*.zip
+misc/*.obj

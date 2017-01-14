@@ -8,14 +8,14 @@ function SceneModel(){
 
 	this.materials = {};
 }
-SceneModel.boneGroupsToLoad = ['female left arm',
-							'female left hand',
-							'female right arm',
-							'female right hand',
-							'female torso',
-							'female legs',
-							'female head',
-							'female neck',
+SceneModel.boneGroupsToLoad = ['male left arm',
+							'male left hand',
+							'male right arm',
+							'male right hand',
+							'male torso',
+							'male legs',
+							'male head',
+							'male neck',
 							'platform',
 							'handheld'];
 SceneModel.initialPose = 'amazing pose';
@@ -199,21 +199,21 @@ SceneModel.prototype = {
 
 		self = this;
 
-		var headUid = boneGroupUids['female head'];
+		var headUid = boneGroupUids['male head'];
 		var head = self.character.boneGroups.get(headUid);
-		var neckUid = boneGroupUids['female neck'];
+		var neckUid = boneGroupUids['male neck'];
 		var neck = self.character.boneGroups.get(neckUid);
-		var torsoUid = boneGroupUids['female torso'];
+		var torsoUid = boneGroupUids['male torso'];
 		var torso = self.character.boneGroups.get(torsoUid);
-		var legsUid = boneGroupUids['female legs'];
+		var legsUid = boneGroupUids['male legs'];
 		var legs = self.character.boneGroups.get(legsUid);
-		var leftArmUid = boneGroupUids['female left arm'];
+		var leftArmUid = boneGroupUids['male left arm'];
 		var leftArm = self.character.boneGroups.get(leftArmUid);
-		var leftHandUid = boneGroupUids['female left hand'];
+		var leftHandUid = boneGroupUids['male left hand'];
 		var leftHand = self.character.boneGroups.get(leftHandUid);
-		var rightArmUid = boneGroupUids['female right arm'];
+		var rightArmUid = boneGroupUids['male right arm'];
 		var rightArm = self.character.boneGroups.get(rightArmUid);
-		var rightHandUid = boneGroupUids['female right hand'];
+		var rightHandUid = boneGroupUids['male right hand'];
 		var rightHand = self.character.boneGroups.get(rightHandUid);
 		var platformUid = boneGroupUids['platform'];
 		var platform = self.character.boneGroups.get(platformUid);

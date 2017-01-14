@@ -66,10 +66,13 @@ SceneView.prototype = {
 		this.cubeMap = new THREE.CubeTextureLoader()
 				.setPath('/test/cubemaps/bridge/')
 				.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
+		/*this.cubeMap = new THREE.CubeTextureLoader()
+				.setPath('/test/cubemaps/purpledark/')
+				.load(['posx.png', 'negx.png', 'posz.png', 'negz.png', 'posy.png', 'negy.png']);*/
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 
-		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), 0.4, this.cubeMap);
+		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .4, this.cubeMap);
 		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 

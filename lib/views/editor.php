@@ -829,9 +829,9 @@ $(document).ready( function(){
 <footer class="footer">
 	<div class="container">
 		<div class="input-group input-group-lg">
-			<input type="text" class="form-control" placeholder="My Figure's Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
+			<input type="text" class="form-control" placeholder="Character Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
 			<span class="input-group-btn">
-				<button class="btn btn-secondary" type="button" onclick="figure.save()">Save Figure</button>
+				<button class="btn btn-secondary" type="button" onclick="view.exportToSTL()">Export to .STL</button>
 			</span>
 		</div>
 	</div>  	
