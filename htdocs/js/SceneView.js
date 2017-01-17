@@ -686,12 +686,19 @@ SceneView.prototype = {
 		for (var i = 0; i < metadata.length; i++){
 			var meshMetadata = metadata[i];
 			var category = meshMetadata.type;
-			var element = document.getElementById(category + "-mesh-category");
+			if (category === undefined){
+				console.error("Got mesh metadata with undefined type: ");
+				console.error(meshMetadata);
+				continue;
+			}
+			console.log(category);
+			var categoryId = category.replaceAll(" ", "_") + "-mesh-category";
+			var element = document.getElementById(categoryId);
 			if (element === null){
-				this.libraryAddCategory("mesh-library", category, category + "-mesh-category");
+				this.libraryAddCategory("mesh-library", category, categoryId);
 			}
 
-			this.libraryAddMesh(category, meshMetadata);
+			this.libraryAddMesh(categoryId, meshMetadata);
 		}
 	},
 
@@ -740,7 +747,7 @@ SceneView.prototype = {
 		document.getElementById(libraryName).appendChild(div);
 	}, 
 
-	libraryAddMesh: function(category, meshMetadata){
+	libraryAddMesh: function(categoryId, meshMetadata){
 		//TODO: Add icon
 		var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
@@ -751,7 +758,7 @@ SceneView.prototype = {
 			<span class="label">' + meshMetadata.name + '\
 		</span>';
 
-		document.getElementById(category + '-mesh-category-data').children[0].appendChild(div);
+		document.getElementById(categoryId + "-data").children[0].appendChild(div);
 	},
 
 	libraryAddPose: function(category, poseMetadata){
