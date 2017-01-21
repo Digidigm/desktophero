@@ -71,12 +71,12 @@ SceneView.prototype = {
 		this.camera.position.z = 12;
 		this.camera.lookAt(this.scene.position);
 
-		this.cubeMap = new THREE.CubeTextureLoader()
-				.setPath('/test/cubemaps/bridge/')
-				.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
 		/*this.cubeMap = new THREE.CubeTextureLoader()
-				.setPath('/test/cubemaps/purpledark/')
-				.load(['posx.png', 'negx.png', 'posz.png', 'negz.png', 'posy.png', 'negy.png']);*/
+				.setPath('/test/cubemaps/bridge/')
+				.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);*/
+		this.cubeMap = new THREE.CubeTextureLoader()
+				.setPath('/test/cubemaps/hill/')
+				.load(['posx.png', 'negx.png', 'posz.png', 'negz.png', 'posy.png', 'negy.png']);
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 

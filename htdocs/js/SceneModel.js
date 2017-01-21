@@ -13,7 +13,7 @@ SceneModel.boneGroupsToLoad = ['male left arm',
 							'male right arm',
 							'male right hand',
 							'male torso',
-							'male legs',
+							'm legs',
 							'male head',
 							'male neck',
 							'platform',
@@ -58,7 +58,6 @@ SceneModel.prototype = {
 
 			var library = this.libraries.get(libraryName);
 			var poses = library.getPoses();
-			console.log(poses);
 			for (var poseName in poses.dict){
 				var pose = poses.get(poseName);
 				allPoses[libraryName].push(pose);
@@ -205,7 +204,7 @@ SceneModel.prototype = {
 		var neck = self.character.boneGroups.get(neckUid);
 		var torsoUid = boneGroupUids['male torso'];
 		var torso = self.character.boneGroups.get(torsoUid);
-		var legsUid = boneGroupUids['male legs'];
+		var legsUid = boneGroupUids['m legs'];
 		var legs = self.character.boneGroups.get(legsUid);
 		var leftArmUid = boneGroupUids['male left arm'];
 		var leftArm = self.character.boneGroups.get(leftArmUid);
@@ -231,7 +230,7 @@ SceneModel.prototype = {
 		platform.attachToBone(legsUid, "#platform", legs.attachPoints["#platform"]);
 
 		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
-		legs.skeleton.bones[0].position.y = 0;
+		//legs.skeleton.bones[0].position.y = 0;
 
 		// Load initial pose.
 		dataSource = this.libraries.get('default');

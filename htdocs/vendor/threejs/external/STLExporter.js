@@ -109,7 +109,7 @@ THREE.STLExporter.prototype = {
 										.applyMatrix4(skinMatrices[k]);
 										finalVector.add(tempVector);
 									}
-									output += '\t\t\tvertex ' + finalVector.x + ' ' + finalVector.y + ' ' + finalVector.z + '\n';
+									output += '\t\t\tvertex ' + finalVector.x + ' ' + -finalVector.z + ' ' + finalVector.y + '\n';
 								}
 							}
 							output += '\t\tendloop\n';

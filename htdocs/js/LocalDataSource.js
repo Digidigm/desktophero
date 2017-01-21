@@ -62,6 +62,8 @@ LocalDataSource.prototype = {
 		this.meshes['platform'] = new MeshMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great']);
 		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']);
 
+		this.meshes['m legs'] = new MeshMetadata('m legs', 'stockto2', 'default', 'legs', ['cool', 'great']);
+
 		// Hair
 		this.meshes['short hair curly'] = new MeshMetadata('short hair curly', 'stockto2', 'default', 'hair', ['cool', 'great']);
 		this.meshes['short hair parted'] = new MeshMetadata('short hair parted', 'stockto2', 'default', 'hair', ['cool', 'great']);
