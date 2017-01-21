@@ -455,66 +455,65 @@ $(document).ready( function(){
 
 
 	setGlobalPose = function(){
-		$("#mesh-library").hide();
-		$("#bone-library").hide();
-		$("#pose-library").show();
+		view.showLibrary('pose');
 	};
 
 	addBoneGroup = function(){
-		$("#mesh-library").hide();
-		$("#bone-library").show();
-		$("#pose-library").hide();
+		view.showLibrary('bone');
 	};
 
 	clickedMeshTab = function(){
-		$("#bone-library").hide();
-		$("#pose-library").hide();
+		view.hideLibrary('pose');
+		view.hideLibrary('bone');
 	};
 
 	clickedPoseTab = function(){
-		$("#mesh-library").hide();
-		$("#bone-library").hide();
+		view.hideLibrary('mesh');
+		view.hideLibrary('bone');
+		view.selectMesh(null);
 	};
 
 	clickedBoneGroupsTab = function(){
-		$("#mesh-library").hide();
-		$("#pose-library").hide();
+		view.hideLibrary('pose');
+		view.hideLibrary('mesh');
+		view.selectMesh(null);
 	};
 
 	clickedSettingsTab = function(){
-		$("#mesh-library").hide();
-		$("#bone-library").hide();
-		$("#pose-library").hide();
+		view.hideLibraries();
+		view.selectMesh(null);
 	};
 
 	// Add mesh button
 	$("#body-accordion").on("click",".mini-select[add-mesh-button]", function(e){
-		var boneGroupUid = $(this).data("mesh-bone-group");
+		var boneGroupUid = $(this).data("mesh-bone-group") + "";
+		var boneGroup = model.character.boneGroups.get(boneGroupUid);
+		model.addMesh(boneGroupUid, boneGroup.libraryName, boneGroup.name);
 		view.selectedBoneGroupUid = boneGroupUid;
+		view.selectMeshFuture(view.selectedBoneGroupUid, boneGroup.name);
+
 		view.libraryClearMeshes();
 		view.libraryPopulateMeshes(boneGroupUid);
-		$("#mesh-library").show();
-		$("#bone-library").hide();
-		$("#pose-library").hide();
+		view.showLibrary('mesh');
 	});
 
 	// Click meshes tab mesh - select
 	$("#body-accordion").on("click",".mini-select[meshes-tab-mesh]", function(e){
-		var boneGroupId = $(this).data("mesh-bone-group");
+		var boneGroupUid = $(this).data("mesh-bone-group") + "";
 		var meshName =  $(this).data("mesh-name");
-		var mesh = model.character.boneGroups.get(boneGroupId).meshes.get(meshName);
-		if (mesh == view.selectedMesh){
-			view.setSelectedMesh(null);
-		} else {
-			view.setSelectedMesh(mesh);
-		}
+		var mesh = model.character.boneGroups.get(boneGroupUid).meshes.get(meshName);
+		view.selectedBoneGroupUid = boneGroupUid;
+		view.selectMesh(mesh);
+		view.libraryPopulateMeshes(boneGroupUid);
+		view.showLibrary('mesh');
 	});
 
 	// Double-click meshes tab mesh - delete
 	$("#body-accordion").on("dblclick",".mini-select[meshes-tab-mesh]", function(e){
-		var boneGroupId = $(this).data("mesh-bone-group");
+		var boneGroupUid = $(this).data("mesh-bone-group") + "";
 		var meshName =  $(this).data("mesh-name");
-		model.removeMesh(boneGroupId, meshName);
+		view.hideLibrary('mesh');
+		model.removeMesh(boneGroupUid, meshName);
 	});
 
 	// Click library mesh
@@ -523,10 +522,15 @@ $(document).ready( function(){
 		var library = $(this).data("mesh-library");
 		var meshName = $(this).data("mesh-mesh-name");
 		if (view.selectedBoneGroupUid !== null){
-			model.addMesh(view.selectedBoneGroupUid, library, meshName);
-			view.selectedBoneGroupUid = null;
+			if (view.selectedMesh == null){ // Add mesh
+				model.addMesh(view.selectedBoneGroupUid, library, meshName);
+				view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
+			} else {
+				model.removeMesh(view.selectedBoneGroupUid, view.selectedMesh.name);
+				model.addMesh(view.selectedBoneGroupUid, library, meshName);
+				view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
+			}
 		}
-		$("#mesh-library").hide();
 	});
 
 	// Click library pose
@@ -544,14 +548,8 @@ $(document).ready( function(){
 		var boneGroupName = $(this).data("bone-bone-name");
 		model.addBoneGroup(library, boneGroupName);
 		
-		$("#bone-library").hide();
+		view.hideLibrary('bone');
 	});
-
-
-	// Library hidden until 'Add <something>' button clicked
-	$("#mesh-library").hide();
-	$("#pose-library").hide();
-	$("#bone-library").hide(); 
 
 	//DO SOMETHING IF YOU CLICK A FILTER
 	$("#mesh-library").on("click",".mini-select[data-tag-id]", function(e){

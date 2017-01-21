@@ -16,6 +16,7 @@ function SceneView(model){
 	this.cubeMap;
 
 	this.selectedMesh;
+	this.futureMeshToSelect = null;
 	this.meshes = []; // Keep track of all meshes added to scene
 
 	this.skeletonHelpers = [];
@@ -96,6 +97,8 @@ SceneView.prototype = {
 		this.populateTabs();
 		this.libraryPopulatePoses();
 		this.libraryPopulateBoneGroups();
+
+		this.hideLibraries();
 	},
 
 	initLights: function(){
@@ -195,7 +198,12 @@ SceneView.prototype = {
 		this.model.character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
 	},
 
-	setSelectedMesh: function(mesh){
+	selectMesh: function(mesh){
+		// If waiting for a mesh to be selected when load, cancel it
+		if (this.futureMeshToSelect != null){
+			this.futureMeshToSelect = null;
+		}
+
 		// reset previously selected mesh to normal material
 		if (this.selectedMesh != null){
 			this.selectedMesh.material = model.materials['default'];
@@ -203,9 +211,42 @@ SceneView.prototype = {
 
 		this.selectedMesh = mesh;
 
-		if (this.selectedMesh != null){
+		if (this.selectedMesh == null){
+			hideLibraries();
+		} else {
 			this.selectedMesh.material = model.materials['selected'];
 		}
+	},
+
+	showLibrary: function(libraryName){
+		this.hideLibraries();
+		if (libraryName === "mesh"){
+			document.getElementById('mesh-library').style.visibility = 'visible';
+		} else if (libraryName === "pose"){
+			document.getElementById('pose-library').style.visibility = 'visible';
+		} else if (libraryName === "bone"){
+			document.getElementById('bone-library').style.visibility = 'visible';
+		}
+	},
+
+	hideLibrary: function(libraryName){
+		if (libraryName === "mesh"){
+			document.getElementById('mesh-library').style.visibility = 'hidden';
+		} else if (libraryName === "pose"){
+			document.getElementById('pose-library').style.visibility = 'hidden';
+		} else if (libraryName === "bone"){
+			document.getElementById('bone-library').style.visibility = 'hidden';
+		}
+	},
+
+	hideLibraries: function(){
+		this.hideLibrary('mesh');
+		this.hideLibrary('pose');
+		this.hideLibrary('bone');
+	},
+
+	selectMeshFuture: function(boneGroupUid, meshName){
+		this.futureMeshToSelect = [boneGroupUid, meshName];
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
@@ -317,6 +358,14 @@ SceneView.prototype = {
 
 
 		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
+
+		// Are we waiting for this mesh to be loaded so we can select it?
+		if (this.futureMeshToSelect !== null &&
+				boneGroup.uid === this.futureMeshToSelect[0] &&
+				meshName === this.futureMeshToSelect[1]){
+			this.selectMesh(mesh);
+			this.futureMeshToSelect = null;
+		}
 	},
 
 	onMeshRemoved: function(boneGroup, meshName){
@@ -537,6 +586,8 @@ SceneView.prototype = {
 	}, */
 
 	onRightClick: function(mouseX, mouseY){
+		this.selectMesh(null);
+
 		if (this.editMode === 'rotate'){
 			this.cancelBoneRotate();
 			return;
