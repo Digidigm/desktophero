@@ -209,7 +209,7 @@ SceneView.prototype = {
 				continue;
 			}
 
-			var boneHandle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
+			var boneHandle = new THREE.Mesh(new THREE.SphereGeometry(0.2, 5, 5), new THREE.MeshBasicMaterial({color: randomColor, wireframe: true}));
 			boneHandle.boneGroupUid = boneGroupUid;
 			boneHandle.boneIndex = i;
 			boneHandle.includeInExport = false;
@@ -231,6 +231,9 @@ SceneView.prototype = {
 
 	onBoneGroupRemoved: function(character, boneGroupUid){
 		console.log("Bone group removed!");
+
+		// Remove meshes that were attached to that bone group
+
 
 		// Remove from three.js scene
 		var boneGroupsToRemove = [];
@@ -286,6 +289,8 @@ SceneView.prototype = {
 
 		var skeletonHelper = new THREE.SkeletonHelper(mesh);
 		skeletonHelper.material.linewidth = 4;
+		skeletonHelper.meshName = meshName;
+		skeletonHelper.visible = this.boneHandlesVisible;
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
@@ -302,20 +307,43 @@ SceneView.prototype = {
 	onMeshRemoved: function(boneGroup, meshName){
 		console.log("Mesh " + meshName + " removed from bone group " + boneGroup.name + ".");
 
+		// Remove mesh and skeletonhelper from scene
+		var toRemove = [];
 		for (var i in this.scene.children){
 			var sceneElement = this.scene.children[i];
 			if (sceneElement.meshName === meshName){
-				this.scene.remove(sceneElement);
-				break;
+				toRemove.push(sceneElement);
 			}
 		}
+		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
+			var element = toRemove[i];
+			this.scene.remove(element);
+		}
 
+		// Remove mesh from this.meshes
+		toRemove = [];
 		for (var i in this.meshes){
 			var mesh = this.meshes[i];
 			if (mesh.meshName === meshName){
-				this.meshes.remove(mesh);
+				toRemove.push(i)
 				break;
 			}
+		}
+		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
+			var index = toRemove[i];
+			this.meshes.splice(index, 1);
+		}
+
+		// Remove skeletonHelper entries.
+		var toRemove = []; 
+		for (var i = 0; i < this.skeletonHelpers.length; i++){
+			if (this.skeletonHelpers[i].meshName === meshName){
+				toRemove.push(i);
+			}
+		}
+		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
+			var index = toRemove[i];
+			this.skeletonHelpers.splice(index, 1);
 		}
 
 		this.meshesTabRemoveMesh(boneGroup.uid, meshName);
@@ -330,6 +358,9 @@ SceneView.prototype = {
 		this.boneHandlesVisible = !this.boneHandlesVisible;
 		for (var i = 0; i < this.boneHandles.length; i++){
 			this.boneHandles[i].visible = this.boneHandlesVisible;
+		}
+		for (var i = 0; i < this.skeletonHelpers.length; i++){
+			this.skeletonHelpers[i].visible = this.boneHandlesVisible;
 		}
 	}, 
 

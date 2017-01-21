@@ -12,9 +12,15 @@ Character.prototype = {
 	},
 
 	removeBoneGroup: function(uid){
+		// Remove meshes attached to bone group
+		var boneGroupToRemove = this.boneGroups.get(uid);
+		for (var meshName in boneGroupToRemove.meshes.dict){
+			boneGroupToRemove.removeMesh(meshName);
+		}
+
 		// TODO: Check/fix this
 		for (var boneGroupUid in this.boneGroups.dict){
-			boneGroup = this.boneGroups.get(boneGroupUid);
+			var boneGroup = this.boneGroups.get(boneGroupUid);
 			if (boneGroup.parentBoneGroupUid === uid){
 				boneGroup.unattach();
 			}
