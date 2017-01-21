@@ -47,10 +47,9 @@
     </head>
 
     <body class="main">
-        <nav class="navbar navbar-dark bg-inverse bg-inverse-custom navbar-fixed-top">
+        <!--<nav class="navbar navbar-dark bg-inverse bg-inverse-custom navbar-fixed-top">
           <div class="container">
             <a class="navbar-brand" href="/">
-              <!-- TODO: Change LOGO to Desktop Hero -->
               <span class="icon-logo"></span>
             </a>
             <a class="navbar-toggler hidden-md-up float-right" data-toggle="collapse" href="#collapsingNavbar" aria-expanded="false" aria-controls="collapsingNavbar">
@@ -92,9 +91,7 @@
                     </form>
                   </div>
                 </li>
-                <!-- TODO: Deduplicate this menu between mobile and desktop so the markup doesn't have to be made twice -->
-                <!-- TODO: Make this logged in aware -->
-                <!-- TODO: Make this nice for logged out users -->
+
                 <li class="nav-item dropdown hidden-sm-down textselect-off">
                   <a class="nav-link dropdown-toggle nav-dropdown-user" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img src="/img/face5.jpg" height="40" width="40" alt="Avatar" class="img-circle"> <span class="icon-caret-down"></span>
@@ -140,6 +137,7 @@
             </div>
           </div>
         </nav>
+        -->
         <!--header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
         <div class="container">
             <div class="navbar-header">

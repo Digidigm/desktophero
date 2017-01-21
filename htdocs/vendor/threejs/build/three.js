@@ -41087,12 +41087,21 @@ THREE.SkeletonHelper = function ( object ) {
 
 		var bone = this.bones[ i ];
 
+		var Color1, Color2;
 		if ( bone.parent instanceof THREE.Bone ) {
+			console.log("Stuff: " + bone.name)
+			if (bone.name.startsWith('#')){
+				Color1 = new THREE.Color( 1, 0, 0);
+				Color2 = new THREE.Color( 1, 1, 0);
+			} else {
+				Color1 = new THREE.Color( 1, 0, 0 );
+				Color2 = new THREE.Color( 1, 1, 0 );
+			}
 
 			geometry.vertices.push( new THREE.Vector3() );
 			geometry.vertices.push( new THREE.Vector3() );
-			geometry.colors.push( new THREE.Color( 0, 0, 1 ) );
-			geometry.colors.push( new THREE.Color( 0, 1, 0 ) );
+			geometry.colors.push( Color1 );
+			geometry.colors.push( Color2 );
 
 		}
 
@@ -41153,8 +41162,16 @@ THREE.SkeletonHelper.prototype.update = function () {
 
 		if ( bone.parent instanceof THREE.Bone ) {
 
+			if (j >= geometry.vertices.length){
+				break;
+			}
+
 			boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
 			geometry.vertices[ j ].setFromMatrixPosition( boneMatrix );
+
+			if (j + 1 >= geometry.vertices.length){
+				break;
+			}
 
 			boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
 			geometry.vertices[ j + 1 ].setFromMatrixPosition( boneMatrix );

@@ -15,6 +15,11 @@ function SceneView(model){
 
 	this.cubeMap;
 
+	this.selectedMesh;
+	this.meshes = []; // Keep track of all meshes added to scene
+
+	this.skeletonHelpers = [];
+
 	this.boneHandles = [];
 	this.boneHandlesVisible = false;
 	this.selectedBone;
@@ -42,6 +47,9 @@ SceneView.prototype = {
 	init: function(){
 
 		this.scene = new THREE.Scene();
+		this.pickingScene = new THREE.Scene();
+		this.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+		this.pickingTexture.texture.minFilter = THREE.LinearFilter;
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
 		this.renderer = new THREE.WebGLRenderer({
 													antialias:true,
@@ -165,6 +173,9 @@ SceneView.prototype = {
 
 	animate: function(){
 		requestAnimationFrame(this.animate.bind(this));
+		for (var i = 0; i < this.skeletonHelpers.length; i++){
+			this.skeletonHelpers[i].update();
+		}
 		this.render();
 		this.renderer.render(this.scene, this.camera);
 	},
@@ -273,6 +284,18 @@ SceneView.prototype = {
 		mesh.boneGroupUid = boneGroup.uid;
 		this.scene.add(mesh);
 
+		var skeletonHelper = new THREE.SkeletonHelper(mesh);
+		skeletonHelper.material.linewidth = 4;
+		this.skeletonHelpers.push(skeletonHelper);
+		this.scene.add(skeletonHelper);
+
+		/*var pickingMesh = new THREE.Geometry();
+		var pickingMaterial = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors });
+		var defaultMaterial new THREE.MeshPhongMaterial({color:0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0});
+*/
+		this.meshes.push(mesh);
+
+
 		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
 	},
 
@@ -283,6 +306,15 @@ SceneView.prototype = {
 			var sceneElement = this.scene.children[i];
 			if (sceneElement.meshName === meshName){
 				this.scene.remove(sceneElement);
+				break;
+			}
+		}
+
+		for (var i in this.meshes){
+			var mesh = this.meshes[i];
+			if (mesh.meshName === meshName){
+				this.meshes.remove(mesh);
+				break;
 			}
 		}
 
@@ -410,8 +442,53 @@ SceneView.prototype = {
 		if (this.editMode !== 'none'){
 			this.finalizeEdit();
 			return;
-		} 
+		}
+
+		// Select mesh
+		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
+		console.log(clickVector);
+		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
+
+		var intersections = this.raycaster.intersectObjects(this.scene.children, false);
+		console.log(intersections);
+		/*var closestMesh = null, closestDistance = null;
+		for (var i = 0; i < intersections.length; i++){
+			var mesh = intersections[i].object;
+			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
+			var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
+			if (bone.name.startsWith("#")){
+				continue;
+			}
+			if (closestMesh === null || intersections[i].distance < closestDistance){
+				closestMesh = bone;
+				closestDistance = intersections[i].distance;
+			}
+		}
+		this.selectedMesh = closestMesh;*/
 	},
+
+	/*pick: function(mouseX, mouseY) {
+		//render the picking scene off-screen
+		renderer.render(this.pickingScene, this.camera, this.pickingTexture);
+		//create buffer for reading single pixel
+		var pixelBuffer = new Uint8Array(4);
+		//read the pixel under the mouse from the texture
+		renderer.readRenderTargetPixels(this.pickingTexture, mouseX, this.pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+		//interpret the pixel as an ID
+		var id = (pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+		var data = this.pickingData[id];
+		if (data) {
+			console.log(data)
+		} else {
+			console.log("Nothing!")
+		}
+	}, 
+
+	function render() {
+		controls.update();
+		pick();
+		renderer.render( scene, camera );
+	}, */
 
 	onRightClick: function(mouseX, mouseY){
 		if (this.editMode === 'rotate'){
@@ -428,17 +505,6 @@ SceneView.prototype = {
 		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
 		console.log(clickVector);
 		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
-
-
-		var helper = new THREE.AxisHelper(20);
-		
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
-		var scale = new THREE.Vector3();
-		this.camera.matrixWorld.decompose(position, quaternion, scale);
-		helper.position.set(position.x, position.y, position.z);
-		helper.rotation.setFromQuaternion(this.camera.quaternion);
-		this.scene.add(helper);
 
 		var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
 		var closestBone = null, closestDistance = null;
