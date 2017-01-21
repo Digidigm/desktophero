@@ -23,32 +23,94 @@ function BoneGroup(name, libraryName, skeleton){
 }
 
 BoneGroup.prototype = {
+	resetPose: function(){
+		var bones = this.skeleton.bones;
+		for (var i = 0; i < bones.length; i++){
+			var bone = bones[i];
+			/*bone.position.x = 0;
+			bone.position.y = 0;
+			bone.position.z = 0;*/
+
+			bone.rotation.x = 0;
+			bone.rotation.y = 0;
+			bone.rotation.z = 0;
+
+			bone.scale.x = 1;
+			bone.scale.y = 1;
+			bone.scale.z = 1;
+		}
+		console.log("===================================")
+		console.log(bones);
+	},
+
+	setPose: function(positions, rotations, scales){
+		var bones = this.skeleton.bones;
+		for (var i = 0; i < bones.length; i++){
+			var bone = bones[i];
+			if (i < positions.length){
+				bone.position.x = positions[i][0];
+				bone.position.y = positions[i][1];
+				bone.position.z = positions[i][2];
+			}
+
+			if (i < rotations.length){
+				bone.rotation.x = rotations[i][0];
+				bone.rotation.y = rotations[i][1];
+				bone.rotation.z = rotations[i][2];
+			}
+			
+			if (i < scales.length){
+				bone.scale.x = scales[i][0];
+				bone.scale.y = scales[i][1];
+				bone.scale.z = scales[i][2];
+			}
+		}
+	},
+
+	getPositions: function(){
+		var bones = this.skeleton.bones;
+		var positions = [];
+		for (var i = 0; i < bones.length; i++){
+			var bone = bones[i];
+			positions.push([bone.position.x, bone.position.y, bone.position.z]);
+		}
+		return positions;
+	},
+
+	getRotations: function(){
+		var bones = this.skeleton.bones;
+		var rotations = [];
+		for (var i = 0; i < bones.length; i++){
+			var bone = bones[i];
+			rotations.push([bone.rotation.x, bone.rotation.y, bone.rotation.z]);
+		}
+		return rotations;
+	},
+
+	getScales: function(){
+		var bones = this.skeleton.bones;
+		var scales = [];
+		for (var i = 0; i < bones.length; i++){
+			var bone = bones[i];
+			scales.push([bone.scale.x, bone.scale.y, bone.scale.z]);
+		}
+		return scales;
+	},
+
 	addMesh: function (meshName, mesh){
 		console.log('Adding mesh "' + meshName + '" to bone group "' + this.name + '".');
 
-		var bone0 = this.skeleton.bones[0];
+		var bones = this.skeleton.bones;
 
-		// Save position, rotation, and scale because they get reset.
-		var position = new THREE.Vector3(bone0.position.x, bone0.position.y, bone0.position.z);
-		var rotation = new THREE.Vector3(bone0.rotation.x, bone0.rotation.y, bone0.rotation.z);
-		var scale = new THREE.Vector3(bone0.scale.x, bone0.scale.y, bone0.scale.z);
+		var savedPositions = this.getPositions();
+		var savedRotations = this.getRotations();
+		var savedScales = this.getScales();
 
 		if (this.parentBone != null){
-			this.parentBone.remove(bone0);
-
-			// Is the following necessary?
-			bone0.position.x = 0;
-			bone0.position.y = 0;
-			bone0.position.z = 0;
-
-			bone0.rotation.x = 0;
-			bone0.rotation.y = 0;
-			bone0.rotation.z = 0;
-
-			bone0.scale.x = 1;
-			bone0.scale.y = 1;
-			bone0.scale.z = 1;
+			this.parentBone.remove(bones[0]);
 		}
+
+		this.resetPose();
 
 		mesh.children = [];
 		mesh.add(this.skeleton.bones[0]);
@@ -56,24 +118,14 @@ BoneGroup.prototype = {
 		mesh.name = meshName;
 		this.meshes.put(meshName, mesh);
 
+		this.setPose(savedPositions, savedRotations, savedScales);
+
 		if (this.parentBone != null){
 			// Restore bone parent.
 			this.attachToBone(this.parentBoneGroupUid,
 								this.parentBoneName,
 								this.parentBone);
-			// Restore previous position, rotation, scale.
-			bone0.position.x = position.x;
-			bone0.position.y = position.y;
-			bone0.position.z = position.z;
-
-			bone0.rotation.x = rotation.x;
-			bone0.rotation.y = rotation.y;
-			bone0.rotation.z = rotation.z;
-
-			bone0.scale.x = scale.x;
-			bone0.scale.y = scale.y;
-			bone0.scale.z = scale.z;
-		}
+		} 
 	},
 
 	removeMesh: function (meshName){
