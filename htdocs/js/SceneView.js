@@ -80,7 +80,7 @@ SceneView.prototype = {
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 
-		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .4, this.cubeMap);
+		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
 		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 
