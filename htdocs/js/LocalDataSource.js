@@ -227,24 +227,24 @@ LocalDataSource.prototype = {
 	refreshBoneGroupsList: function(){
 		this.boneGroups = new ObservableDict();
 		// Fake data for now.
-		this.boneGroups.put('male left arm', new PoseMetadata('male left arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('male right arm', new PoseMetadata('male right arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('male left hand', new PoseMetadata('male left hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('male right hand', new PoseMetadata('male right hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('male torso', new PoseMetadata('male torso', 'stockto2', 'default', 'torso', ['cool', 'great']));
-		this.boneGroups.put('male head', new PoseMetadata('male head', 'stockto2', 'default', 'head', ['cool', 'great']));
-		this.boneGroups.put('male neck', new PoseMetadata('male neck', 'stockto2', 'default', 'head', ['cool', 'great']));
+		this.boneGroups.put('male left arm', new BoneGroupMetadata('male left arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('male right arm', new BoneGroupMetadata('male right arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('male left hand', new BoneGroupMetadata('male left hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('male right hand', new BoneGroupMetadata('male right hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('male torso', new BoneGroupMetadata('male torso', 'stockto2', 'default', 'torso', ['cool', 'great'], ['torso', 'male shirts', 'capes',  'female shirts', 'accessories']));
+		this.boneGroups.put('male head', new BoneGroupMetadata('male head', 'stockto2', 'default', 'head', ['cool', 'great'], ['headgear', 'head','accessories']));
+		this.boneGroups.put('male neck', new BoneGroupMetadata('male neck', 'stockto2', 'default', 'head', ['cool', 'great'], []));
 
-		this.boneGroups.put('female left arm', new PoseMetadata('female left arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('female right arm', new PoseMetadata('female right arm', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('female left hand', new PoseMetadata('female left hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('female right hand', new PoseMetadata('female right hand', 'stockto2', 'default', 'arm', ['cool', 'great']));
-		this.boneGroups.put('female torso', new PoseMetadata('female torso', 'stockto2', 'default', 'torso', ['cool', 'great']));
-		this.boneGroups.put('female head', new PoseMetadata('female head', 'stockto2', 'default', 'head', ['cool', 'great']));
-		this.boneGroups.put('female neck', new PoseMetadata('female neck', 'stockto2', 'default', 'head', ['cool', 'great']));
+		this.boneGroups.put('female left arm', new BoneGroupMetadata('female left arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('female right arm', new BoneGroupMetadata('female right arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('female left hand', new BoneGroupMetadata('female left hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('female right hand', new BoneGroupMetadata('female right hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
+		this.boneGroups.put('female torso', new BoneGroupMetadata('female torso', 'stockto2', 'default', 'torso', ['cool', 'great'], []));
+		this.boneGroups.put('female head', new BoneGroupMetadata('female head', 'stockto2', 'default', 'head', ['cool', 'great'], []));
+		this.boneGroups.put('female neck', new BoneGroupMetadata('female neck', 'stockto2', 'default', 'head', ['cool', 'great'], []));
 
-		this.boneGroups.put('platform', new PoseMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great']));
-		this.boneGroups.put('handheld', new PoseMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']));
+		this.boneGroups.put('platform', new BoneGroupMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great'], []));
+		this.boneGroups.put('handheld', new BoneGroupMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great'], []));
 
 		this.boneGroupsRefreshedEvent.notify(this.boneGroups);
 	},
@@ -286,6 +286,7 @@ LocalDataSource.prototype = {
 
 			// Construct new bone group with skeleton.
 			var boneGroup = new BoneGroup(boneGroupName, self.name, skeleton);
+			boneGroup.metadata = self.boneGroups.get(boneGroupName);
 			callback(boneGroup);
 		});
 	}
@@ -307,10 +308,11 @@ function PoseMetadata(name, author, library, type, tags){
 	this.tags = tags;
 }
 
-function BoneGroupMetadata(name, author, library, type, tags){
+function BoneGroupMetadata(name, author, library, type, tags, compatibleTypes){
 	this.name = name;
 	this.author = author;
 	this.library = library;
 	this.type = type;
 	this.tags = tags;
+	this.compatibleTypes = compatibleTypes;
 }

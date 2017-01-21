@@ -34,6 +34,21 @@ SceneModel.prototype = {
 		return allMeshes;
 	},
 
+	getMeshesForType: function(types){
+		var allMeshes = [];
+		for (var libraryName in this.libraries.dict){
+			var library = this.libraries.get(libraryName);
+			var meshes = library.getMeshes();
+			for (var meshName in meshes){
+				meshMetadata = meshes[meshName];
+				if (types.indexOf(meshMetadata.type) > -1){
+					allMeshes.push(meshMetadata);
+				}
+			}
+		}
+		return allMeshes;
+	},
+
 	addMesh(boneGroupUid, libraryName, meshName){
 		var defaultMaterial = self.materials["default"];
 		var boneGroup = this.character.boneGroups.get(boneGroupUid);

@@ -14,6 +14,8 @@ function BoneGroup(name, libraryName, skeleton){
 	this.parentBoneName; // Used when saving character.
 	this.parentBone = null;
 
+	this.metadata = null;
+
 	for (var i = 0; i < skeleton.bones.length; i++){
 		bone = skeleton.bones[i];
 		if (bone.name.startsWith("#")){
@@ -39,8 +41,6 @@ BoneGroup.prototype = {
 			bone.scale.y = 1;
 			bone.scale.z = 1;
 		}
-		console.log("===================================")
-		console.log(bones);
 	},
 
 	setPose: function(positions, rotations, scales){

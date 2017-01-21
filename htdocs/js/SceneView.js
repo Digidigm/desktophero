@@ -39,6 +39,8 @@ function SceneView(model){
 
 	this.boneAxisHelper;
 
+	this.selectedBoneGroupUid = null;
+
 	this.addModelListeners();
 
 }
@@ -91,7 +93,6 @@ SceneView.prototype = {
 		this.initLights();
 
 		this.populateTabs();
-		this.libraryPopulateMeshes();
 		this.libraryPopulatePoses();
 		this.libraryPopulateBoneGroups();
 	},
@@ -778,8 +779,18 @@ SceneView.prototype = {
 		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
 	},
 
-	libraryPopulateMeshes: function(){
-		var metadata = model.getAvailableMeshes();
+	libraryClearMeshes: function(){
+		library = document.getElementById('mesh-library')
+		while(library.children.length > 1){
+			library.removeChild(library.children[1]);
+		}
+	},
+
+	libraryPopulateMeshes: function(boneGroupUid){
+		var boneGroup = model.character.boneGroups.get(boneGroupUid);
+		var compatibleTypes = boneGroup.metadata.compatibleTypes; 
+
+		var metadata = model.getMeshesForType(compatibleTypes);
 		for (var i = 0; i < metadata.length; i++){
 			var meshMetadata = metadata[i];
 			var category = meshMetadata.type;

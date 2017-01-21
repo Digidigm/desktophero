@@ -486,11 +486,13 @@ $(document).ready( function(){
 		$("#bone-library").hide();
 		$("#pose-library").hide();
 	};
-	selectedBoneGroup = null;
+
 	// Add mesh button
 	$("#body-accordion").on("click",".mini-select[add-mesh-button]", function(e){
 		var boneGroupUid = $(this).data("mesh-bone-group");
-		selectedBoneGroup = boneGroupUid;
+		view.selectedBoneGroupUid = boneGroupUid;
+		view.libraryClearMeshes();
+		view.libraryPopulateMeshes(boneGroupUid);
 		$("#mesh-library").show();
 		$("#bone-library").hide();
 		$("#pose-library").hide();
@@ -508,9 +510,9 @@ $(document).ready( function(){
 		var mid = $(this).data("mesh-id");
 		var library = $(this).data("mesh-library");
 		var meshName = $(this).data("mesh-mesh-name");
-		if (selectedBoneGroup !== null){
-			model.addMesh(selectedBoneGroup, library, meshName);
-			selectedBoneGroup = null;
+		if (view.selectedBoneGroupUid !== null){
+			model.addMesh(view.selectedBoneGroupUid, library, meshName);
+			view.selectedBoneGroupUid = null;
 		}
 		$("#mesh-library").hide();
 	});
@@ -731,7 +733,7 @@ $(document).ready( function(){
 							</div>
 							<div id="settings-characteristics-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-characteristics">
 								<div class="card-block">
-									This is Figure Characteristics
+									This is Figu re Characteristics
 									<!--Filled by AJAX: getcharacteristics(); -->
 								</div>
 							</div>
