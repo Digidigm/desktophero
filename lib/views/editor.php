@@ -498,7 +498,19 @@ $(document).ready( function(){
 		$("#pose-library").hide();
 	});
 
-	// Click meshes tab mesh
+	// Click meshes tab mesh - select
+	$("#body-accordion").on("click",".mini-select[meshes-tab-mesh]", function(e){
+		var boneGroupId = $(this).data("mesh-bone-group");
+		var meshName =  $(this).data("mesh-name");
+		var mesh = model.character.boneGroups.get(boneGroupId).meshes.get(meshName);
+		if (mesh == view.selectedMesh){
+			view.setSelectedMesh(null);
+		} else {
+			view.setSelectedMesh(mesh);
+		}
+	});
+
+	// Double-click meshes tab mesh - delete
 	$("#body-accordion").on("dblclick",".mini-select[meshes-tab-mesh]", function(e){
 		var boneGroupId = $(this).data("mesh-bone-group");
 		var meshName =  $(this).data("mesh-name");

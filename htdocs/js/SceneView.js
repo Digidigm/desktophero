@@ -83,6 +83,7 @@ SceneView.prototype = {
 		this.scene.background = this.cubeMap;
 
 		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
+		this.model.materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, this.cubeMap);
 		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 
@@ -192,6 +193,19 @@ SceneView.prototype = {
 	addModelListeners: function(){
 		this.model.character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
 		this.model.character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
+	},
+
+	setSelectedMesh: function(mesh){
+		// reset previously selected mesh to normal material
+		if (this.selectedMesh != null){
+			this.selectedMesh.material = model.materials['default'];
+		}
+
+		this.selectedMesh = mesh;
+
+		if (this.selectedMesh != null){
+			this.selectedMesh.material = model.materials['selected'];
+		}
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
