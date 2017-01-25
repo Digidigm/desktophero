@@ -262,10 +262,13 @@ LocalDataSource.prototype = {
 	refreshPosesList: function(){
 		this.poses = new ObservableDict();
 		// Fake data for now.
-		this.poses.put('amazing pose', new PoseMetadata('amazing pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
-		this.poses.put('awesome pose', new PoseMetadata('awesome pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
-		this.poses.put('cool pose', new PoseMetadata('cool pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
-		this.poses.put('charge', new PoseMetadata('charge', 'stockto2', 'default', 'full figure', []));
+		this.poses.put('amazing pose', new PoseMetadata('amazing pose', 'stockto2', 'default', 'full', ['cool', 'great']));
+		this.poses.put('awesome pose', new PoseMetadata('awesome pose', 'stockto2', 'default', 'full', ['cool', 'great']));
+		this.poses.put('cool pose', new PoseMetadata('cool pose', 'stockto2', 'default', 'full', ['cool', 'great']));
+		this.poses.put('charge', new PoseMetadata('charge', 'stockto2', 'default', 'full', []));
+		this.poses.put('test', new PoseMetadata('test', 'stockto2', 'default', 'full', []));
+
+		this.poses.put('charge', new PoseMetadata('charge', 'stockto2', 'default', 'legs', []));
 
 		this.posesRefreshedEvent.notify(this.poses);
 	},

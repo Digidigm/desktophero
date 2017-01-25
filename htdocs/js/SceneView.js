@@ -876,13 +876,17 @@ SceneView.prototype = {
 	},
 
 	libraryPopulatePoses: function(){
-		this.libraryAddCategory("pose-library", 'Poses', 'poses-pose-category');
 		var dict = model.getAvailablePoses();
 		for (var libraryName in dict){
 			var poseMetadatas = dict[libraryName];
 			for (var i = 0; i < poseMetadatas.length; i++){
 				var poseMetadata = poseMetadatas[i];
-				this.libraryAddPose('poses', poseMetadata);
+				var category = poseMetadata.type;
+				var element = document.getElementById(category + "-pose-category");
+				if (element === null){
+					this.libraryAddCategory("pose-library", category, category + "-pose-category");
+				}
+				this.libraryAddPose(category, poseMetadata);
 			}
 		}
 	},
