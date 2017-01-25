@@ -46,6 +46,9 @@ Character.prototype = {
 
 				for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
 					var bone = boneGroup.skeleton.bones[j];
+					if (pose.affectedBones.indexOf(bone.name) == -1){
+						continue;
+					}
 
 					if (bone.name === poseBone.name){
 						bone.position.x = poseBone.position.x;

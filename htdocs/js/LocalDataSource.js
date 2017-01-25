@@ -261,14 +261,33 @@ LocalDataSource.prototype = {
 
 	refreshPosesList: function(){
 		this.poses = new ObservableDict();
-		// Fake data for now.
-		this.poses.put('amazing pose', new PoseMetadata('amazing pose', 'stockto2', 'default', 'full', ['cool', 'great']));
-		this.poses.put('awesome pose', new PoseMetadata('awesome pose', 'stockto2', 'default', 'full', ['cool', 'great']));
-		this.poses.put('cool pose', new PoseMetadata('cool pose', 'stockto2', 'default', 'full', ['cool', 'great']));
-		this.poses.put('charge', new PoseMetadata('charge', 'stockto2', 'default', 'full', []));
-		this.poses.put('test', new PoseMetadata('test', 'stockto2', 'default', 'full', []));
 
-		this.poses.put('charge', new PoseMetadata('charge', 'stockto2', 'default', 'legs', []));
+		this.poses.put('legs charge', new PoseMetadata('legs charge', 'stockto2', 'default', 'legs'));
+		this.poses.put('legs crouching', new PoseMetadata('legs crouching', 'stockto2', 'default', 'legs'));
+		this.poses.put('legs right leg step', new PoseMetadata('legs right leg step', 'stockto2', 'default', 'legs'));
+		this.poses.put('legs weight shifted', new PoseMetadata('legs weight shifted', 'stockto2', 'default', 'legs'));
+		this.poses.put('standing on one leg', new PoseMetadata('standing on one leg', 'stockto2', 'default', 'legs'));
+		this.poses.put('legs default', new PoseMetadata('legs default', 'stockto2', 'default', 'legs'));
+
+		this.poses.put('left hand on hip', new PoseMetadata('left hand on hip', 'stockto2', 'default', 'arms'));
+		this.poses.put('right arm out', new PoseMetadata('right arm out', 'stockto2', 'default', 'arms'));
+		this.poses.put('right hand on chest', new PoseMetadata('right hand on chest', 'stockto2', 'default', 'arms'));
+		this.poses.put('right hand outstretched', new PoseMetadata('right hand outstretched', 'stockto2', 'default', 'arms'));
+
+		this.poses.put('torso double hand thrust', new PoseMetadata('torso double hand thrust', 'stockto2', 'default', 'torso'));
+		this.poses.put('torso charge', new PoseMetadata('torso charge', 'stockto2', 'default', 'torso'));
+		this.poses.put('torso hold weapon', new PoseMetadata('torso hold weapon', 'stockto2', 'default', 'torso'));
+		this.poses.put('torso standing ready', new PoseMetadata('torso standing ready', 'stockto2', 'default', 'torso'));
+		this.poses.put('torso thrust weapon', new PoseMetadata('torso thrust weapon', 'stockto2', 'default', 'torso'));
+		this.poses.put('torso default', new PoseMetadata('torso default', 'stockto2', 'default', 'torso'));
+
+		this.poses.put('head bowed', new PoseMetadata('head bowed', 'stockto2', 'default', 'head'));
+		this.poses.put('head looking left', new PoseMetadata('head looking left', 'stockto2', 'default', 'head'));
+		this.poses.put('head looking right', new PoseMetadata('head looking right', 'stockto2', 'default', 'head'));
+		this.poses.put('head looking up', new PoseMetadata('head looking up', 'stockto2', 'default', 'head'));
+		this.poses.put('head looking up left', new PoseMetadata('head looking up left', 'stockto2', 'default', 'head'));
+		this.poses.put('head looking up right', new PoseMetadata('head looking up right', 'stockto2', 'default', 'head'));
+		this.poses.put('head default', new PoseMetadata('head default', 'stockto2', 'default', 'head'));
 
 		this.posesRefreshedEvent.notify(this.poses);
 	},
