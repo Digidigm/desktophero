@@ -488,9 +488,9 @@ $(document).ready( function(){
 	$("#body-accordion").on("click",".mini-select[add-mesh-button]", function(e){
 		var boneGroupUid = $(this).data("mesh-bone-group") + "";
 		var boneGroup = model.character.boneGroups.get(boneGroupUid);
-		model.addMesh(boneGroupUid, boneGroup.libraryName, boneGroup.name);
+		model.addMesh(boneGroupUid, boneGroup.libraryName, "box");
 		view.selectedBoneGroupUid = boneGroupUid;
-		view.selectMeshFuture(view.selectedBoneGroupUid, boneGroup.name);
+		view.selectMeshFuture(view.selectedBoneGroupUid, "box");
 
 		view.libraryClearMeshes();
 		view.libraryPopulateMeshes(boneGroupUid);
@@ -498,7 +498,7 @@ $(document).ready( function(){
 	});
 
 	// Click meshes tab mesh - select
-	$("#body-accordion").on("click",".mini-select[meshes-tab-mesh]", function(e){
+	$("#body-accordion").on("click",".mini-select[meshes-tab-mesh]",function(e){
 		var boneGroupUid = $(this).data("mesh-bone-group") + "";
 		var meshName =  $(this).data("mesh-name");
 		var mesh = model.character.boneGroups.get(boneGroupUid).meshes.get(meshName);

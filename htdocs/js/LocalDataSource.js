@@ -40,34 +40,63 @@ LocalDataSource.prototype = {
 	refreshMeshesList: function(){
 		this.meshes = new ObservableDict();
 
-		// Fake data for now.
-		this.meshes['male left arm'] = new MeshMetadata('male left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['male right arm'] = new MeshMetadata('male right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['male left hand'] = new MeshMetadata('male left hand', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['male right hand'] = new MeshMetadata('male right hand', 'stockto2', 'default', 'arm', ['cool', 'great'])
-		this.meshes['male torso'] = new MeshMetadata('male torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
-		this.meshes['male head'] = new MeshMetadata('male head', 'stockto2', 'default', 'head', ['cool', 'great']);
-		this.meshes['male head thin'] = new MeshMetadata('male head thin', 'stockto2', 'default', 'head', ['cool', 'great']);
-		this.meshes['male neck'] = new MeshMetadata('male neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
-		
-		this.meshes['female left arm'] = new MeshMetadata('female left arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['female right arm'] = new MeshMetadata('female right arm', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['female left hand'] = new MeshMetadata('female left hand', 'stockto2', 'default', 'arm', ['cool', 'great']);
-		this.meshes['female right hand'] = new MeshMetadata('female right hand', 'stockto2', 'default', 'arm', ['cool', 'great'])
-		this.meshes['female torso'] = new MeshMetadata('female torso', 'stockto2', 'default', 'torso', ['cool', 'great']);
-		this.meshes['female head'] = new MeshMetadata('female head', 'stockto2', 'default', 'head', ['cool', 'great']);
-		this.meshes['female neck'] = new MeshMetadata('female neck', 'stockto2', 'default', 'neck', ['cool', 'great']);
+		// Torso
+		this.meshes['cloth shirt'] = new MeshMetadata('cloth shirt', 'stockto2', 'default', 'female shirts', []);
+		this.meshes['female torso'] = new MeshMetadata('female torso', 'stockto2', 'default', 'torso', []);
+		this.meshes['patterned shirt'] = new MeshMetadata('patterned shirt', 'stockto2', 'default', 'female shirts', []);
+		this.meshes['armor w cape - top'] = new MeshMetadata('armor w cape - top', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['armor w cape'] = new MeshMetadata('armor w cape', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['barbarian torso'] = new MeshMetadata('barbarian torso', 'stockto2', 'default', 'male torso', []);
+		this.meshes['billowing cape'] = new MeshMetadata('billowing cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['blacksmith\'s apron'] = new MeshMetadata('blacksmith\'s apron', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['cape hood 2'] = new MeshMetadata('cape hood 2', 'stockto2', 'default', 'capes', []);
+		this.meshes['cape hood'] = new MeshMetadata('cape hood', 'stockto2', 'default', 'capes', []);
+		this.meshes['captain\'s armor'] = new MeshMetadata('captain\'s armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['chain mail'] = new MeshMetadata('chain mail', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['chest strap back a'] = new MeshMetadata('chest strap back a', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['chest strap back b'] = new MeshMetadata('chest strap back b', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['chest strap front a'] = new MeshMetadata('chest strap front a', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['chest strap front b'] = new MeshMetadata('chest strap front b', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['cloak cape'] = new MeshMetadata('cloak cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['cloth belt'] = new MeshMetadata('cloth belt', 'stockto2', 'default', 'belts', []);
+		this.meshes['cloth collar'] = new MeshMetadata('cloth collar', 'stockto2', 'default', 'collars', []);
+		this.meshes['collar w fastenings'] = new MeshMetadata('collar w fastenings', 'stockto2', 'default', 'collars', []);
+		this.meshes['decayed armor'] = new MeshMetadata('decayed armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['decaying cape 2'] = new MeshMetadata('decaying cape 2', 'stockto2', 'default', 'capes', []);
+		this.meshes['decaying cape'] = new MeshMetadata('decaying cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['demon torso'] = new MeshMetadata('demon torso', 'stockto2', 'default', 'Uncategorized', []);
+		this.meshes['druid shirt'] = new MeshMetadata('druid shirt', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['elvin belt'] = new MeshMetadata('elvin belt', 'stockto2', 'default', 'belts', []);
+		this.meshes['elvin breastplate'] = new MeshMetadata('elvin breastplate', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['elvin cape'] = new MeshMetadata('elvin cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['fancy cape'] = new MeshMetadata('fancy cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['fat belly'] = new MeshMetadata('fat belly', 'stockto2', 'default', 'male torso', []);
+		this.meshes['flat collar'] = new MeshMetadata('flat collar', 'stockto2', 'default', 'collars', []);
+		this.meshes['flowing cape'] = new MeshMetadata('flowing cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['leather armor'] = new MeshMetadata('leather armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['male torso'] = new MeshMetadata('male torso', 'stockto2', 'default', 'torso', []);
+		this.meshes['metal band'] = new MeshMetadata('metal band', 'stockto2', 'default', 'belts', []);
+		this.meshes['old cape'] = new MeshMetadata('old cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['partial armor'] = new MeshMetadata('partial armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['patterned armor'] = new MeshMetadata('patterned armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['plain collar'] = new MeshMetadata('plain collar', 'stockto2', 'default', 'collars', []);
+		this.meshes['plate armor'] = new MeshMetadata('plate armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['regal cape'] = new MeshMetadata('regal cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['regal cape thin'] = new MeshMetadata('regal cape thin', 'stockto2', 'default', 'capes', []);
+		this.meshes['sash'] = new MeshMetadata('sash', 'stockto2', 'default', 'belts', []);
+		this.meshes['shirt w buckles'] = new MeshMetadata('shirt w buckles', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['simple armor'] = new MeshMetadata('simple armor', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['simple cape'] = new MeshMetadata('simple cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['simple collar'] = new MeshMetadata('simple collar', 'stockto2', 'default', 'collar', []);
+		this.meshes['simple tunic'] = new MeshMetadata('simple tunic', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['skull pendent'] = new MeshMetadata('skull pendent', 'stockto2', 'default', 'belts', []);
+		this.meshes['thick cape'] = new MeshMetadata('thick cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['torso w long hair'] = new MeshMetadata('torso w long hair', 'stockto2', 'default', 'male torso', []);
+		this.meshes['tunic shirt'] = new MeshMetadata('tunic shirt', 'stockto2', 'default', 'male shirts', []);
+		this.meshes['windswept cape'] = new MeshMetadata('windswept cape', 'stockto2', 'default', 'capes', []);
+		this.meshes['wraith torso'] = new MeshMetadata('wraith torso', 'stockto2', 'default', 'male torso', []);
 
-		this.meshes['monkey goggles'] = new MeshMetadata('monkey goggles', 'stockto2', 'default', 'headgear', ['cool', 'great']);
-		this.meshes['platform'] = new MeshMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great']);
-		this.meshes['handheld'] = new MeshMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great']);
-
-		this.meshes['m legs'] = new MeshMetadata('m legs', 'stockto2', 'default', 'legs', ['cool', 'great']);
-
-		// Hair
-		this.meshes['short hair curly'] = new MeshMetadata('short hair curly', 'stockto2', 'default', 'hair', ['cool', 'great']);
-		this.meshes['short hair parted'] = new MeshMetadata('short hair parted', 'stockto2', 'default', 'hair', ['cool', 'great']);
-
+		// Head
 		this.meshes['antler helmet'] = new MeshMetadata('antler helmet', 'stockto2', 'default', 'headgear', []);
 		this.meshes['arctic hood'] = new MeshMetadata('arctic hood', 'stockto2', 'default', 'headgear', []);
 		this.meshes['basic helmet 2'] = new MeshMetadata('basic helmet 2', 'stockto2', 'default', 'headgear', []);
@@ -110,12 +139,12 @@ LocalDataSource.prototype = {
 		this.meshes['pointy cap'] = new MeshMetadata('pointy cap', 'stockto2', 'default', 'headgear', []);
 		this.meshes['pointy hood'] = new MeshMetadata('pointy hood', 'stockto2', 'default', 'headgear', []);
 		this.meshes['ponytail messy'] = new MeshMetadata('ponytail messy', 'stockto2', 'default', 'hair', []);
-		this.meshes['pre-bearded human'] = new MeshMetadata('pre-bearded human', 'stockto2', 'default', 'Uncategorized', []);
+		this.meshes['pre-bearded human'] = new MeshMetadata('pre-bearded human', 'stockto2', 'default', 'head', []);
 		this.meshes['seargent\'s helmet'] = new MeshMetadata('seargent\'s helmet', 'stockto2', 'default', 'headgear', []);
 		this.meshes['short hair messy'] = new MeshMetadata('short hair messy', 'stockto2', 'default', 'hair', []);
 		this.meshes['short hair pulled back'] = new MeshMetadata('short hair pulled back', 'stockto2', 'default', 'hair', []);
 		this.meshes['short hair stiff'] = new MeshMetadata('short hair stiff', 'stockto2', 'default', 'hair', []);
-		this.meshes['short hair stiff with braids'] = new MeshMetadata('short hair stiff with braids', 'stockto2', 'default', 'hair', []);
+		this.meshes['short hair stiff with braids'] = new MeshMetadata('short hair stiff with braids', 'stockto2', 'default', 'hair', []); 
 		this.meshes['short streaked beard'] = new MeshMetadata('short streaked beard', 'stockto2', 'default', 'beards', []);
 		this.meshes['sideburns'] = new MeshMetadata('sideburns', 'stockto2', 'default', 'beards', []);
 		this.meshes['simple'] = new MeshMetadata('simple', 'stockto2', 'default', 'head', []);
@@ -125,91 +154,107 @@ LocalDataSource.prototype = {
 		this.meshes['soldier helmet'] = new MeshMetadata('soldier helmet', 'stockto2', 'default', 'headgear', []);
 		this.meshes['specter'] = new MeshMetadata('specter', 'stockto2', 'default', 'head', []);
 		this.meshes['stern human'] = new MeshMetadata('stern human', 'stockto2', 'default', 'head', []);
-		this.meshes['test'] = new MeshMetadata('test', 'stockto2', 'default', 'headgear', []);
 		this.meshes['undead'] = new MeshMetadata('undead', 'stockto2', 'default', 'head', []);
 		this.meshes['winged helmet'] = new MeshMetadata('winged helmet', 'stockto2', 'default', 'headgear', []);
 
-		this.meshes['armor w cape - top'] = new MeshMetadata('armor w cape - top', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['armor w cape'] = new MeshMetadata('armor w cape', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['barbarian torso'] = new MeshMetadata('barbarian torso', 'stockto2', 'default', 'male torso', []);
-		this.meshes['billowing cape'] = new MeshMetadata('billowing cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['blacksmith\'s apron'] = new MeshMetadata('blacksmith\'s apron', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['cape hood 2'] = new MeshMetadata('cape hood 2', 'stockto2', 'default', 'capes', []);
-		this.meshes['cape hood'] = new MeshMetadata('cape hood', 'stockto2', 'default', 'capes', []);
-		this.meshes['captain\'s armor'] = new MeshMetadata('captain\'s armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['chain mail'] = new MeshMetadata('chain mail', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['chest strap back a'] = new MeshMetadata('chest strap back a', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['chest strap back b'] = new MeshMetadata('chest strap back b', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['chest strap front a'] = new MeshMetadata('chest strap front a', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['chest strap front b'] = new MeshMetadata('chest strap front b', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['cloak cape'] = new MeshMetadata('cloak cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['cloth belt'] = new MeshMetadata('cloth belt', 'stockto2', 'default', 'belts', []);
-		this.meshes['cloth collar'] = new MeshMetadata('cloth collar', 'stockto2', 'default', 'collars', []);
-		this.meshes['collar w fastenings'] = new MeshMetadata('collar w fastenings', 'stockto2', 'default', 'collars', []);
-		this.meshes['decayed armor'] = new MeshMetadata('decayed armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['decaying cape 2'] = new MeshMetadata('decaying cape 2', 'stockto2', 'default', 'capes', []);
-		this.meshes['decaying cape'] = new MeshMetadata('decaying cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['demon torso'] = new MeshMetadata('demon torso', 'stockto2', 'default', 'Uncategorized', []);
-		this.meshes['druid shirt'] = new MeshMetadata('druid shirt', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['elvin belt'] = new MeshMetadata('elvin belt', 'stockto2', 'default', 'belts', []);
-		this.meshes['elvin breastplate'] = new MeshMetadata('elvin breastplate', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['elvin cape'] = new MeshMetadata('elvin cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['fancy cape'] = new MeshMetadata('fancy cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['fat belly'] = new MeshMetadata('fat belly', 'stockto2', 'default', 'male torso', []);
-		this.meshes['flat collar'] = new MeshMetadata('flat collar', 'stockto2', 'default', 'collars', []);
-		this.meshes['flowing cape'] = new MeshMetadata('flowing cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['human torso'] = new MeshMetadata('human torso', 'stockto2', 'default', 'male torso', []);
-		this.meshes['leather armor'] = new MeshMetadata('leather armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['metal band'] = new MeshMetadata('metal band', 'stockto2', 'default', 'belts', []);
-		this.meshes['old cape'] = new MeshMetadata('old cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['partial armor'] = new MeshMetadata('partial armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['patterned armor'] = new MeshMetadata('patterned armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['plain collar'] = new MeshMetadata('plain collar', 'stockto2', 'default', 'collars', []);
-		this.meshes['plate armor'] = new MeshMetadata('plate armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['regal cape'] = new MeshMetadata('regal cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['regal cape thin'] = new MeshMetadata('regal cape thin', 'stockto2', 'default', 'capes', []);
-		this.meshes['sash'] = new MeshMetadata('sash', 'stockto2', 'default', 'belts', []);
-		this.meshes['shirt w buckles'] = new MeshMetadata('shirt w buckles', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['simple armor'] = new MeshMetadata('simple armor', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['simple cape'] = new MeshMetadata('simple cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['simple collar'] = new MeshMetadata('simple collar', 'stockto2', 'default', 'collar', []);
-		this.meshes['simple tunic'] = new MeshMetadata('simple tunic', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['skull pendent'] = new MeshMetadata('skull pendent', 'stockto2', 'default', 'belts', []);
-		this.meshes['thick cape'] = new MeshMetadata('thick cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['torso w long hair'] = new MeshMetadata('torso w long hair', 'stockto2', 'default', 'male torso', []);
-		this.meshes['tunic shirt'] = new MeshMetadata('tunic shirt', 'stockto2', 'default', 'male shirts', []);
-		this.meshes['windswept cape'] = new MeshMetadata('windswept cape', 'stockto2', 'default', 'capes', []);
-		this.meshes['wraith torso'] = new MeshMetadata('wraith torso', 'stockto2', 'default', 'male torso', []);
+		// Arms
+		this.meshes['muscled arm left'] = new MeshMetadata('muscled arm left', 'stockto2', 'default', 'arms', []);
+		this.meshes['normal arm left'] = new MeshMetadata('normal arm left', 'stockto2', 'default', 'arms', []);
+		this.meshes['muscled arm right'] = new MeshMetadata('muscled arm right', 'stockto2', 'default', 'arms', []);
+		this.meshes['normal arm right'] = new MeshMetadata('normal arm right', 'stockto2', 'default', 'arms', []);
+			
+		// Hands
+		this.meshes['left hand closed'] = new MeshMetadata('left hand closed', 'stockto2', 'default', 'hands', []);
+		this.meshes['left hand open'] = new MeshMetadata('left hand open', 'stockto2', 'default', 'hands', []);
+		this.meshes['right hand closed'] = new MeshMetadata('right hand closed', 'stockto2', 'default', 'hands', []);
+		this.meshes['right hand open'] = new MeshMetadata('right hand open', 'stockto2', 'default', 'hands', []);
 
+		// Weapons
+		this.meshes['bone'] = new MeshMetadata('bone', 'stockto2', 'default', 'items', []);
+		this.meshes['book'] = new MeshMetadata('book', 'stockto2', 'default', 'items', []);
+		this.meshes['elvin shield'] = new MeshMetadata('elvin shield', 'stockto2', 'default', 'shields', []);
+		this.meshes['simple shield'] = new MeshMetadata('simple shield', 'stockto2', 'default', 'shields', []);
+		this.meshes['skull'] = new MeshMetadata('skull', 'stockto2', 'default', 'items', []);
+		this.meshes['triangle shield'] = new MeshMetadata('triangle shield', 'stockto2', 'default', 'shields', []);
+		this.meshes['assassin\'s knife'] = new MeshMetadata('assassin\'s knife', 'stockto2', 'default', 'weapons', []);
+		this.meshes['barbarian\'s axe'] = new MeshMetadata('barbarian\'s axe', 'stockto2', 'default', 'weapons', []);
+		this.meshes['basic sword'] = new MeshMetadata('basic sword', 'stockto2', 'default', 'weapons', []);
+		this.meshes['bone club'] = new MeshMetadata('bone club', 'stockto2', 'default', 'weapons', []);
+		this.meshes['decayed sword'] = new MeshMetadata('decayed sword', 'stockto2', 'default', 'weapons', []);
+		this.meshes['gnarled staff'] = new MeshMetadata('gnarled staff', 'stockto2', 'default', 'weapons', []);
+		this.meshes['knife'] = new MeshMetadata('knife', 'stockto2', 'default', 'weapons', []);
+		this.meshes['long spear'] = new MeshMetadata('long spear', 'stockto2', 'default', 'weapons.001', []);
+		this.meshes['longbow 2'] = new MeshMetadata('longbow 2', 'stockto2', 'default', 'weapons', []);
+		this.meshes['longbow'] = new MeshMetadata('longbow', 'stockto2', 'default', 'weapons', []);
+		this.meshes['machete 2'] = new MeshMetadata('machete 2', 'stockto2', 'default', 'weapons', []);
+		this.meshes['machete'] = new MeshMetadata('machete', 'stockto2', 'default', 'weapons', []);
+		this.meshes['pistol'] = new MeshMetadata('pistol', 'stockto2', 'default', 'weapons', []);
+		this.meshes['short lance'] = new MeshMetadata('short lance', 'stockto2', 'default', 'weapons', []);
+		this.meshes['short lance'] = new MeshMetadata('short lance', 'stockto2', 'default', 'weapons.001', []);
+		this.meshes['short spear'] = new MeshMetadata('short spear', 'stockto2', 'default', 'weapons', []);
+		this.meshes['shortsword'] = new MeshMetadata('shortsword', 'stockto2', 'default', 'weapons', []);
+		this.meshes['wooden staff'] = new MeshMetadata('wooden staff', 'stockto2', 'default', 'weapons', []);
+		this.meshes['feathered wings'] = new MeshMetadata('feathered wings', 'stockto2', 'default', 'wings', []);
+		this.meshes['quiver'] = new MeshMetadata('quiver', 'stockto2', 'default', 'items', []);
+		this.meshes['quiver with bow'] = new MeshMetadata('quiver with bow', 'stockto2', 'default', 'items', []);
+		this.meshes['steam pack'] = new MeshMetadata('steam pack', 'stockto2', 'default', 'items', []);
+
+		// Legs
 		this.meshes['animal pelt skirt'] = new MeshMetadata('animal pelt skirt', 'stockto2', 'default', 'skirts', []);
+		this.meshes['armored leg guard 2'] = new MeshMetadata('armored leg guard 2', 'stockto2', 'default', 'legwear', []);
+		this.meshes['armored leg guard'] = new MeshMetadata('armored leg guard', 'stockto2', 'default', 'legwear', []);
 		this.meshes['armored pants'] = new MeshMetadata('armored pants', 'stockto2', 'default', 'skirts', []);
-		this.meshes['armored robe'] = new MeshMetadata('armored robe', 'stockto2', 'default', 'robes/dresses', []);
+		this.meshes['armored robe'] = new MeshMetadata('armored robe', 'stockto2', 'default', 'robes', []);
 		this.meshes['armored skirt 2'] = new MeshMetadata('armored skirt 2', 'stockto2', 'default', 'skirts', []);
 		this.meshes['armored skirt 3'] = new MeshMetadata('armored skirt 3', 'stockto2', 'default', 'skirts', []);
 		this.meshes['armored skirt'] = new MeshMetadata('armored skirt', 'stockto2', 'default', 'skirts', []);
+		this.meshes['baggy pants'] = new MeshMetadata('baggy pants', 'stockto2', 'default', 'pants', []);
+		this.meshes['box'] = new MeshMetadata('box', 'stockto2', 'default', 'misc', []);
+		this.meshes['cloth leggings'] = new MeshMetadata('cloth leggings', 'stockto2', 'default', 'pants', []);
+		this.meshes['decaying leg guard'] = new MeshMetadata('decaying leg guard', 'stockto2', 'default', 'legwear', []);
 		this.meshes['decaying metal girdle'] = new MeshMetadata('decaying metal girdle', 'stockto2', 'default', 'skirts', []);
-		this.meshes['elegant dress 2'] = new MeshMetadata('elegant dress 2', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['elegant dress'] = new MeshMetadata('elegant dress', 'stockto2', 'default', 'robes/dresses', []);
+		this.meshes['elegant dress 2'] = new MeshMetadata('elegant dress 2', 'stockto2', 'default', 'robes', []);
+		this.meshes['elegant dress'] = new MeshMetadata('elegant dress', 'stockto2', 'default', 'robes', []);
+		this.meshes['elvin boots'] = new MeshMetadata('elvin boots', 'stockto2', 'default', 'footwear', []);
 		this.meshes['elvin guard'] = new MeshMetadata('elvin guard', 'stockto2', 'default', 'skirts', []);
-		this.meshes['knee-length robe bottom'] = new MeshMetadata('knee-length robe bottom', 'stockto2', 'default', 'robes/dresses', []);
+		this.meshes['female legs'] = new MeshMetadata('female legs', 'stockto2', 'default', 'legs', []);
+		this.meshes['giant feet'] = new MeshMetadata('giant feet', 'stockto2', 'default', 'feet', []);
+		this.meshes['knee-length robe bottom'] = new MeshMetadata('knee-length robe bottom', 'stockto2', 'default', 'robes', []);
 		this.meshes['leather girdle'] = new MeshMetadata('leather girdle', 'stockto2', 'default', 'skirts', []);
 		this.meshes['leather guard'] = new MeshMetadata('leather guard', 'stockto2', 'default', 'skirts', []);
+		this.meshes['legs'] = new MeshMetadata('legs', 'stockto2', 'default', 'legs', []);
+		this.meshes['long pants'] = new MeshMetadata('long pants', 'stockto2', 'default', 'pants', []);
 		this.meshes['metal girdle'] = new MeshMetadata('metal girdle', 'stockto2', 'default', 'skirts', []);
 		this.meshes['metal guard'] = new MeshMetadata('metal guard', 'stockto2', 'default', 'skirts', []);
 		this.meshes['metal loin wrap'] = new MeshMetadata('metal loin wrap', 'stockto2', 'default', 'skirts', []);
-		this.meshes['priestly robe'] = new MeshMetadata('priestly robe', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['short robe 2'] = new MeshMetadata('short robe 2', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['short robe'] = new MeshMetadata('short robe', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['side skirt'] = new MeshMetadata('side skirt', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['side skirt double'] = new MeshMetadata('side skirt double', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['simple robe'] = new MeshMetadata('simple robe', 'stockto2', 'default', 'robes/dresses', []);
+		this.meshes['pants boot tops'] = new MeshMetadata('pants boot tops', 'stockto2', 'default', 'legwear', []);
+		this.meshes['pants top 2'] = new MeshMetadata('pants top 2', 'stockto2', 'default', 'pants', []);
+		this.meshes['pants top'] = new MeshMetadata('pants top', 'stockto2', 'default', 'pants', []);
+		this.meshes['plain boots'] = new MeshMetadata('plain boots', 'stockto2', 'default', 'footwear', []);
+		this.meshes['priestly robe'] = new MeshMetadata('priestly robe', 'stockto2', 'default', 'robes', []);
+		this.meshes['short boots 2'] = new MeshMetadata('short boots 2', 'stockto2', 'default', 'footwear', []);
+		this.meshes['short boots'] = new MeshMetadata('short boots', 'stockto2', 'default', 'footwear', []);
+		this.meshes['short robe 2'] = new MeshMetadata('short robe 2', 'stockto2', 'default', 'robes', []);
+		this.meshes['short robe'] = new MeshMetadata('short robe', 'stockto2', 'default', 'robes', []);
+		this.meshes['side skirt'] = new MeshMetadata('side skirt', 'stockto2', 'default', 'robes', []);
+		this.meshes['side skirt double'] = new MeshMetadata('side skirt double', 'stockto2', 'default', 'robes', []);
+		this.meshes['simple leg guard'] = new MeshMetadata('simple leg guard', 'stockto2', 'default', 'legwear', []);
+		this.meshes['simple robe'] = new MeshMetadata('simple robe', 'stockto2', 'default', 'robes', []);
+		this.meshes['simple shoes'] = new MeshMetadata('simple shoes', 'stockto2', 'default', 'footwear', []);
 		this.meshes['simple skirt'] = new MeshMetadata('simple skirt', 'stockto2', 'default', 'skirts', []);
-		this.meshes['slit robe'] = new MeshMetadata('slit robe', 'stockto2', 'default', 'robes/dresses', []);
+		this.meshes['slit robe'] = new MeshMetadata('slit robe', 'stockto2', 'default', 'robes', []);
 		this.meshes['steel girdle'] = new MeshMetadata('steel girdle', 'stockto2', 'default', 'skirts', []);
-		this.meshes['trailing robe'] = new MeshMetadata('trailing robe', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['w legs'] = new MeshMetadata('w legs', 'stockto2', 'default', 'legs', []);
-		this.meshes['wizardly robes'] = new MeshMetadata('wizardly robes', 'stockto2', 'default', 'robes/dresses', []);
-		this.meshes['wraith robe'] = new MeshMetadata('wraith robe', 'stockto2', 'default', 'robes/dresses', []);
+		this.meshes['tight leggings'] = new MeshMetadata('tight leggings', 'stockto2', 'default', 'pants', []);
+		this.meshes['trailing robe'] = new MeshMetadata('trailing robe', 'stockto2', 'default', 'robes', []);
+		this.meshes['wizardly robes'] = new MeshMetadata('wizardly robes', 'stockto2', 'default', 'robes', []);
+		this.meshes['woodsman boots'] = new MeshMetadata('woodsman boots', 'stockto2', 'default', 'footwear', []);
+		this.meshes['wraith robe'] = new MeshMetadata('wraith robe', 'stockto2', 'default', 'robes', []);
+
+		this.meshes['thick neck'] = new MeshMetadata('thick neck', 'stockto2', 'default', 'neck', []);
+		this.meshes['thin neck'] = new MeshMetadata('thin neck', 'stockto2', 'default', 'neck', []);
+
+		// Platforms
+		this.meshes['smooth circular platform'] = new MeshMetadata('smooth circular platform', 'stockto2', 'default', 'platforms', []);
 
 		this.meshesRefreshedEvent.notify(this.meshes);
 	},
@@ -220,31 +265,27 @@ LocalDataSource.prototype = {
 		this.poses.put('amazing pose', new PoseMetadata('amazing pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
 		this.poses.put('awesome pose', new PoseMetadata('awesome pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
 		this.poses.put('cool pose', new PoseMetadata('cool pose', 'stockto2', 'default', 'full figure', ['cool', 'great']));
+		this.poses.put('charge', new PoseMetadata('charge', 'stockto2', 'default', 'full figure', []));
 
 		this.posesRefreshedEvent.notify(this.poses);
 	},
 
 	refreshBoneGroupsList: function(){
 		this.boneGroups = new ObservableDict();
-		// Fake data for now.
-		this.boneGroups.put('male left arm', new BoneGroupMetadata('male left arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('male right arm', new BoneGroupMetadata('male right arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('male left hand', new BoneGroupMetadata('male left hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('male right hand', new BoneGroupMetadata('male right hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('male torso', new BoneGroupMetadata('male torso', 'stockto2', 'default', 'torso', ['cool', 'great'], ['torso', 'male shirts', 'capes',  'female shirts', 'accessories']));
-		this.boneGroups.put('male head', new BoneGroupMetadata('male head', 'stockto2', 'default', 'head', ['cool', 'great'], ['headgear', 'head','accessories']));
-		this.boneGroups.put('male neck', new BoneGroupMetadata('male neck', 'stockto2', 'default', 'head', ['cool', 'great'], []));
+		
+		this.boneGroups.put('left arm', new BoneGroupMetadata('left arm', 'dutchmogul', 'default', 'arm', ['cool', 'great'], ['arms']));
+		this.boneGroups.put('right arm', new BoneGroupMetadata('right arm', 'dutchmogul', 'default', 'arm', ['cool', 'great'], ['arms']));
+		this.boneGroups.put('left hand', new BoneGroupMetadata('left hand', 'dutchmogul', 'default', 'hands', ['cool', 'great'], ['hands']));
+		this.boneGroups.put('right hand', new BoneGroupMetadata('right hand', 'dutchmogul', 'default', 'arm', ['cool', 'great'], ['hands']));
+		this.boneGroups.put('male torso', new BoneGroupMetadata('male torso', 'dutchmogul', 'default', 'torso', ['cool', 'great'], ['torso', 'male torso', 'male shirts', 'belts', 'collars', 'capes', 'accessories']));
+		this.boneGroups.put('female torso', new BoneGroupMetadata('female torso', 'dutchmogul', 'default', 'torso', ['cool', 'great'], ['torso', 'male shirts', 'capes', 'male shirts', 'female shirts', 'accessories']));
+		this.boneGroups.put('head', new BoneGroupMetadata('head', 'dutchmogul', 'default', 'head', ['cool', 'great'], ['headgear', 'head', 'hair', 'accessories']));
+		this.boneGroups.put('neck', new BoneGroupMetadata('neck', 'dutchmogul', 'default', 'neck', ['cool', 'great'], ['neck', 'accessories']));
+		this.boneGroups.put('legs', new BoneGroupMetadata('legs', 'dutchmogul', 'default', 'legs', ['cool', 'great'], ['legs', 'skirts', 'robes', 'pants', 'legwear', 'footwear']));
 
-		this.boneGroups.put('female left arm', new BoneGroupMetadata('female left arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('female right arm', new BoneGroupMetadata('female right arm', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('female left hand', new BoneGroupMetadata('female left hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('female right hand', new BoneGroupMetadata('female right hand', 'stockto2', 'default', 'arm', ['cool', 'great'], []));
-		this.boneGroups.put('female torso', new BoneGroupMetadata('female torso', 'stockto2', 'default', 'torso', ['cool', 'great'], []));
-		this.boneGroups.put('female head', new BoneGroupMetadata('female head', 'stockto2', 'default', 'head', ['cool', 'great'], []));
-		this.boneGroups.put('female neck', new BoneGroupMetadata('female neck', 'stockto2', 'default', 'head', ['cool', 'great'], []));
-
-		this.boneGroups.put('platform', new BoneGroupMetadata('platform', 'stockto2', 'default', 'platform', ['cool', 'great'], []));
-		this.boneGroups.put('handheld', new BoneGroupMetadata('handheld', 'stockto2', 'default', 'weapon', ['cool', 'great'], []));
+		this.boneGroups.put('platform', new BoneGroupMetadata('platform', 'dutchmogul', 'default', 'platform', ['cool', 'great'], ['platforms']));
+		this.boneGroups.put('item', new BoneGroupMetadata('item', 'dutchmogul', 'default', 'item', ['cool', 'great'], ['accessories', 'items', 'wings', 'shields']));
+		this.boneGroups.put('weapon', new BoneGroupMetadata('weapon', 'dutchmogul', 'default', 'weapon', ['cool', 'great'], ['weapons']));
 
 		this.boneGroupsRefreshedEvent.notify(this.boneGroups);
 	},

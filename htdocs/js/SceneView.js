@@ -212,7 +212,7 @@ SceneView.prototype = {
 		this.selectedMesh = mesh;
 
 		if (this.selectedMesh == null){
-			hideLibraries();
+			this.hideLibraries();
 		} else {
 			this.selectedMesh.material = model.materials['selected'];
 		}

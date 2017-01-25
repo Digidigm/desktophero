@@ -8,16 +8,42 @@ function SceneModel(){
 
 	this.materials = {};
 }
-SceneModel.boneGroupsToLoad = ['male left arm',
-							'male left hand',
-							'male right arm',
-							'male right hand',
-							'male torso',
-							'm legs',
-							'male head',
-							'male neck',
-							'platform',
-							'handheld'];
+initialBoneGroups = ['male torso',
+							'legs',
+							'head',
+							'left arm',
+							'right arm',
+							'left hand',
+							'right hand',
+							'neck',
+							'weapon',
+							'platform'];
+boneGroupUids = {};
+
+initialMeshes = {'male torso': 'male torso',
+				'simple tunic': 'male torso',
+				'legs': 'legs', 
+				'elvin boots': 'legs', 
+				'baggy pants': 'legs', 
+				'human male': 'head',
+				'muscled arm left': 'left arm',
+				'muscled arm right': 'right arm',
+				'left hand closed': 'left hand',
+				'right hand open': 'right hand',
+				'thick neck': 'neck',
+				'basic sword': 'weapon',
+				'smooth circular platform': 'platform'};
+
+initialAttachments = {'male torso': ['legs', '#top'],
+						'head': ['neck', '#top'],
+						'left arm': ['male torso', '#left arm'],
+						'right arm': ['male torso', '#right arm'],
+						'left hand': ['left arm', '#hand'],
+						'right hand': ['right arm', '#hand'],
+						'neck': ['male torso', '#neck'],
+						'weapon': ['left hand', '#palm'],
+						'platform': ['legs', '#platform']};
+
 SceneModel.initialPose = 'amazing pose';
 
 SceneModel.prototype = {
@@ -162,64 +188,75 @@ SceneModel.prototype = {
 		var self = this;
 		
 		var defaultDataSource = self.libraries.get('default');
-		var boneGroupsLeftToBeLoaded = 10;
-		var boneGroupUids = {};
+		var boneGroupsLeftToBeLoaded = initialBoneGroups.length;
 
-		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
-			var name = SceneModel.boneGroupsToLoad[i];
+		for (var i = 0; i < initialBoneGroups.length; i++){
+			var name = initialBoneGroups[i];
 
 			defaultDataSource.fetchBoneGroup(name, function(boneGroup){
 				self.character.addBoneGroup(boneGroup);
 				boneGroupUids[boneGroup.name] = boneGroup.uid;
 				boneGroupsLeftToBeLoaded -= 1;
 				if (boneGroupsLeftToBeLoaded <= 0){
-					self.initBoneGroupsAdded(boneGroupUids);
+					self.initBoneGroupsAdded();
 				}
 			});
 		}
 	},
 
-	initBoneGroupsAdded: function(boneGroupUids){
+	initBoneGroupsAdded: function(){
 		var self = this;
 
 		var defaultDataSource = self.libraries.get('default');
-		var meshesLeftToBeLoaded = 10;
+		var meshesLeftToBeLoaded = Object.keys(initialMeshes).length;
 
 		var defaultMaterial = self.materials["default"];
 		// Attach meshes to bone groups.
-		for (var i = 0; i < SceneModel.boneGroupsToLoad.length; i++){
-			var name = SceneModel.boneGroupsToLoad[i];
+		for (var i = 0; i < Object.keys(initialMeshes).length; i++){
+			var name = Object.keys(initialMeshes)[i];
 
 			defaultDataSource.fetchMesh(name, function(name, mesh){
-				// Get the UID of the bone group matching this mesh's name.
-				var boneGroupUid = boneGroupUids[name];
+				// Get the UID of the bone group matching this mesh.
+				var boneGroupName = initialMeshes[name];
+				var boneGroupUid = boneGroupUids[boneGroupName];
 				var boneGroup = self.character.boneGroups.get(boneGroupUid);
 				mesh.material = new THREE.MeshFaceMaterial([defaultMaterial]);
+
 				boneGroup.addMesh(name, mesh);
 				meshesLeftToBeLoaded -= 1;
 				if (meshesLeftToBeLoaded <= 0){
-					self.initMeshesAdded(boneGroupUids);
+					self.initMeshesAdded();
 				}
 			});
 		}
 	},
 
-	initMeshesAdded: function(boneGroupUids){
+	initMeshesAdded: function(){
 		// Attach bone groups to their correct parent bones.
-
-		// TODO: You should be able to do this even before loading the meshes. 
-		// But it seems that even if the bone is not at position 0, 0, 0 the mesh 
-		// still DOES get added at 0, 0, 0 and it doesn't match.
 
 		self = this;
 
-		var headUid = boneGroupUids['male head'];
+		for (var i = 0; i < Object.keys(initialAttachments).length; i++){
+			var boneGroupName = Object.keys(initialAttachments)[i];
+			var boneGroupUid = boneGroupUids[boneGroupName];
+			var boneGroup = self.character.boneGroups.get(boneGroupUid);
+
+			var attachToName = initialAttachments[boneGroupName][0];
+			var attachToUid = boneGroupUids[attachToName];
+			var attachToBoneGroup = self.character.boneGroups.get(attachToUid);
+			var attachToPoint = initialAttachments[boneGroupName][1];
+
+			boneGroup.attachToBone(attachToUid, attachToPoint, attachToBoneGroup.attachPoints[attachToPoint]);
+
+		}
+
+		/*var headUid = boneGroupUids['male head'];
 		var head = self.character.boneGroups.get(headUid);
 		var neckUid = boneGroupUids['male neck'];
 		var neck = self.character.boneGroups.get(neckUid);
 		var torsoUid = boneGroupUids['male torso'];
 		var torso = self.character.boneGroups.get(torsoUid);
-		var legsUid = boneGroupUids['m legs'];
+		var legsUid = boneGroupUids['legs'];
 		var legs = self.character.boneGroups.get(legsUid);
 		var leftArmUid = boneGroupUids['male left arm'];
 		var leftArm = self.character.boneGroups.get(leftArmUid);
@@ -231,7 +268,7 @@ SceneModel.prototype = {
 		var rightHand = self.character.boneGroups.get(rightHandUid);
 		var platformUid = boneGroupUids['platform'];
 		var platform = self.character.boneGroups.get(platformUid);
-		var handheldUid = boneGroupUids['handheld'];
+		var handheldUid = boneGroupUids['weapon'];
 		var handheld = self.character.boneGroups.get(handheldUid);
 
 		neck.attachToBone(torsoUid, "#neck", torso.attachPoints["#neck"]);
@@ -242,7 +279,7 @@ SceneModel.prototype = {
 		head.attachToBone(neckUid, "#top", neck.attachPoints["#top"]);
 		handheld.attachToBone(leftHandUid, "#palm", leftHand.attachPoints["#palm"]);
 		torso.attachToBone(legsUid, "#top", legs.attachPoints["#top"]);
-		platform.attachToBone(legsUid, "#platform", legs.attachPoints["#platform"]);
+		platform.attachToBone(legsUid, "#platform", legs.attachPoints["#platform"]);*/
 
 		// Place manually because OrbitControls jumps if not centered on (0, 0, 0).
 		//legs.skeleton.bones[0].position.y = 0;
