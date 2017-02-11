@@ -39,8 +39,10 @@ function SceneView(model){
 	this.Z_AXIS = new THREE.Vector3(0,0,1);
 
 	this.boneAxisHelper;
-
 	this.selectedBoneGroupUid = null;
+
+	this.meshPickingView = new PickingView();
+	this.viewPickingScene = false;
 
 	this.addModelListeners();
 
@@ -50,9 +52,7 @@ SceneView.prototype = {
 	init: function(){
 
 		this.scene = new THREE.Scene();
-		this.pickingScene = new THREE.Scene();
-		this.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-		this.pickingTexture.texture.minFilter = THREE.LinearFilter;
+
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
 		this.renderer = new THREE.WebGLRenderer({
 													antialias:true,
@@ -182,7 +182,11 @@ SceneView.prototype = {
 			this.skeletonHelpers[i].update();
 		}
 		this.render();
-		this.renderer.render(this.scene, this.camera);
+		if (this.viewPickingScene){
+			this.renderer.render(this.meshPickingView.scene, this.camera);
+		} else {
+			this.renderer.render(this.scene, this.camera);
+		}
 	},
 
 	resize: function(innerWidth, innerHeight){
@@ -350,12 +354,7 @@ SceneView.prototype = {
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
-		/*var pickingMesh = new THREE.Geometry();
-		var pickingMaterial = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors });
-		var defaultMaterial new THREE.MeshPhongMaterial({color:0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0});
-*/
 		this.meshes.push(mesh);
-
 
 		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
 
@@ -366,6 +365,8 @@ SceneView.prototype = {
 			this.selectMesh(mesh);
 			this.futureMeshToSelect = null;
 		}
+
+		this.meshPickingView.addMesh(mesh, boneGroup);
 	},
 
 	onMeshRemoved: function(boneGroup, meshName){
@@ -426,7 +427,11 @@ SceneView.prototype = {
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].visible = this.boneHandlesVisible;
 		}
-	}, 
+	},
+
+	togglePickingScene: function(){
+		this.viewPickingScene = !this.viewPickingScene;
+	},
 
 	startBoneRotate: function(){
 		if (this.selectedBone === null){
@@ -539,51 +544,16 @@ SceneView.prototype = {
 			return;
 		}
 
-		// Select mesh
-		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
-		console.log(clickVector);
-		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
-
-		var intersections = this.raycaster.intersectObjects(this.scene.children, false);
-		console.log(intersections);
-		/*var closestMesh = null, closestDistance = null;
-		for (var i = 0; i < intersections.length; i++){
-			var mesh = intersections[i].object;
-			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
-			var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
-			if (bone.name.startsWith("#")){
-				continue;
-			}
-			if (closestMesh === null || intersections[i].distance < closestDistance){
-				closestMesh = bone;
-				closestDistance = intersections[i].distance;
-			}
-		}
-		this.selectedMesh = closestMesh;*/
-	},
-
-	/*pick: function(mouseX, mouseY) {
-		//render the picking scene off-screen
-		renderer.render(this.pickingScene, this.camera, this.pickingTexture);
-		//create buffer for reading single pixel
+		var pickingTexture = this.meshPickingView.pickingTexture;
+		this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
 		var pixelBuffer = new Uint8Array(4);
-		//read the pixel under the mouse from the texture
-		renderer.readRenderTargetPixels(this.pickingTexture, mouseX, this.pickingTexture.height - mouseY, 1, 1, pixelBuffer);
-		//interpret the pixel as an ID
-		var id = (pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-		var data = this.pickingData[id];
-		if (data) {
-			console.log(data)
-		} else {
-			console.log("Nothing!")
-		}
-	}, 
-
-	function render() {
-		controls.update();
-		pick();
-		renderer.render( scene, camera );
-	}, */
+		this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+		
+		// Create id from RGB values
+		var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+		var meshId = this.meshPickingView.meshIdMap[colorId];
+		console.log("Clicked " + meshId);
+	},
 
 	onRightClick: function(mouseX, mouseY){
 		this.selectMesh(null);
@@ -1040,6 +1010,8 @@ function onKeyDown(event){
 
     if (letter == 'Q' || letter == 'q'){
     	view.toggleBoneHandlesVisible();
+    } else if (letter == 'P' || letter == 'p'){
+    	view.togglePickingScene();
     } else if (letter == 'R' || letter == 'r'){
     	view.startBoneRotate();
     } else if (letter == 'G' || letter == 'g'){

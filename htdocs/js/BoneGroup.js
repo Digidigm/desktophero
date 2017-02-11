@@ -97,6 +97,36 @@ BoneGroup.prototype = {
 		return scales;
 	},
 
+	attachPickingMesh(mesh){
+		var bones = this.skeleton.bones;
+
+		var savedPositions = this.getPositions();
+		var savedRotations = this.getRotations();
+		var savedScales = this.getScales();
+
+		if (this.parentBone != null){
+			this.parentBone.remove(bones[0]);
+		}
+
+		this.resetPose();
+
+		mesh.children = [];
+		//mesh.add(this.skeleton.bones[0]);
+		console.log("Meshers")
+		console.log(mesh)
+		console.log(this.meshes)
+		mesh.bind(this.skeleton);
+		
+		this.setPose(savedPositions, savedRotations, savedScales);
+
+		if (this.parentBone != null){
+			// Restore bone parent.
+			this.attachToBone(this.parentBoneGroupUid,
+								this.parentBoneName,
+								this.parentBone);
+		}
+	},
+
 	addMesh: function (meshName, mesh){
 		console.log('Adding mesh "' + meshName + '" to bone group "' + this.name + '".');
 
@@ -125,7 +155,7 @@ BoneGroup.prototype = {
 			this.attachToBone(this.parentBoneGroupUid,
 								this.parentBoneName,
 								this.parentBone);
-		} 
+		}
 	},
 
 	removeMesh: function (meshName){
