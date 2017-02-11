@@ -41089,7 +41089,6 @@ THREE.SkeletonHelper = function ( object ) {
 
 		var Color1, Color2;
 		if ( bone.parent instanceof THREE.Bone ) {
-			console.log("Stuff: " + bone.name)
 			if (bone.name.startsWith('#')){
 				Color1 = new THREE.Color( 1, 0, 0);
 				Color2 = new THREE.Color( 1, 1, 0);

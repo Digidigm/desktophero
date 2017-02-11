@@ -39,8 +39,10 @@ function SceneView(model){
 	this.Z_AXIS = new THREE.Vector3(0,0,1);
 
 	this.boneAxisHelper;
-
 	this.selectedBoneGroupUid = null;
+
+	this.meshPickingView = new PickingView();
+	this.viewPickingScene = false;
 
 	this.addModelListeners();
 
@@ -50,9 +52,7 @@ SceneView.prototype = {
 	init: function(){
 
 		this.scene = new THREE.Scene();
-		this.pickingScene = new THREE.Scene();
-		this.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-		this.pickingTexture.texture.minFilter = THREE.LinearFilter;
+
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
 		this.renderer = new THREE.WebGLRenderer({
 													antialias:true,
@@ -182,7 +182,11 @@ SceneView.prototype = {
 			this.skeletonHelpers[i].update();
 		}
 		this.render();
-		this.renderer.render(this.scene, this.camera);
+		if (this.viewPickingScene){
+			this.renderer.render(this.meshPickingView.scene, this.camera);
+		} else {
+			this.renderer.render(this.scene, this.camera);
+		}
 	},
 
 	resize: function(innerWidth, innerHeight){
@@ -350,12 +354,7 @@ SceneView.prototype = {
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
-		/*var pickingMesh = new THREE.Geometry();
-		var pickingMaterial = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors });
-		var defaultMaterial new THREE.MeshPhongMaterial({color:0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0});
-*/
 		this.meshes.push(mesh);
-
 
 		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
 
@@ -366,6 +365,8 @@ SceneView.prototype = {
 			this.selectMesh(mesh);
 			this.futureMeshToSelect = null;
 		}
+
+		this.meshPickingView.addMesh(mesh, boneGroup);
 	},
 
 	onMeshRemoved: function(boneGroup, meshName){
@@ -426,7 +427,11 @@ SceneView.prototype = {
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].visible = this.boneHandlesVisible;
 		}
-	}, 
+	},
+
+	togglePickingScene: function(){
+		this.viewPickingScene = !this.viewPickingScene;
+	},
 
 	startBoneRotate: function(){
 		if (this.selectedBone === null){
@@ -541,11 +546,11 @@ SceneView.prototype = {
 
 		// Select mesh
 		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
-		console.log(clickVector);
+		//console.log(clickVector);
 		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
 
 		var intersections = this.raycaster.intersectObjects(this.scene.children, false);
-		console.log(intersections);
+		//console.log(intersections);
 		/*var closestMesh = null, closestDistance = null;
 		for (var i = 0; i < intersections.length; i++){
 			var mesh = intersections[i].object;
@@ -1040,6 +1045,8 @@ function onKeyDown(event){
 
     if (letter == 'Q' || letter == 'q'){
     	view.toggleBoneHandlesVisible();
+    } else if (letter == 'P' || letter == 'p'){
+    	view.togglePickingScene();
     } else if (letter == 'R' || letter == 'r'){
     	view.startBoneRotate();
     } else if (letter == 'G' || letter == 'g'){
