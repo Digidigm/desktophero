@@ -50,7 +50,7 @@ PickingView.prototype = {
 		applyVertexColors( pickingMesh.geometry, color);
 		boneGroup.attachPickingMesh(pickingMesh);
 
-		this.meshIdMap[id] = mesh.name;
+		this.meshIdMap[id] = mesh.uid;
 		this.scene.add(pickingMesh);
 	}
 }

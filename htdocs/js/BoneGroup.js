@@ -1,5 +1,5 @@
 function BoneGroup(name, libraryName, skeleton){
-	this.uid = createUid();
+	this.uid = createUid('bonegroup-' + name + '-');
 	this.name = name;
 	this.libraryName = libraryName; // Keeps track of where this bone group is found, for saving characters.
 	this.skeleton = skeleton;
@@ -146,6 +146,7 @@ BoneGroup.prototype = {
 		mesh.add(this.skeleton.bones[0]);
 		mesh.bind(this.skeleton);
 		mesh.name = meshName;
+		mesh.uid = createUid('mesh-' + meshName + '-')
 		this.meshes.put(meshName, mesh);
 
 		this.setPose(savedPositions, savedRotations, savedScales);

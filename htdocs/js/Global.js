@@ -26,8 +26,9 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 NEXT_UID = 600;
-createUid = function(){
+createUid = function(prefix){
+	prefix = prefix || ''
     uid = NEXT_UID;
     NEXT_UID += 1;
-    return uid + '';
+    return (prefix + uid + '').replaceAll(' ', '_');
 };
