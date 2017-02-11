@@ -544,51 +544,16 @@ SceneView.prototype = {
 			return;
 		}
 
-		// Select mesh
-		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
-		//console.log(clickVector);
-		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
-
-		var intersections = this.raycaster.intersectObjects(this.scene.children, false);
-		//console.log(intersections);
-		/*var closestMesh = null, closestDistance = null;
-		for (var i = 0; i < intersections.length; i++){
-			var mesh = intersections[i].object;
-			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
-			var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
-			if (bone.name.startsWith("#")){
-				continue;
-			}
-			if (closestMesh === null || intersections[i].distance < closestDistance){
-				closestMesh = bone;
-				closestDistance = intersections[i].distance;
-			}
-		}
-		this.selectedMesh = closestMesh;*/
-	},
-
-	/*pick: function(mouseX, mouseY) {
-		//render the picking scene off-screen
-		renderer.render(this.pickingScene, this.camera, this.pickingTexture);
-		//create buffer for reading single pixel
+		var pickingTexture = this.meshPickingView.pickingTexture;
+		this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
 		var pixelBuffer = new Uint8Array(4);
-		//read the pixel under the mouse from the texture
-		renderer.readRenderTargetPixels(this.pickingTexture, mouseX, this.pickingTexture.height - mouseY, 1, 1, pixelBuffer);
-		//interpret the pixel as an ID
-		var id = (pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-		var data = this.pickingData[id];
-		if (data) {
-			console.log(data)
-		} else {
-			console.log("Nothing!")
-		}
-	}, 
-
-	function render() {
-		controls.update();
-		pick();
-		renderer.render( scene, camera );
-	}, */
+		this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+		
+		// Create id from RGB values
+		var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+		var meshId = this.meshPickingView.meshIdMap[colorId];
+		console.log("Clicked " + meshId);
+	},
 
 	onRightClick: function(mouseX, mouseY){
 		this.selectMesh(null);

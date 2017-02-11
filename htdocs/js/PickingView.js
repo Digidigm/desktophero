@@ -3,6 +3,11 @@ function PickingView(){
 	this.colorIdMap = {};
 
 	this.scene.add(new THREE.AmbientLight(0x555555));
+
+	this.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+	this.pickingTexture.texture.minFilter = THREE.LinearFilter;
+
+	this.meshIdMap = {};
 }
 
 PickingView.prototype = {
@@ -17,15 +22,6 @@ PickingView.prototype = {
 	}, 
 
 	addMesh: function(mesh, boneGroup){
-
-		/*var pickingGeometry = new THREE.Geometry();
-		var pickingMaterial = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors });
-
-		pickingGeometry.merge(mesh.geometry, mesh.matrixWorld)
-		pickingGeometry.bones = mesh.geometry.bones.slice();
-		pickingGeometry.skinIndices = mesh.geometry.skinIndices.slice();
-		pickingGeometry.skinWeights = mesh.geometry.skinWeights.slice();*/
-
 		function applyVertexColors( g, c ) {
 			g.faces.forEach( function( f ) {
 				var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
@@ -43,13 +39,18 @@ PickingView.prototype = {
 		applyVertexColors( pickingMesh.geometry, color);
 		boneGroup.attachPickingMesh(pickingMesh);
 
+		// Create id from RGB color values
+		var r = (color.r * 255);
+		var g = (color.g * 255);
+		var b = (color.b * 255);
+		var id = ( r << 16 ) | ( g << 8 ) | ( b );
+		this.meshIdMap[id] = mesh.name;
+
 		this.scene.add(pickingMesh);
 	}
 }
 
 // Class properties/functions
 
-PickingView.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-PickingView.pickingTexture.texture.minFilter = THREE.LinearFilter;
 PickingView.pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 PickingView.pickingMaterial.skinning = true;
