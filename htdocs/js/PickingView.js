@@ -31,21 +31,26 @@ PickingView.prototype = {
 			});
 		}
 
+		// Find a unique color/id for this mesh
+		var color;
+		var id = undefined;
+		while (id == undefined || id in this.meshIdMap){
+			color = new THREE.Color(Math.random() * 0xffffff);
+			// Create id from RGB color values
+			var r = (color.r * 255);
+			var g = (color.g * 255);
+			var b = (color.b * 255);
+			var id = ( r << 16 ) | ( g << 8 ) | ( b );
+		}
+
 		var pickingMesh = mesh.clone(); //new THREE.SkinnedMesh(pickingGeometry, pickingMaterial);
 		pickingMesh.material = pickingMesh.material.clone();
 		pickingMesh.material.materials = [PickingView.pickingMaterial];
-
-		var color = new THREE.Color(Math.random() * 0xffffff);
+		
 		applyVertexColors( pickingMesh.geometry, color);
 		boneGroup.attachPickingMesh(pickingMesh);
 
-		// Create id from RGB color values
-		var r = (color.r * 255);
-		var g = (color.g * 255);
-		var b = (color.b * 255);
-		var id = ( r << 16 ) | ( g << 8 ) | ( b );
 		this.meshIdMap[id] = mesh.name;
-
 		this.scene.add(pickingMesh);
 	}
 }
