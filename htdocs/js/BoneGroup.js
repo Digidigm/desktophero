@@ -147,7 +147,7 @@ BoneGroup.prototype = {
 		mesh.bind(this.skeleton);
 		mesh.name = meshName;
 		mesh.uid = createUid('mesh-' + meshName + '-')
-		this.meshes.put(meshName, mesh);
+		this.meshes.put(mesh.uid, mesh);
 
 		this.setPose(savedPositions, savedRotations, savedScales);
 
@@ -159,8 +159,8 @@ BoneGroup.prototype = {
 		}
 	},
 
-	removeMesh: function (meshName){
-		this.meshes.remove(meshName);
+	removeMesh: function (meshId){
+		this.meshes.remove(meshId);
 	},
 
 	attachToBone: function(parentBoneGroupUid, parentBoneName, parentBone){

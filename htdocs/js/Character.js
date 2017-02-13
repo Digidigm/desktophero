@@ -83,5 +83,15 @@ Character.prototype = {
 			name: this.name,
 			boneGroups: this.boneGroups.dict
 		};
+	},
+
+	getMesh: function(meshId){
+		for (var boneGroupUid in this.boneGroups.dict){
+			var boneGroup = this.boneGroups.get(boneGroupUid);
+			if (meshId in boneGroup.meshes.dict){
+				return [boneGroupUid, boneGroup.meshes.get(meshId)];
+			}
+		}
+		return null;
 	}
 }

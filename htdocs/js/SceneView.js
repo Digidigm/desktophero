@@ -283,9 +283,9 @@ SceneView.prototype = {
 		//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
 		this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
 
-		for (var meshName in boneGroup.meshes.dict){
+		for (var meshId in boneGroup.meshes.dict){
 			//TODO: add icon as well.
-			this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
+			this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
 		}
 	},
 
@@ -340,28 +340,28 @@ SceneView.prototype = {
 		label.innerText = 'Attached to: None';
 	},
 
-	onMeshAdded: function(boneGroup, meshName){
-		console.log("Mesh " + meshName + " added to bone group " + boneGroup.name + ".");
+	onMeshAdded: function(boneGroup, meshId){
+		console.log("Mesh " + meshId + " added to bone group " + boneGroup.name + ".");
 
-		var mesh = boneGroup.meshes.get(meshName);
+		var mesh = boneGroup.meshes.get(meshId);
 		mesh.boneGroupUid = boneGroup.uid;
 		this.scene.add(mesh);
 
 		var skeletonHelper = new THREE.SkeletonHelper(mesh);
 		skeletonHelper.material.linewidth = 4;
-		skeletonHelper.meshName = meshName;
+		skeletonHelper.meshId = meshId;
 		skeletonHelper.visible = this.boneHandlesVisible;
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
 		this.meshes.push(mesh);
 
-		this.meshesTabAddMesh(boneGroup.uid, meshName, "stuff.png");
+		this.meshesTabAddMesh(boneGroup.uid, meshId, "stuff.png");
 
 		// Are we waiting for this mesh to be loaded so we can select it?
 		if (this.futureMeshToSelect !== null &&
 				boneGroup.uid === this.futureMeshToSelect[0] &&
-				meshName === this.futureMeshToSelect[1]){
+				mesh.name === this.futureMeshToSelect[1]){
 			this.selectMesh(mesh);
 			this.futureMeshToSelect = null;
 		}
@@ -369,14 +369,14 @@ SceneView.prototype = {
 		this.meshPickingView.addMesh(mesh, boneGroup);
 	},
 
-	onMeshRemoved: function(boneGroup, meshName){
-		console.log("Mesh " + meshName + " removed from bone group " + boneGroup.name + ".");
+	onMeshRemoved: function(boneGroup, meshId){
+		console.log("Mesh " + meshId + " removed from bone group " + boneGroup.name + ".");
 
 		// Remove mesh and skeletonhelper from scene
 		var toRemove = [];
 		for (var i in this.scene.children){
 			var sceneElement = this.scene.children[i];
-			if (sceneElement.meshName === meshName){
+			if (sceneElement.uid == meshId){
 				toRemove.push(sceneElement);
 			}
 		}
@@ -389,7 +389,7 @@ SceneView.prototype = {
 		toRemove = [];
 		for (var i in this.meshes){
 			var mesh = this.meshes[i];
-			if (mesh.meshName === meshName){
+			if (mesh.uid == meshId){
 				toRemove.push(i)
 				break;
 			}
@@ -402,7 +402,7 @@ SceneView.prototype = {
 		// Remove skeletonHelper entries.
 		var toRemove = []; 
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
-			if (this.skeletonHelpers[i].meshName === meshName){
+			if (this.skeletonHelpers[i].meshId == meshId){
 				toRemove.push(i);
 			}
 		}
@@ -411,7 +411,7 @@ SceneView.prototype = {
 			this.skeletonHelpers.splice(index, 1);
 		}
 
-		this.meshesTabRemoveMesh(boneGroup.uid, meshName);
+		this.meshesTabRemoveMesh(boneGroup.uid, meshId);
 	},
 
 	onPoseChanged: function(character, poseName){
@@ -553,6 +553,15 @@ SceneView.prototype = {
 		var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
 		var meshId = this.meshPickingView.meshIdMap[colorId];
 		console.log("Clicked " + meshId);
+		var meshResult = model.character.getMesh(meshId);
+		if (meshResult != null){
+			boneGroupUid = meshResult[0];
+			mesh = meshResult[1];
+			this.selectMesh(mesh);
+			this.libraryClearMeshes();
+			this.libraryPopulateMeshes(boneGroupUid);
+			this.showLibrary('mesh');
+		}
 	},
 
 	onRightClick: function(mouseX, mouseY){
@@ -694,16 +703,16 @@ SceneView.prototype = {
 			this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
 			//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
 
-			for (var meshName in boneGroup.meshes.dict){
+			for (var meshId in boneGroup.meshes.dict){
 				//TODO: add icon as well.
-				this.meshesTabAddMesh(boneGroupUid, meshName, "stuff.png");
+				this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
 			}
 		}
 	},
 
 	meshesTabAddBoneGroup: function(boneGroupUid, boneGroupName){
 		var div = document.createElement('div');
-		elementUid = "meshes-tab-" + boneGroupUid;
+		var elementUid = "meshes-tab-" + boneGroupUid;
 		div.className = "panel card clearfix";
 		div.innerHTML = '<div class="card-header" role="tab" id="' + elementUid + '">\
 				<h5>\
@@ -730,27 +739,25 @@ SceneView.prototype = {
 		document.getElementById(elementUid + '-data').children[0].appendChild(div);
 	},
 
-	meshesTabAddMesh: function(boneGroupUid, meshName, iconUrl){
+	meshesTabAddMesh: function(boneGroupUid, meshId, iconUrl){
+		var elementUid = "meshes-tab-" + boneGroupUid;
 		//TODO: Add icon
-		elementId = "meshes-tab-" + boneGroupUid;
-
 		var div = document.createElement('div');
-		div.id = boneGroupUid + "-" + meshName;
+		div.id = meshId;
 		div.className = "mini-select col-md-3";
 		div.setAttribute("meshes-tab-mesh", "stuff");
-		div.setAttribute("data-mesh-name", meshName);
+		div.setAttribute("data-mesh-name", meshId);
 		div.setAttribute("data-mesh-bone-group", boneGroupUid);
 		div.innerHTML = '<img src="' + iconUrl + '" alt="icon">\
-			<span class="label">' + meshName + '\
+			<span class="label">' + meshId + '\
 		</span>';
 
 		tab = document.getElementById(elementId + '-data').children[0];
 		tab.insertBefore(div, tab.childNodes[0]);
 	},
 
-	meshesTabRemoveMesh: function(boneGroupUid, meshName){
-		elementId = boneGroupUid + "-" + meshName;
-		var tabEntry = document.getElementById(elementId);
+	meshesTabRemoveMesh: function(boneGroupUid, meshId){
+		var tabEntry = document.getElementById(meshId);
 		tabEntry.parentNode.removeChild(tabEntry);
 	},
 
@@ -775,7 +782,7 @@ SceneView.prototype = {
 
 	poseTabAddPose: function(boneGroupUid, poseName, iconUrl){
 		//TODO: Add icon
-		boneGroupUid = boneGroupUid + "-" + meshName;
+		boneGroupUid = boneGroupUid + "-" + poseName;
 
 		var div = document.createElement('div');
 		div.className = "mini-select col-md-3";

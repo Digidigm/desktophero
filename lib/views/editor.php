@@ -513,7 +513,7 @@ $(document).ready( function(){
 		var boneGroupUid = $(this).data("mesh-bone-group") + "";
 		var meshName =  $(this).data("mesh-name");
 		view.hideLibrary('mesh');
-		model.removeMesh(boneGroupUid, meshName);
+		model.removeMesh(boneGroupUid, meshId);
 	});
 
 	// Click library mesh
@@ -526,7 +526,7 @@ $(document).ready( function(){
 				model.addMesh(view.selectedBoneGroupUid, library, meshName);
 				view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
 			} else {
-				model.removeMesh(view.selectedBoneGroupUid, view.selectedMesh.name);
+				model.removeMesh(view.selectedBoneGroupUid, view.selectedMesh.uid);
 				model.addMesh(view.selectedBoneGroupUid, library, meshName);
 				view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
 			}
