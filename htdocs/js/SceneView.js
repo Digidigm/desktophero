@@ -42,7 +42,8 @@ function SceneView(model){
 	this.boneAxisHelper;
 
 	this.meshPickingView = new PickingView(model);
-	this.viewPickingScene = false;
+
+	this.mode = 'mesh';
 
 	this.addModelListeners();
 
@@ -182,9 +183,9 @@ SceneView.prototype = {
 			this.skeletonHelpers[i].update();
 		}
 		this.render();
-		if (this.viewPickingScene){
+		if (this.mode == 'mesh picking'){
 			this.renderer.render(this.meshPickingView.scene, this.camera);
-		} else {
+		} else if (this.mode == 'mesh') {
 			this.renderer.render(this.scene, this.camera);
 		}
 	},
@@ -430,8 +431,9 @@ SceneView.prototype = {
 		this.selectMesh(null);
 	},
 
-	togglePickingScene: function(){
-		this.viewPickingScene = !this.viewPickingScene;
+	setMode: function(mode){
+		console.log("Setting mode to " + mode);
+		this.mode = mode;
 	},
 
 	startBoneRotate: function(){
@@ -711,6 +713,10 @@ SceneView.prototype = {
 			}
 			
 		}
+	},
+
+	onDeletePressed: function(){
+		this.model.removeMesh(this.selectedMesh.uid);
 	},
 
 	populateTabs: function(){
@@ -1040,12 +1046,20 @@ function onKeyDown(event){
       keynum = event.which;
     }
 
+    if (keynum == 46){ // Delete
+    	view.onDeletePressed();
+    } else if (keynum == 219){ // 
+		view.setMode('mesh picking');
+    } else if (keynum == 221){ // 
+    	view.setMode('bone picking');
+    }
+
     var letter = String.fromCharCode(keynum);
 
     if (letter == 'Q' || letter == 'q'){
     	view.toggleSelectBoneMode();
-    } else if (letter == 'P' || letter == 'p'){
-    	view.togglePickingScene();
+    } else if (letter == 'M' || letter == 'm'){
+    	view.setMode('mesh');
     } else if (letter == 'R' || letter == 'r'){
     	view.startBoneRotate();
     } else if (letter == 'G' || letter == 'g'){
@@ -1054,7 +1068,7 @@ function onKeyDown(event){
     	view.startBoneScale();
     } else if ('XxYyZz'.indexOf(letter) != -1){
     	view.setEditAxis(letter);
-    } else if (letter == "p" || letter == "P"){
+    } else if (letter == "h" || letter == "H"){
     	//TODO: Make this update the photo_render
     	var dataUrl =  window.view.renderer.domElement.toDataURL("image/png");
     	console.log(dataUrl);
