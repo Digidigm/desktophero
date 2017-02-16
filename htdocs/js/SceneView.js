@@ -22,7 +22,6 @@ function SceneView(model){
 	this.skeletonHelpers = [];
 
 	this.boneHandles = [];
-	this.selectBoneMode = false;
 	this.selectedBone;
 	this.editMode = 'none';
 	this.rotationBoneOrigin;
@@ -86,6 +85,7 @@ SceneView.prototype = {
 
 		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
 		this.model.materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, this.cubeMap);
+		this.model.materials.selected_orange = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, this.cubeMap);
 		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 
@@ -185,7 +185,7 @@ SceneView.prototype = {
 		this.render();
 		if (this.mode == 'mesh picking'){
 			this.renderer.render(this.meshPickingView.scene, this.camera);
-		} else if (this.mode == 'mesh') {
+		} else if (this.mode == 'mesh' || this.mode == 'bone' || this.mode == 'pose') {
 			this.renderer.render(this.scene, this.camera);
 		}
 	},
@@ -276,7 +276,7 @@ SceneView.prototype = {
 			boneHandle.includeInExport = false;
 			this.boneHandles.push(boneHandle);
 
-			boneHandle.visible = this.selectBoneMode;
+			boneHandle.visible = (this.mode == 'pose');
 			this.scene.add(boneHandle);
 		}
 
@@ -351,7 +351,7 @@ SceneView.prototype = {
 		var skeletonHelper = new THREE.SkeletonHelper(mesh);
 		skeletonHelper.material.linewidth = 4;
 		skeletonHelper.meshId = meshId;
-		skeletonHelper.visible = this.selectBoneMode;
+		skeletonHelper.visible = (this.mode == 'pose');
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
@@ -418,20 +418,23 @@ SceneView.prototype = {
 		poseNameLabel.innerText = 'Current Pose: ' + poseName;
 	},
 
-	toggleSelectBoneMode: function(){
-		this.selectBoneMode = !this.selectBoneMode;
-		for (var i = 0; i < this.boneHandles.length; i++){
-			this.boneHandles[i].visible = this.selectBoneMode;
-		}
-		for (var i = 0; i < this.skeletonHelpers.length; i++){
-			this.skeletonHelpers[i].visible = this.selectBoneMode;
-		}
-		this.selectMesh(null);
-	},
-
 	setMode: function(mode){
 		console.log("Setting mode to " + mode);
 		this.mode = mode;
+
+
+		// Hide/show bone handles
+		var showBoneHandles = (mode == 'pose');
+		for (var i = 0; i < this.boneHandles.length; i++){
+			this.boneHandles[i].visible = showBoneHandles;
+		}
+		for (var i = 0; i < this.skeletonHelpers.length; i++){
+			this.skeletonHelpers[i].visible = showBoneHandles;
+		}
+		
+		if (mode != 'mesh'){
+			this.selectMesh(null);
+		}
 	},
 
 	startBoneRotate: function(){
@@ -573,7 +576,7 @@ SceneView.prototype = {
 	},
 
 	onRightClick: function(mouseX, mouseY){
-		if (this.selectBoneMode){
+		if (this.mode == 'pose'){
 			var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
 			console.log(clickVector);
 			this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
@@ -1055,9 +1058,11 @@ function onKeyDown(event){
     var letter = String.fromCharCode(keynum);
 
     if (letter == 'Q' || letter == 'q'){
-    	view.toggleSelectBoneMode();
+    	view.setMode('pose');
     } else if (letter == 'M' || letter == 'm'){
     	view.setMode('mesh');
+    } else if (letter == 'B' || letter == 'b'){
+    	view.setMode('bone');
     } else if (letter == 'R' || letter == 'r'){
     	view.startBoneRotate();
     } else if (letter == 'G' || letter == 'g'){
