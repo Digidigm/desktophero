@@ -1,4 +1,6 @@
-function PickingView(){
+function PickingView(model){
+	this.model = model;
+
 	this.scene = new THREE.Scene();
 	this.colorIdMap = {};
 
@@ -8,6 +10,8 @@ function PickingView(){
 	this.pickingTexture.texture.minFilter = THREE.LinearFilter;
 
 	this.meshIdMap = {};
+
+	this.addModelListeners();
 }
 
 PickingView.prototype = {
@@ -22,6 +26,22 @@ PickingView.prototype = {
 	}, 
 
 	addMesh: function(mesh, boneGroup){
+		
+	},
+
+	addModelListeners: function(){
+		this.model.character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
+	},
+
+	onBoneGroupAdded: function(character, boneGroupUid){
+		var boneGroup = character.boneGroups.get(boneGroupUid);
+		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
+	},
+
+	onMeshAdded: function(boneGroup, meshId){
+		var mesh = this.model.character.getMesh(meshId)[1];
+
 		function applyVertexColors( g, c ) {
 			g.faces.forEach( function( f ) {
 				var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
@@ -44,6 +64,7 @@ PickingView.prototype = {
 		}
 
 		var pickingMesh = mesh.clone(); //new THREE.SkinnedMesh(pickingGeometry, pickingMaterial);
+		pickingMesh.uid = meshId;
 		pickingMesh.material = pickingMesh.material.clone();
 		pickingMesh.material.materials = [PickingView.pickingMaterial];
 		
@@ -52,7 +73,30 @@ PickingView.prototype = {
 
 		this.meshIdMap[id] = mesh.uid;
 		this.scene.add(pickingMesh);
+	},
+
+	onMeshRemoved: function(boneGroup, meshId){
+		// Remove mesh from scene
+		var toRemove = [];
+		for (var i in this.scene.children){
+			var sceneElement = this.scene.children[i];
+			if (sceneElement.uid == meshId){
+				toRemove.push(sceneElement);
+			}
+		}
+		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
+			var element = toRemove[i];
+			this.scene.remove(element);
+		}
+
+		// Remove mesh from meshIdMap
+		delete this.meshIdMap[meshId];
 	}
+
+	// TODO: finish adding model listeners. Meshes need to be removed from
+	// the picking view when they are removed from the regular view. New
+	// meshes coming in need to be given a color rather than using default
+	// material.
 }
 
 // Class properties/functions

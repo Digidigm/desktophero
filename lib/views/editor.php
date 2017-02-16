@@ -521,15 +521,14 @@ $(document).ready( function(){
 		var mid = $(this).data("mesh-id");
 		var library = $(this).data("mesh-library");
 		var meshName = $(this).data("mesh-mesh-name");
-		if (view.selectedBoneGroupUid !== null){
-			if (view.selectedMesh == null){ // Add mesh
-				model.addMesh(view.selectedBoneGroupUid, library, meshName);
-				view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
-			} else {
-				model.removeMesh(view.selectedBoneGroupUid, view.selectedMesh.uid);
-				model.addMesh(view.selectedBoneGroupUid, library, meshName);
-				view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
-			}
+		if (view.selectedMesh == null){ // Add mesh
+			model.addMesh(view.selectedBoneGroupUid, library, meshName);
+			view.selectMeshFuture(view.selectedBoneGroupUid, meshName);
+		} else {
+			var boneGroupUid = view.selectedMesh.boneGroupUid;
+			model.removeMesh(view.selectedMesh.uid);
+			model.addMesh(boneGroupUid, library, meshName);
+			view.selectMeshFuture(boneGroupUid, meshName);
 		}
 	});
 

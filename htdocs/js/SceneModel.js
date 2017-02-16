@@ -84,12 +84,14 @@ SceneModel.prototype = {
 		});
 	},
 
-	removeMesh(boneGroupUid, meshName){
-		var boneGroup = this.character.boneGroups.get(boneGroupUid);
-		boneGroup.removeMesh(meshName);
-
-		// Remove entry under meshes tab.
-
+	removeMesh(meshId){
+		var boneGroups = this.character.boneGroups;
+		for (var boneGroupUid in boneGroups.dict){
+			var boneGroup = this.character.boneGroups.get(boneGroupUid);
+			if (meshId in boneGroup.meshes.dict){
+				boneGroup.removeMesh(meshId);
+			}
+		}
 	},
 
 	getAvailablePoses: function(){

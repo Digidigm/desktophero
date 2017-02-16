@@ -22,7 +22,7 @@ function SceneView(model){
 	this.skeletonHelpers = [];
 
 	this.boneHandles = [];
-	this.boneHandlesVisible = false;
+	this.selectBoneMode = false;
 	this.selectedBone;
 	this.editMode = 'none';
 	this.rotationBoneOrigin;
@@ -31,6 +31,7 @@ function SceneView(model){
 
 	this.mouseX;
 	this.mouseY;
+	this.rightMouseDownXY;
 
 	this.raycaster = new THREE.Raycaster();
 
@@ -39,9 +40,8 @@ function SceneView(model){
 	this.Z_AXIS = new THREE.Vector3(0,0,1);
 
 	this.boneAxisHelper;
-	this.selectedBoneGroupUid = null;
 
-	this.meshPickingView = new PickingView();
+	this.meshPickingView = new PickingView(model);
 	this.viewPickingScene = false;
 
 	this.addModelListeners();
@@ -275,7 +275,7 @@ SceneView.prototype = {
 			boneHandle.includeInExport = false;
 			this.boneHandles.push(boneHandle);
 
-			boneHandle.visible = this.boneHandlesVisible;
+			boneHandle.visible = this.selectBoneMode;
 			this.scene.add(boneHandle);
 		}
 
@@ -350,7 +350,7 @@ SceneView.prototype = {
 		var skeletonHelper = new THREE.SkeletonHelper(mesh);
 		skeletonHelper.material.linewidth = 4;
 		skeletonHelper.meshId = meshId;
-		skeletonHelper.visible = this.boneHandlesVisible;
+		skeletonHelper.visible = this.selectBoneMode;
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
@@ -419,14 +419,15 @@ SceneView.prototype = {
 		poseNameLabel.innerText = 'Current Pose: ' + poseName;
 	},
 
-	toggleBoneHandlesVisible: function(){
-		this.boneHandlesVisible = !this.boneHandlesVisible;
+	toggleSelectBoneMode: function(){
+		this.selectBoneMode = !this.selectBoneMode;
 		for (var i = 0; i < this.boneHandles.length; i++){
-			this.boneHandles[i].visible = this.boneHandlesVisible;
+			this.boneHandles[i].visible = this.selectBoneMode;
 		}
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
-			this.skeletonHelpers[i].visible = this.boneHandlesVisible;
+			this.skeletonHelpers[i].visible = this.selectBoneMode;
 		}
+		this.selectMesh(null);
 	},
 
 	togglePickingScene: function(){
@@ -538,33 +539,19 @@ SceneView.prototype = {
 		return vector;
 	},
 
-	onLeftClick: function(mouseX, mouseY){
+	onLeftMouseDown: function(mouseX, mouseY){
 		if (this.editMode !== 'none'){
 			this.finalizeEdit();
 			return;
 		}
-
-		var pickingTexture = this.meshPickingView.pickingTexture;
-		this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
-		var pixelBuffer = new Uint8Array(4);
-		this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
-		
-		// Create id from RGB values
-		var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-		var meshId = this.meshPickingView.meshIdMap[colorId];
-		console.log("Clicked " + meshId);
-		var meshResult = model.character.getMesh(meshId);
-		if (meshResult != null){
-			boneGroupUid = meshResult[0];
-			mesh = meshResult[1];
-			this.selectMesh(mesh);
-			this.libraryClearMeshes();
-			this.libraryPopulateMeshes(boneGroupUid);
-			this.showLibrary('mesh');
-		}
 	},
 
-	onRightClick: function(mouseX, mouseY){
+	onLeftMouseUp: function(mouseX, mouseY){
+
+	},
+
+	onRightMouseDown: function(mouseX, mouseY){
+		this.rightMouseDownXY = [mouseX, mouseY];
 		this.selectMesh(null);
 
 		if (this.editMode === 'rotate'){
@@ -577,42 +564,72 @@ SceneView.prototype = {
 			this.cancelBoneScale();
 			return;
 		}
+	},
 
-		var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
-		console.log(clickVector);
-		this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
-
-		var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
-		var closestBone = null, closestDistance = null;
-		for (var i = 0; i < intersections.length; i++){
-			var boneHandle = intersections[i].object;
-			var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
-			var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
-			if (bone.name.startsWith("#")){
-				continue;
-			}
-			if (closestBone === null || intersections[i].distance < closestDistance){
-				closestBone = bone;
-				closestDistance = intersections[i].distance;
-			}
-		}
-		this.selectedBone = closestBone;
-
-		if (closestBone == null){
-			this.boneAxisHelper.visible = false;
-		} else {
-			this.boneAxisHelper.visible = true;
-			console.log("Clicked on " + this.selectedBone.name);
-			console.log(closestBone);
-
-			var globalBonePosition = new THREE.Vector3()
-			this.scene.updateMatrixWorld();
-			globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
-			this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
+	onRightMouseUp: function(mouseX, mouseY){
+		if (mouseX == this.rightMouseDownXY[0] && mouseY == this.rightMouseDownXY[1]){
+			this.onRightClick(mouseX, mouseY);
 		}
 	},
 
-	onMiddleClick: function(mouseX, mouseY, event){
+	onRightClick: function(mouseX, mouseY){
+		if (this.selectBoneMode){
+			var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
+			console.log(clickVector);
+			this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
+
+			var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
+			var closestBone = null, closestDistance = null;
+			for (var i = 0; i < intersections.length; i++){
+				var boneHandle = intersections[i].object;
+				var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
+				var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
+				if (bone.name.startsWith("#")){
+					continue;
+				}
+				if (closestBone === null || intersections[i].distance < closestDistance){
+					closestBone = bone;
+					closestDistance = intersections[i].distance;
+				}
+			}
+			this.selectedBone = closestBone;
+
+			if (closestBone == null){
+				this.boneAxisHelper.visible = false;
+			} else {
+				this.boneAxisHelper.visible = true;
+				console.log("Clicked on " + this.selectedBone.name);
+				console.log(closestBone);
+
+				var globalBonePosition = new THREE.Vector3()
+				this.scene.updateMatrixWorld();
+				globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
+				this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
+			}
+		} else {
+			// Select mesh mode
+			var pickingTexture = this.meshPickingView.pickingTexture;
+			this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
+			var pixelBuffer = new Uint8Array(4);
+			this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+			
+			// Create id from RGB values
+			var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+			var meshId = this.meshPickingView.meshIdMap[colorId];
+			console.log("Clicked " + meshId);
+			var meshResult = model.character.getMesh(meshId);
+			if (meshResult !== null){
+				boneGroupUid = meshResult[0];
+				mesh = meshResult[1];
+				this.selectMesh(mesh);
+				this.libraryClearMeshes();
+				this.libraryPopulateMeshes(boneGroupUid);
+				this.showLibrary('mesh');
+			}
+		}
+	},
+
+	onMiddleMouseDown: function(mouseX, mouseY, event){
 		console.log("Middle click");
 	},
 
@@ -984,11 +1001,21 @@ function onMouseDown(event){
 	}*/
 
 	if (event.button === 0){
-		view.onLeftClick(event.clientX, event.clientY, event);
+		view.onLeftMouseDown(event.clientX, event.clientY, event);
 	} else if (event.button == 1){
-		view.onMiddleClick(event.clientX, event.clientY, event);
+		view.onMiddleMouseDown(event.clientX, event.clientY, event);
 	} else if (event.button == 2){
-		view.onRightClick(event.clientX, event.clientY, event);
+		view.onRightMouseDown(event.clientX, event.clientY, event);
+	}
+}
+
+function onMouseUp(event){
+	if (event.button === 0){
+		view.onLeftMouseUp(event.clientX, event.clientY, event);
+	} else if (event.button == 1){
+		// Middle click
+	} else if (event.button == 2){
+		view.onRightMouseUp(event.clientX, event.clientY, event);
 	}
 }
 
@@ -1016,7 +1043,7 @@ function onKeyDown(event){
     var letter = String.fromCharCode(keynum);
 
     if (letter == 'Q' || letter == 'q'){
-    	view.toggleBoneHandlesVisible();
+    	view.toggleSelectBoneMode();
     } else if (letter == 'P' || letter == 'p'){
     	view.togglePickingScene();
     } else if (letter == 'R' || letter == 'r'){
@@ -1035,5 +1062,6 @@ function onKeyDown(event){
 }
 
 document.addEventListener('mousedown', onMouseDown, false);
+document.addEventListener('mouseup', onMouseUp, false);
 document.onmousemove = onMouseMove;
 document.addEventListener('keydown', onKeyDown, false);
