@@ -25,10 +25,6 @@ PickingView.prototype = {
 		return randomColor;
 	}, 
 
-	addMesh: function(mesh, boneGroup){
-		
-	},
-
 	addModelListeners: function(){
 		this.model.character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
 	},

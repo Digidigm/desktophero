@@ -255,7 +255,7 @@ SceneView.prototype = {
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
-		console.log("Bone group added!");
+		console.log("`group added!");
 		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
@@ -366,8 +366,6 @@ SceneView.prototype = {
 			this.selectMesh(mesh);
 			this.futureMeshToSelect = null;
 		}
-
-		this.meshPickingView.addMesh(mesh, boneGroup);
 	},
 
 	onMeshRemoved: function(boneGroup, meshId){
@@ -1051,7 +1049,7 @@ function onKeyDown(event){
     } else if (keynum == 219){ // 
 		view.setMode('mesh picking');
     } else if (keynum == 221){ // 
-    	view.setMode('bone picking');
+
     }
 
     var letter = String.fromCharCode(keynum);
