@@ -1097,7 +1097,7 @@ function onKeyDown(event){
 
     var letter = String.fromCharCode(keynum);
 
-    if (letter == 'Q' || letter == 'q'){
+    if (letter == 'P' || letter == 'p'){
     	view.setMode('pose');
     } else if (letter == 'M' || letter == 'm'){
     	view.setMode('mesh');
