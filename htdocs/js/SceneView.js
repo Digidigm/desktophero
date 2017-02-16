@@ -85,7 +85,7 @@ SceneView.prototype = {
 
 		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
 		this.model.materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, this.cubeMap);
-		this.model.materials.selected_orange = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, this.cubeMap);
+		this.model.materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, this.cubeMap);
 		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
 		this.model.materials.default = this.model.materials.metallic;
 
@@ -220,6 +220,27 @@ SceneView.prototype = {
 			this.hideLibraries();
 		} else {
 			this.selectedMesh.material = model.materials['selected'];
+		}
+	},
+
+	selectBoneGroup: function(boneGroup){
+		// reset previously selected bone group to normal material
+		if (this.selectedBoneGroup != null){
+			for (var meshId in this.selectedBoneGroup.meshes.dict){
+				var mesh = this.selectedBoneGroup.meshes.get(meshId);
+				mesh.material = model.materials['default'];
+			}
+		}
+		
+		this.selectedBoneGroup = boneGroup;
+
+		if (this.selectedBoneGroup == null){
+			// hide options 
+		} else {
+			for (var meshId in this.selectedBoneGroup.meshes.dict){
+				var mesh = this.selectedBoneGroup.meshes.get(meshId);
+				mesh.material = model.materials['boneGroupSelected'];
+			}
 		}
 	},
 
@@ -435,6 +456,10 @@ SceneView.prototype = {
 		if (mode != 'mesh'){
 			this.selectMesh(null);
 		}
+
+		if (mode != 'bone'){
+			this.selectBoneGroup(null);
+		}
 	},
 
 	startBoneRotate: function(){
@@ -609,8 +634,7 @@ SceneView.prototype = {
 				globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
 				this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
 			}
-		} else {
-			// Select mesh mode
+		} else if (this.mode == 'mesh'){
 			var pickingTexture = this.meshPickingView.pickingTexture;
 			this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
 			var pixelBuffer = new Uint8Array(4);
@@ -628,6 +652,22 @@ SceneView.prototype = {
 				this.libraryClearMeshes();
 				this.libraryPopulateMeshes(boneGroupUid);
 				this.showLibrary('mesh');
+			}
+		} else if (this.mode == 'bone'){
+			var pickingTexture = this.meshPickingView.pickingTexture;
+			this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
+			var pixelBuffer = new Uint8Array(4);
+			this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+			
+			// Create id from RGB values
+			var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+			var meshId = this.meshPickingView.meshIdMap[colorId];
+			console.log("Clicked " + meshId);
+			var meshResult = model.character.getMesh(meshId);
+			if (meshResult !== null){
+				boneGroupUid = meshResult[0];
+				var boneGroup = this.model.character.boneGroups.get(boneGroupUid);
+				this.selectBoneGroup(boneGroup);
 			}
 		}
 	},
