@@ -273,6 +273,11 @@ SceneView.prototype = {
 				var mesh = this.selectedBoneGroup.meshes.get(meshId);
 				mesh.material = model.materials['boneGroupSelected'];
 			}
+
+			// Update info panel
+			document.getElementById("bone-info-name").innerText = this.selectedBoneGroup.name;
+			var attachedToName = model.character.boneGroups.get(this.selectedBoneGroup.parentBoneGroupUid).name;
+			document.getElementById("bone-info-attached-to").innerText = attachedToName;
 			this.showInfoPanel('bone');
 		}
 	},
