@@ -463,20 +463,15 @@ $(document).ready( function(){
 	};
 
 	clickedMeshTab = function(){
-		view.hideLibrary('pose');
-		view.hideLibrary('bone');
+		view.setMode('mesh');
 	};
 
 	clickedPoseTab = function(){
-		view.hideLibrary('mesh');
-		view.hideLibrary('bone');
-		view.selectMesh(null);
+		view.setMode('pose');
 	};
 
 	clickedBoneGroupsTab = function(){
-		view.hideLibrary('pose');
-		view.hideLibrary('mesh');
-		view.selectMesh(null);
+		view.setMode('bone');
 	};
 
 	clickedSettingsTab = function(){
@@ -649,160 +644,47 @@ $(document).ready( function(){
 			uilog(type + " Uploaded: " + original.name + " [" + original.size +"bytes]");
 		}
 	});
+
+	
 });
 </script>
 
-<div id="body-accordion-container" class="col-md-3">
-	<h2 class="text-white"> Figure Setup </h2>
-	<div class="panel with-nav-tabs panel-primary">
-		<div class="panel-heading">
-				<ul class="nav nav-tabs">
-					<li class="nav-item"><a href="#tab1primary" class="nav-link active" data-toggle="tab" onclick="clickedMeshTab()">Meshes</a></li>
-					<li class="nav-item"><a href="#tab2primary" class="nav-link" data-toggle="tab" onclick="clickedPoseTab()">Pose</a></li>
-					<li class="nav-item"><a href="#tab3primary" class="nav-link" data-toggle="tab" onclick="clickedBoneGroupsTab()">Bone Groups</a></li>
-					<li class="nav-item"><a href="#tab4primary" class="nav-link" data-toggle="tab" onclick="clickedSettingsTab()"><span class="icon-thunderbolt"></span></a></li>
-					<!--TODO: Figure out what the COG icon is -->
-				</ul>
-		</div>
-		<div class="panel-body">
-			<div class="tab-content">
-				<div class="tab-pane in active" id="tab1primary">
-					<div id="body-accordion" role="tablist" aria-multiselectable="true">
-						<!-- Will be populated by SceneView.js -->
-					</div>
-				</div>
-				<div class="tab-pane" id="tab2primary">
-					<div id="pose-accordion" role="tablist" aria-multiselectable="true">
-						<!-- Global Poses category -->
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="pose-tab-global-poses">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#pose-accordion" href="#pose-tab-global-poses-data" aria-expanded="false" aria-controls="pose-tab-global-poses-data"> Pose </a>
-								</h5>
-							</div>
-							<div id="pose-tab-global-poses-data" class="collapse scroll" role="tabpanel" aria-labelledby="pose-tab-global-poses">
-								<div class="card-block">
-									<label id=current-pose-label>Current Pose: None</label>
-									<button type="button" class="btn btn-secondary btn-sm" onclick="setGlobalPose()">Set Pose</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="tab-pane" id="tab3primary">
-					<div id="bones-accordion" role="tablist" aria-multiselectable="true">
-						<!-- Will be populated by SceneView.js -->
-						<button class="btn btn-secondary btn-sm" type="button" onclick="addBoneGroup()">Add Bone Group</button>
-					</div>
-				</div>
-				<div class="tab-pane" id="tab4primary">
-					<div id="settings-accordion" role="tablist" aria-multiselectable="true">
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="settings-genre">
-								<h5>
-									<a data-toggle="collapse" data-parent="#settings-accordion-settings" href="#settings-genre-data" aria-expanded="false" aria-controls="settings-genre-data"> Genre </a>
-								</h5>
-							</div>
-							<div id="settings-genre-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-genre">
-								<div class="card-block">
-									This is Genre
-									<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#settings-genre-data"); -->
-								</div>
-							</div>
-						</div>
 
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="settings-options">
-								<h5>
-									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-options-data" aria-expanded="false" aria-controls="settings-options-data"> Options </a>
-								</h5>
-							</div>
-							<div id="settings-options-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-options">
-								<div class="card-block">
-									<ul>
-										<li>Left Handed</li>
-										<li>Right Handed</li>
-										<li>Ambidexterous</li>
-										<li>Male</li>
-										<li>Female</li>
-										<li>Androgenous</li>
-										<li>Thing</li>
-										<li>Otherthing</li>
-									</ul>
-									<!--Filled by AJAX: getSimpleItems("/api/v1/tags/by/genre","#settings-genre-data"); -->
-								</div>
-							</div>
-						</div>
+<li ></li>
 
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="settings-characteristics">
-								<h5>
-									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-characteristics-data" aria-expanded="true" aria-controls="settings-characteristics-data"> Figure Characteristics </a>
-								</h5>
-							</div>
-							<div id="settings-characteristics-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-characteristics">
-								<div class="card-block">
-									This is Figu re Characteristics
-									<!--Filled by AJAX: getcharacteristics(); -->
-								</div>
-							</div>
-						</div>
+<div id="body-accordion-container" class="col-md-5">
+	<div class="btn-group" data-toggle="buttons" id="mode-options" mesh="mode-options">
+	  <label class="btn btn-primary nav-link mesh-btn active">
+	    <input type="radio" name="options" id="option1" autocomplete="off" checked onclick="clickedMeshTab()"> Mesh
+	  </label>
+	  <label class="btn btn-primary bone-btn">
+	    <input type="radio" name="options" id="option2" autocomplete="off" onclick="clickedBoneGroupsTab()">  Bone Groups
+	  </label>
+	  <label class="btn btn-primary pose-btn">
+	    <input type="radio" name="options" id="option3" autocomplete="off" onclick="clickedPoseTab()"> Pose
+	  </label>
+	</div>
 
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="settings-presets">
-								<h5>
-									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-presets-data" aria-expanded="true" aria-controls="settings-presets-data"> Presets </a>
-								</h5>
-							</div>
-							<div id="settings-presets-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-presets">
-								<div class="card-block">
-									This is Presets
-									<!--Filled by AJAX: getPresets(); -->
-								</div>
-							</div>
-						</div>
+	<div class="mesh-info" id="mesh-info">
+		<br>
+		<h3><label id="mesh-info-name">Mesh Name</label></h3>
+		<label id="mesh-info-blurb">Here's some great text about the mesh.</label>
+		<br>
+		<label id="mesh-info-author">Author: stuff</label>
+		<br>
+		<br>
+		<label>Attached to:&nbsp;</label><label id="mesh-info-attached-to">stuff</label>
+		<br>
+		<br>
 
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="settings-story">
-								<h5>
-									<a data-toggle="collapse" data-parent="#settings-accordion" href="#settings-story-data" aria-expanded="true" aria-controls="settings-story-data"> Story </a>
-								</h5>
-							</div>
-							<div id="settings-story-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-story">
-								<div class="card-block">
-									<label>Describe Your Character</label>
-									<textarea name="figure_description" data-object="figure" data-bind="figure_description"></textarea>
-
-									<label>Tell Their Story</label>
-									<textarea name="figure_story" data-object="figure" data-bind="figure_story"></textarea>
-									
-									<label>Inspiration Photo</label>
-									<form enctype='multipart/form-data' id='inspiration-upload' data-folder="inspiration" data-upload="image" data-for="photo_inspiration">
-										<input type="file" name="file" multiple>
-									</form>
-
-									<img data-photo='photo_inspiration' class='figure-photo'>
-								</div>
-							</div>
-						</div>
-
-
-						<div class="panel card clearfix">
-							<div class="card-header" role="tab" id="settings-print">
-								<h5>
-									<a class="collapsed" data-toggle="collapse" data-parent="#settings-accordion" href="#settings-print-data" aria-expanded="false" aria-controls="settings-print-data"> Size, Print, Material </a>
-								</h5>
-							</div>
-							<div id="settings-print-data" class="collapse scroll" role="tabpanel" aria-labelledby="settings-print">
-								<div class="card-block">
-									Size, Print, Material
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="view.onDeletePressed()">Delete</button>
+		</span>
+		<br>
+		<br>
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="view.clickedAddMesh()">Add Mesh</button>
+		</span>
 	</div>
 </div>
 

@@ -95,7 +95,7 @@ SceneView.prototype = {
 
 		this.initLights();
 
-		this.populateTabs();
+		//this.populateTabs();
 		this.libraryPopulatePoses();
 		this.libraryPopulateBoneGroups();
 
@@ -221,6 +221,21 @@ SceneView.prototype = {
 		} else {
 			this.selectedMesh.material = model.materials['selected'];
 		}
+
+		if (this.selectedMesh == null){
+			// Update mesh info label
+			var meshInfoPanel = document.getElementById("mesh-info");
+			meshInfoPanel.hidden = true;
+		} else {
+			// Update mesh info label
+			var meshInfoPanel = document.getElementById("mesh-info");
+			meshInfoPanel.hidden = false;
+
+			document.getElementById("mesh-info-name").innerText = this.selectedMesh.name;
+			var boneGroupName = model.character.boneGroups.get(mesh.boneGroupUid).name;
+			document.getElementById("mesh-info-attached-to").innerText = boneGroupName;
+		}
+		
 	},
 
 	selectBoneGroup: function(boneGroup){
@@ -301,14 +316,14 @@ SceneView.prototype = {
 			this.scene.add(boneHandle);
 		}
 
-		this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
+		//this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
 		//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
-		this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
+		//this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
 
-		for (var meshId in boneGroup.meshes.dict){
+		/*for (var meshId in boneGroup.meshes.dict){
 			//TODO: add icon as well.
 			this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
-		}
+		}*/
 	},
 
 	onBoneGroupRemoved: function(character, boneGroupUid){
@@ -350,10 +365,10 @@ SceneView.prototype = {
 	},
 
 	onBoneGroupAttached: function(boneGroup, attachedToUid){
-		var boneGroupAttachedTo = model.character.boneGroups.get(attachedToUid);
+		/*var boneGroupAttachedTo = model.character.boneGroups.get(attachedToUid);
 		var labelId = boneGroup.uid + "-bone-attach-label";
 		var label = document.getElementById(labelId);
-		label.innerText = 'Attached to: ' + boneGroupAttachedTo.name;
+		label.innerText = 'Attached to: ' + boneGroupAttachedTo.name;*/
 	},
 
 	onBoneGroupUnattached: function(boneGroup){
@@ -378,7 +393,7 @@ SceneView.prototype = {
 
 		this.meshes.push(mesh);
 
-		this.meshesTabAddMesh(boneGroup.uid, meshId, "stuff.png");
+		//this.meshesTabAddMesh(boneGroup.uid, meshId, "stuff.png");
 
 		// Are we waiting for this mesh to be loaded so we can select it?
 		if (this.futureMeshToSelect !== null &&
@@ -431,7 +446,7 @@ SceneView.prototype = {
 			this.skeletonHelpers.splice(index, 1);
 		}
 
-		this.meshesTabRemoveMesh(boneGroup.uid, meshId);
+		//this.meshesTabRemoveMesh(boneGroup.uid, meshId);
 	},
 
 	onPoseChanged: function(character, poseName){
@@ -580,7 +595,6 @@ SceneView.prototype = {
 
 	onRightMouseDown: function(mouseX, mouseY){
 		this.rightMouseDownXY = [mouseX, mouseY];
-		this.selectMesh(null);
 
 		if (this.editMode === 'rotate'){
 			this.cancelBoneRotate();
@@ -645,7 +659,9 @@ SceneView.prototype = {
 			var meshId = this.meshPickingView.meshIdMap[colorId];
 			console.log("Clicked " + meshId);
 			var meshResult = model.character.getMesh(meshId);
-			if (meshResult !== null){
+			if (meshResult == null){
+				this.selectMesh(null);
+			} else {
 				boneGroupUid = meshResult[0];
 				mesh = meshResult[1];
 				this.selectMesh(mesh);
@@ -757,7 +773,22 @@ SceneView.prototype = {
 	},
 
 	onDeletePressed: function(){
-		this.model.removeMesh(this.selectedMesh.uid);
+		if (this.mode == 'mesh'){
+			this.model.removeMesh(this.selectedMesh.uid);
+		} else if (this.mode == 'bone'){
+			this.model.removeBoneGroup(this.selectedBoneGroup.uid);
+		}
+		this.selectMesh(null);
+	},
+
+	clickedAddMesh: function(){
+		var boneGroup = this.model.character.boneGroups.get(this.selectedMesh.boneGroupUid);
+		model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+		this.selectMeshFuture(boneGroup.uid, "box");
+
+		this.libraryClearMeshes();
+		this.libraryPopulateMeshes(boneGroup.uid);
+		this.showLibrary('mesh');
 	},
 
 	populateTabs: function(){
@@ -768,7 +799,7 @@ SceneView.prototype = {
 			//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
 
 			for (var meshId in boneGroup.meshes.dict){
-				//TODO: add icon as well.
+				//TODO: add icon as well.b
 				this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
 			}
 		}
