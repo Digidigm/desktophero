@@ -224,18 +224,35 @@ SceneView.prototype = {
 
 		if (this.selectedMesh == null){
 			// Update mesh info label
-			var meshInfoPanel = document.getElementById("mesh-info");
-			meshInfoPanel.hidden = true;
+			this.hideInfoPanel();
 		} else {
 			// Update mesh info label
-			var meshInfoPanel = document.getElementById("mesh-info");
-			meshInfoPanel.hidden = false;
+			this.showInfoPanel('mesh');
 
 			document.getElementById("mesh-info-name").innerText = this.selectedMesh.name;
 			var boneGroupName = model.character.boneGroups.get(mesh.boneGroupUid).name;
 			document.getElementById("mesh-info-attached-to").innerText = boneGroupName;
 		}
 		
+	},
+
+	showInfoPanel: function(panelName){
+		this.hideInfoPanel();
+
+		if (panelName == 'mesh'){
+			var meshInfoPanel = document.getElementById("mesh-info");
+			meshInfoPanel.hidden = false;
+		} else if (panelName == 'bone'){
+			var boneInfoPanel = document.getElementById("bone-info");
+			boneInfoPanel.hidden = false;
+		}
+	},
+
+	hideInfoPanel: function(){
+		var meshInfoPanel = document.getElementById("mesh-info");
+		meshInfoPanel.hidden = true;
+		var boneInfoPanel = document.getElementById("bone-info");
+		boneInfoPanel.hidden = true;
 	},
 
 	selectBoneGroup: function(boneGroup){
@@ -250,12 +267,13 @@ SceneView.prototype = {
 		this.selectedBoneGroup = boneGroup;
 
 		if (this.selectedBoneGroup == null){
-			// hide options 
+			this.hideInfoPanel();
 		} else {
 			for (var meshId in this.selectedBoneGroup.meshes.dict){
 				var mesh = this.selectedBoneGroup.meshes.get(meshId);
 				mesh.material = model.materials['boneGroupSelected'];
 			}
+			this.showInfoPanel('bone');
 		}
 	},
 
@@ -680,7 +698,9 @@ SceneView.prototype = {
 			var meshId = this.meshPickingView.meshIdMap[colorId];
 			console.log("Clicked " + meshId);
 			var meshResult = model.character.getMesh(meshId);
-			if (meshResult !== null){
+			if (meshResult == null){
+				this.selectBoneGroup(null);
+			} else {
 				boneGroupUid = meshResult[0];
 				var boneGroup = this.model.character.boneGroups.get(boneGroupUid);
 				this.selectBoneGroup(boneGroup);

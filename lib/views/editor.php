@@ -686,6 +686,28 @@ $(document).ready( function(){
 			<button class="btn btn-primary" type="button" onclick="view.clickedAddMesh()">Add Mesh</button>
 		</span>
 	</div>
+
+	<div class="bone-info" id="bone-info">
+		<br>
+		<h3><label id="bone-info-name">Bone Group Name</label></h3>
+		<label id="bone-info-blurb">Here's a blurb about the bone group.</label>
+		<br>
+		<label id="bone-info-author">Author: stuff</label>
+		<br>
+		<br>
+		<label>Attached to:&nbsp;</label><label id="bone-info-attached-to">stuff</label>
+		<br>
+		<br>
+
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="view.onDeletePressed()">Delete</button>
+		</span>
+		<br>
+		<br>
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="view.clickedAttachBoneGroupTo()">Attach to...</button>
+		</span>
+	</div>
 </div>
 
 

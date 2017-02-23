@@ -31,7 +31,7 @@
   border-color: #285e8e;
 }
 
-.mesh-info {
+.mesh-info, .bone-info {
 	color: #ffffff;
 	font-size: 120%;
 	text-align: center;
