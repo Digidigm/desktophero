@@ -364,8 +364,6 @@ $(document).ready( function(){
 
 	//Create a running narrative of what's happening for users in the UI console
 	clearuilog();
-	uilog( "User ID is: " + user.id);
-	uilog( "Figure ID is: " + figure.id);
 
 	//now tha all the HTML is present, make sure to refresh the UI
 	figure.refreshUI();
@@ -458,6 +456,7 @@ $(document).ready( function(){
 	};
 
 	clickedAddBoneGroup = function(){
+		view.selectBoneGroup(null);
 		view.showLibrary('bone');
 	};
 
@@ -539,13 +538,13 @@ $(document).ready( function(){
 		var mid = $(this).data("bone-id");
 		var library = $(this).data("bone-library");
 		var boneGroupName = $(this).data("bone-bone-name").replaceAll('_', ' ');
-		model.addBoneGroup(library, boneGroupName);
-		
 		view.hideLibrary('bone');
 
 		showAttachBoneGroupDialog(
 			function(toBoneGroupUid, attachPoint){
 				view.attachBoneGroupFuture(boneGroupName, toBoneGroupUid, attachPoint);
+				view.addDefaultMeshFuture(boneGroupName);
+				model.addBoneGroup(library, boneGroupName);
 			});
 		
 	});

@@ -20,6 +20,7 @@ function SceneView(model){
 
 	this.futureMeshToSelect = null;
 	this.futureBoneGroupToAttach = null;
+	this.futureBoneGroupAddDefaultMesh = null;
 
 	this.skeletonHelpers = [];
 
@@ -325,6 +326,10 @@ SceneView.prototype = {
 		this.futureBoneGroupToAttach = [boneGroupName, toBoneGroupUid, attachPoint];
 	},
 
+	addDefaultMeshFuture: function(boneGroupName){
+		this.futureBoneGroupAddDefaultMesh = boneGroupName;
+	},
+
 	onBoneGroupAdded: function(character, boneGroupUid){
 		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
@@ -359,6 +364,12 @@ SceneView.prototype = {
 			model.attachBoneGroup(boneGroup.uid, toBoneGroupUid, attachPoint);
 
 			this.futureBoneGroupToAttach = null;
+		}
+
+		if (this.futureBoneGroupAddDefaultMesh !== null &&
+				boneGroup.name === this.futureBoneGroupAddDefaultMesh){
+			this.model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+			this.futureBoneGroupAddDefaultMesh = null;
 		}
 
 		//this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
@@ -823,16 +834,24 @@ SceneView.prototype = {
 
 	onDeletePressed: function(){
 		if (this.mode == 'mesh'){
+			// If only one mesh left, add the Box mesh so that there is still something
+			// to click on, and issue a warning.
+			var boneGroup = this.model.character.boneGroups.get(this.selectedMesh.boneGroupUid);
+			if (Object.keys(boneGroup.meshes.dict).length <= 1){
+				uilog("Can't delete the last mesh in a bone group! Delete the whole bone group instead.");
+				this.model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+				this.selectMeshFuture(boneGroup.uid, "box");
+			}
+
 			this.model.removeMesh(this.selectedMesh.uid);
 		} else if (this.mode == 'bone'){
 			this.model.removeBoneGroup(this.selectedBoneGroup.uid);
 		}
-		this.selectMesh(null);
 	},
 
 	clickedAddMesh: function(){
 		var boneGroup = this.model.character.boneGroups.get(this.selectedMesh.boneGroupUid);
-		model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+		this.model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
 		this.selectMeshFuture(boneGroup.uid, "box");
 
 		this.libraryClearMeshes();
