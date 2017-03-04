@@ -422,31 +422,30 @@ $(document).ready( function(){
 		}).then(onResult);
 	};
 
-	clickedAttachBoneGroup = function(boneGroupUid, boneGroupNameUnderscored){
-		boneGroupName = boneGroupNameUnderscored.replaceAll('_', ' ');
+	showAttachBoneGroupDialog = function(onResult){
 		options = {};
 		attachPoints = model.getAvailableAttachPoints();
 		for (var toBoneGroupUid in attachPoints){
-			var boneGroupName = model.character.boneGroups.get(toBoneGroupUid).name;
+			var toBoneGroupName = model.character.boneGroups.get(toBoneGroupUid).name;
 			for (var i in attachPoints[toBoneGroupUid]){
 				attachPoint = attachPoints[toBoneGroupUid][i];
 				id = toBoneGroupUid + ';' + attachPoint;
-				label = boneGroupName + ' (' + attachPoint.substring(1) + ')';
+				label = toBoneGroupName + ' (' + attachPoint.substring(1) + ')';
 				options[id] = label;
 			}
 		}
 
-		var onResult = function(result){
+		var parseResults = function(result){
 			tokens = result.split(';');
 			toBoneGroupUid = tokens[0];
 			attachPoint = tokens[1];
-			model.attachBoneGroup(boneGroupUid, toBoneGroupUid, attachPoint);
+			onResult(toBoneGroupUid, attachPoint);
 		};
 
-		showSelectDialogBox('Attach Bone Group "' + boneGroupName + '"',
+		showSelectDialogBox('Attach Bone Group',
 							options,
 							'Select Attach Point',
-							onResult);
+							parseResults);
 	};
 
 	clickedRemoveBoneGroup = function(boneGroupId){
@@ -458,7 +457,7 @@ $(document).ready( function(){
 		view.showLibrary('pose');
 	};
 
-	addBoneGroup = function(){
+	clickedAddBoneGroup = function(){
 		view.showLibrary('bone');
 	};
 
@@ -539,10 +538,16 @@ $(document).ready( function(){
 	$("#bone-library").on("click",".mini-select[data-bone-id]", function(e){
 		var mid = $(this).data("bone-id");
 		var library = $(this).data("bone-library");
-		var boneGroupName = $(this).data("bone-bone-name");
+		var boneGroupName = $(this).data("bone-bone-name").replaceAll('_', ' ');
 		model.addBoneGroup(library, boneGroupName);
 		
 		view.hideLibrary('bone');
+
+		showAttachBoneGroupDialog(
+			function(toBoneGroupUid, attachPoint){
+				view.attachBoneGroupFuture(boneGroupName, toBoneGroupUid, attachPoint);
+			});
+		
 	});
 
 	//DO SOMETHING IF YOU CLICK A FILTER
@@ -698,14 +703,19 @@ $(document).ready( function(){
 		<label>Attached to:&nbsp;</label><label id="bone-info-attached-to">stuff</label>
 		<br>
 		<br>
-
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="showAttachBoneGroupDialog(function(toBoneGroupUid, attachPoint)
+					{model.attachBoneGroup(view.selectedBoneGroup.uid, toBoneGroupUid, attachPoint);});">Attach to...</button>
+		</span>
+		<br>
+		<br>
 		<span class="btn-group">
 			<button class="btn btn-primary" type="button" onclick="view.onDeletePressed()">Delete</button>
 		</span>
 		<br>
 		<br>
 		<span class="btn-group">
-			<button class="btn btn-primary" type="button" onclick="view.clickedAttachBoneGroupTo()">Attach to...</button>
+			<button class="btn btn-primary" type="button" onclick="clickedAddBoneGroup()">Add Bone Group</button>
 		</span>
 	</div>
 </div>

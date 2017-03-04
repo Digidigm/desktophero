@@ -16,8 +16,10 @@ function SceneView(model){
 	this.cubeMap;
 
 	this.selectedMesh;
-	this.futureMeshToSelect = null;
 	this.meshes = []; // Keep track of all meshes added to scene
+
+	this.futureMeshToSelect = null;
+	this.futureBoneGroupToAttach = null;
 
 	this.skeletonHelpers = [];
 
@@ -100,6 +102,7 @@ SceneView.prototype = {
 		this.libraryPopulateBoneGroups();
 
 		this.hideLibraries();
+		this.hideInfoPanel();
 	},
 
 	initLights: function(){
@@ -217,7 +220,7 @@ SceneView.prototype = {
 		this.selectedMesh = mesh;
 
 		if (this.selectedMesh == null){
-			this.hideLibraries();
+			
 		} else {
 			this.selectedMesh.material = model.materials['selected'];
 		}
@@ -256,6 +259,11 @@ SceneView.prototype = {
 	},
 
 	selectBoneGroup: function(boneGroup){
+		// If waiting for a bone group to be to be attached on load, cancel it
+		if (this.futureBoneGroupToAttach != null){
+			this.futureBoneGroupToAttach = null;
+		}
+
 		// reset previously selected bone group to normal material
 		if (this.selectedBoneGroup != null){
 			for (var meshId in this.selectedBoneGroup.meshes.dict){
@@ -313,6 +321,10 @@ SceneView.prototype = {
 		this.futureMeshToSelect = [boneGroupUid, meshName];
 	},
 
+	attachBoneGroupFuture: function(boneGroupName, toBoneGroupUid, attachPoint){
+		this.futureBoneGroupToAttach = [boneGroupName, toBoneGroupUid, attachPoint];
+	},
+
 	onBoneGroupAdded: function(character, boneGroupUid){
 		console.log("`group added!");
 		var boneGroup = character.boneGroups.get(boneGroupUid);
@@ -337,6 +349,17 @@ SceneView.prototype = {
 
 			boneHandle.visible = (this.mode == 'pose');
 			this.scene.add(boneHandle);
+		}
+
+		// Are we waiting for this bone group to be loaded so we can attach it?
+		if (this.futureBoneGroupToAttach !== null &&
+				boneGroup.name === this.futureBoneGroupToAttach[0]){
+			var toBoneGroupUid = this.futureBoneGroupToAttach[1];
+			var attachPoint = this.futureBoneGroupToAttach[2];
+			
+			model.attachBoneGroup(boneGroup.uid, toBoneGroupUid, attachPoint);
+
+			this.futureBoneGroupToAttach = null;
 		}
 
 		//this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
@@ -481,6 +504,7 @@ SceneView.prototype = {
 		console.log("Setting mode to " + mode);
 		this.mode = mode;
 
+		this.hideLibraries();
 
 		// Hide/show bone handles
 		var showBoneHandles = (mode == 'pose');
@@ -489,6 +513,12 @@ SceneView.prototype = {
 		}
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].visible = showBoneHandles;
+		}
+		this.boneAxisHelper.visible = showBoneHandles;
+
+		if (mode == 'pose'){
+			console.log("WHat")
+			this.showLibrary('pose');
 		}
 		
 		if (mode != 'mesh'){
@@ -684,6 +714,7 @@ SceneView.prototype = {
 			var meshResult = model.character.getMesh(meshId);
 			if (meshResult == null){
 				this.selectMesh(null);
+				this.hideLibrary('mesh');
 			} else {
 				boneGroupUid = meshResult[0];
 				mesh = meshResult[1];
