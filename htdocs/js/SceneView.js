@@ -326,7 +326,6 @@ SceneView.prototype = {
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
-		console.log("`group added!");
 		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
@@ -501,7 +500,6 @@ SceneView.prototype = {
 	},
 
 	setMode: function(mode){
-		console.log("Setting mode to " + mode);
 		this.mode = mode;
 
 		this.hideLibraries();
@@ -670,7 +668,6 @@ SceneView.prototype = {
 	onRightClick: function(mouseX, mouseY){
 		if (this.mode == 'pose'){
 			var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
-			console.log(clickVector);
 			this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
 
 			var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
@@ -694,7 +691,6 @@ SceneView.prototype = {
 			} else {
 				this.boneAxisHelper.visible = true;
 				console.log("Clicked on " + this.selectedBone.name);
-				console.log(closestBone);
 
 				var globalBonePosition = new THREE.Vector3()
 				this.scene.updateMatrixWorld();
@@ -710,7 +706,6 @@ SceneView.prototype = {
 			// Create id from RGB values
 			var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
 			var meshId = this.meshPickingView.meshIdMap[colorId];
-			console.log("Clicked " + meshId);
 			var meshResult = model.character.getMesh(meshId);
 			if (meshResult == null){
 				this.selectMesh(null);
@@ -731,9 +726,7 @@ SceneView.prototype = {
 			
 			// Create id from RGB values
 			var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-			var meshId = this.meshPickingView.meshIdMap[colorId];
-			console.log("Clicked " + meshId);
-			var meshResult = model.character.getMesh(meshId);
+			var meshId = this.meshPickingView.meshIdMap[colorId];			var meshResult = model.character.getMesh(meshId);
 			if (meshResult == null){
 				this.selectBoneGroup(null);
 			} else {
@@ -992,7 +985,6 @@ SceneView.prototype = {
 				console.error(meshMetadata);
 				continue;
 			}
-			console.log(category);
 			var categoryId = category.replaceAll(" ", "_") + "-mesh-category";
 			var element = document.getElementById(categoryId);
 			if (element === null){

@@ -112,9 +112,6 @@ BoneGroup.prototype = {
 
 		mesh.children = [];
 		//mesh.add(this.skeleton.bones[0]);
-		console.log("Meshers")
-		console.log(mesh)
-		console.log(this.meshes)
 		mesh.bind(this.skeleton);
 		
 		this.setPose(savedPositions, savedRotations, savedScales);
