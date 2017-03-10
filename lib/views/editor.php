@@ -656,7 +656,7 @@ $(document).ready( function(){
 
 <li ></li>
 
-<div id="body-accordion-container" class="col-md-5">
+<div id="body-accordion-container" class="col-md-5" oncontextmenu="return false;">
 	<div class="btn-group" data-toggle="buttons" id="mode-options" mesh="mode-options">
 	  <label class="btn btn-primary nav-link mesh-btn active">
 	    <input type="radio" name="options" id="option1" autocomplete="off" checked onclick="clickedMeshTab()"> Mesh

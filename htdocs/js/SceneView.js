@@ -1129,22 +1129,6 @@ SceneView.prototype = {
 };
 
 function onMouseDown(event){
-
-	//make it so i can still pull up the JS console by using shift-right-click
-	//make it so you can click on UI
-	//TODO: Test this in multiple browsers
-	/*var target = event.originalEvent || event.originalTarget;
-	if (event.shiftKey || ! $(target.srcElement || target.originalTarget).is('canvas') ) {
-
-		//if you hold down shift or cick on anything other than the canvas do the normal thing
-		console.log("don't prevent me");
-
-	} else {
-
-		//if you're holding down shift or you click on a canvas element, don't do the normal thin
-		event.preventDefault();
-	}*/
-
 	if (event.button === 0){
 		view.onLeftMouseDown(event.clientX, event.clientY, event);
 	} else if (event.button == 1){
@@ -1162,6 +1146,9 @@ function onMouseUp(event){
 	} else if (event.button == 2){
 		view.onRightMouseUp(event.clientX, event.clientY, event);
 	}
+
+	document.activeElement.blur();
+	document.getElementById("editor").focus();
 }
 
 function onMouseMove(event){
