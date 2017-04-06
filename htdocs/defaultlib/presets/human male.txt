@@ -56,7 +56,7 @@
 			"#neck"
 		],
 		"weapon": [
-			"left hand",
+			"right hand",
 			"#palm"
 		],
 		"platform": [
