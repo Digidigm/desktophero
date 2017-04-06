@@ -1,0 +1,67 @@
+{
+	"boneGroups": [
+		"male torso",
+		"legs",
+		"head",
+		"left arm",
+		"right arm",
+		"left hand",
+		"right hand",
+		"neck",
+		"weapon",
+		"platform"
+	],
+	"meshes": {
+		"male torso": "male torso",
+		"simple tunic": "male torso",
+		"legs": "legs",
+		"elvin boots": "legs",
+		"baggy pants": "legs",
+		"human male": "head",
+		"muscled arm left": "left arm",
+		"muscled arm right": "right arm",
+		"left hand closed": "left hand",
+		"right hand open": "right hand",
+		"thick neck": "neck",
+		"basic sword": "weapon",
+		"smooth circular platform": "platform"
+	},
+	"attachments": {
+		"male torso": [
+			"legs",
+			"#top"
+		],
+		"head": [
+			"neck",
+			"#top"
+		],
+		"left arm": [
+			"male torso",
+			"#left arm"
+		],
+		"right arm": [
+			"male torso",
+			"#right arm"
+		],
+		"left hand": [
+			"left arm",
+			"#hand"
+		],
+		"right hand": [
+			"right arm",
+			"#hand"
+		],
+		"neck": [
+			"male torso",
+			"#neck"
+		],
+		"weapon": [
+			"left hand",
+			"#palm"
+		],
+		"platform": [
+			"legs",
+			"#platform"
+		]
+	}
+}

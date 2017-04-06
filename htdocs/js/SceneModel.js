@@ -291,5 +291,14 @@ SceneModel.prototype = {
 		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
 		//	self.character.loadPose(SceneModel.initialPose, jsonPose);
 		});
+	},
+
+	loadBodyPreset: function(libraryName, presetName){
+		dataSource = this.libraries.get(libraryName);
+		dataSource.fetchPreset(presetName, function(json){
+			preset = JSON.parse(json);
+			console.log(preset.meshes);
+			
+		});
 	}
 };

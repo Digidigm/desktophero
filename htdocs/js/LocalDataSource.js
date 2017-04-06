@@ -7,6 +7,7 @@ function LocalDataSource(name, directoryURL){
 	this.meshesDirectory = directoryURL + '/meshes';
 	this.posesDirectory = directoryURL + '/poses';
 	this.boneGroupsDirectory = directoryURL + '/bone groups';
+	this.presetsDirectory = directoryURL + '/presets';
 	this.meshes = new ObservableDict();
 	this.poses = new ObservableDict();
 	this.boneGroups = new ObservableDict();
@@ -318,6 +319,14 @@ LocalDataSource.prototype = {
 		this.boneGroups.put('weapon', new BoneGroupMetadata('weapon', 'dutchmogul', 'default', 'weapon', ['cool', 'great'], ['weapons']));
 
 		this.boneGroupsRefreshedEvent.notify(this.boneGroups);
+	},
+
+	fetchPreset: function(name, callback){
+		var filename = this.presetsDirectory + '/' + name + '.txt';
+		jQuery.get(filename, function(contents){
+			
+			callback(contents);
+		});
 	},
 
 	fetchMesh: function(name, callback){
