@@ -31,7 +31,27 @@
   border-color: #285e8e;
 }
 
-.mesh-info, .bone-info {
+.preset-btn,
+.preset-btn:hover,
+.preset-btn:focus,
+.preset-btn:active,
+.preset-btn.active {
+  color: #ffffff;
+  background-color: rgba(0, 200, 0, .3);
+  border-color: #285e8e;
+}
+
+.character-btn,
+.character-btn:hover,
+.character-btn:focus,
+.character-btn:active,
+.character-btn.active {
+  color: #ffffff;
+  background-color: rgba(100, 100, 100, .4);
+  border-color: #285e8e;
+}
+
+.mesh-info, .bone-info, .preset-info {
 	color: #ffffff;
 	font-size: 120%;
 	text-align: center;

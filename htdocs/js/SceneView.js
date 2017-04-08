@@ -249,6 +249,9 @@ SceneView.prototype = {
 		} else if (panelName == 'bone'){
 			var boneInfoPanel = document.getElementById("bone-info");
 			boneInfoPanel.hidden = false;
+		} else if (panelName == 'preset'){
+			var presetInfoPanel = document.getElementById("preset-info");
+			presetInfoPanel.hidden = false;
 		}
 	},
 
@@ -257,6 +260,8 @@ SceneView.prototype = {
 		meshInfoPanel.hidden = true;
 		var boneInfoPanel = document.getElementById("bone-info");
 		boneInfoPanel.hidden = true;
+		var presetInfoPanel = document.getElementById("preset-info");
+		presetInfoPanel.hidden = true;
 	},
 
 	selectBoneGroup: function(boneGroup){
@@ -412,12 +417,6 @@ SceneView.prototype = {
 			var index = toRemove[i];
 			this.boneHandles.splice(index, 1);
 		}
-
-		// Remove bone group tab from the Mesh/Bone tabs
-		var tabEntry = document.getElementById('meshes-tab-' + boneGroupUid).parentNode;
-		tabEntry.parentNode.removeChild(tabEntry);
-		tabEntry = document.getElementById('bone-groups-tab-' + boneGroupUid).parentNode;
-		tabEntry.parentNode.removeChild(tabEntry);
 	},
 
 	onBoneGroupAttached: function(boneGroup, attachedToUid){
@@ -526,7 +525,6 @@ SceneView.prototype = {
 		this.boneAxisHelper.visible = showBoneHandles;
 
 		if (mode == 'pose'){
-			console.log("WHat")
 			this.showLibrary('pose');
 		}
 		
@@ -537,6 +535,10 @@ SceneView.prototype = {
 		if (mode != 'bone'){
 			this.selectBoneGroup(null);
 		}
+
+		if (mode == 'preset'){
+			this.showInfoPanel('preset');
+		} 
 	},
 
 	startBoneRotate: function(){

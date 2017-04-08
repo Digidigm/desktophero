@@ -472,9 +472,14 @@ $(document).ready( function(){
 		view.setMode('bone');
 	};
 
-	clickedSettingsTab = function(){
+	clickedPresetsTab = function(){
+		view.setMode('preset');
+	};
+
+	clickedCharacterTab = function(){
 		view.hideLibraries();
 		view.selectMesh(null);
+		view.selectBoneGroup(null);
 	};
 
 	// Add mesh button
@@ -530,7 +535,7 @@ $(document).ready( function(){
 		var mid = $(this).data("pose-id");
 		var library = $(this).data("pose-library");
 		var poseName = $(this).data("pose-pose-name");
-		model.loadPose(library, poseName);
+		model.loadJSONPose(library, poseName);
 	});
 
 	// Click library bone group
@@ -656,7 +661,7 @@ $(document).ready( function(){
 
 <li ></li>
 
-<div id="body-accordion-container" class="col-md-5" oncontextmenu="return false;">
+<div id="body-accordion-container" class="col-md-6" oncontextmenu="return false;">
 	<div class="btn-group" data-toggle="buttons" id="mode-options" mesh="mode-options">
 	  <label class="btn btn-primary nav-link mesh-btn active">
 	    <input type="radio" name="options" id="option1" autocomplete="off" checked onclick="clickedMeshTab()"> Mesh
@@ -666,6 +671,12 @@ $(document).ready( function(){
 	  </label>
 	  <label class="btn btn-primary pose-btn">
 	    <input type="radio" name="options" id="option3" autocomplete="off" onclick="clickedPoseTab()"> Pose
+	  </label>
+	  <label class="btn btn-primary preset-btn">
+	    <input type="radio" name="options" id="option4" autocomplete="off" onclick="clickedPresetsTab()"> Presets
+	  </label>
+	  <label class="btn btn-primary character-btn">
+	    <input type="radio" name="options" id="option5" autocomplete="off" onclick="clickedCharacterTab()"> Character
 	  </label>
 	</div>
 
@@ -715,6 +726,16 @@ $(document).ready( function(){
 		<br>
 		<span class="btn-group">
 			<button class="btn btn-primary" type="button" onclick="clickedAddBoneGroup()">Add Bone Group</button>
+		</span>
+	</div>
+
+	<div class="preset-info" id="preset-info">
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="model.character.clear(); model.loadPreset('default', 'human male');">Human Male</button>
+		</span>
+		<br>
+		<span class="btn-group">
+			<button class="btn btn-primary" type="button" onclick="model.character.clear(); model.loadPreset('default', 'human female');">Human Female</button>
 		</span>
 	</div>
 </div>

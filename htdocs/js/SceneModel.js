@@ -132,10 +132,10 @@ SceneModel.prototype = {
 		FileSaver.download(jsonString, poseName + ".txt");
 	},
 
-	loadPose: function(libraryName, poseName){
+	loadJSONPose: function(libraryName, poseName){
 		var self = this;
 		self.libraries.get(libraryName).fetchPose(poseName, function(poseJson){
-			self.character.loadPose(poseName, poseJson);
+			self.character.loadJSONPose(poseJson);
 		});
 	},
 
@@ -143,16 +143,38 @@ SceneModel.prototype = {
 		// Must save bone groups, meshes attached to bone groups, 
 		// places meshes are attached, pos/rot/scale of bone groups, pose.
 
-		var json = {
+		/*var json = {
 			character: this.character.toJSON(),
 			pose: this.character.getCurrentPose()
-		};
+		};*/
+		thing = {};
+		thing.boneGroups = [];
+		thing.meshes = {};
+		thing.attachments = {};
+		var boneGroups = this.character.boneGroups;
+		for (var boneGroupUid in boneGroups.dict){
+			var boneGroup = boneGroups.get(boneGroupUid);
+			thing.boneGroups.push(boneGroup.name);
 
-		FileSaver.download(JSON.stringify(json, null, " "), this.character.name + ".js");
+			for (var meshId in boneGroup.meshes.dict){
+				var mesh = boneGroup.meshes.get(meshId);
+				thing.meshes[mesh.name] = boneGroup.name;
+			}
+
+			console.log(boneGroup.parentBone);
+			if (boneGroup.parentBone != null){
+				var parentBoneGroup = this.character.boneGroups.get(boneGroup.parentBoneGroupUid);
+				thing.attachments[boneGroup.name] = [parentBoneGroup.name, boneGroup.parentBoneName];
+			}
+		}
+
+		thing.pose = this.character.getCurrentPose();
+
+		FileSaver.download(JSON.stringify(thing, null, "\t"), this.character.name + ".txt");
 	},
 
 	initCharacter: function(){
-		this.loadBodyPreset('default', this.defaultCharacter);
+		this.loadPreset('default', this.defaultCharacter);
 	},
 
 	presetBoneGroupsAdded: function(preset, boneGroupUids){
@@ -184,7 +206,6 @@ SceneModel.prototype = {
 
 	presetMeshesAdded: function(preset, boneGroupUids){
 		// Attach bone groups to their correct parent bones.
-
 		self = this;
 
 		for (var i = 0; i < Object.keys(preset.attachments).length; i++){
@@ -200,19 +221,33 @@ SceneModel.prototype = {
 			boneGroup.attachToBone(attachToUid, attachToPoint, attachToBoneGroup.attachPoints[attachToPoint]);
 		}
 
-		// Load initial pose.
-		dataSource = this.libraries.get('default');
-		dataSource.fetchPose(SceneModel.initialPose, function(jsonPose){
-		//	self.character.loadPose(SceneModel.initialPose, jsonPose);
+		// Load pose.
+		if (preset.pose != undefined){
+			self.character.loadPose(preset.pose);
+		}
+	},
+
+	loadVariation: function(libraryName, variationName){
+		var self = this;
+
+		dataSource = this.libraries.get(libraryName);
+		dataSource.fetchVariation(variationName, function(json){
+			self.loadJSONVariation(json);
 		});
 	},
 
-	loadBodyPreset: function(libraryName, presetName){
+	loadPreset: function(libraryName, presetName){
 		var self = this;
 
 		dataSource = this.libraries.get(libraryName);
 		dataSource.fetchPreset(presetName, function(json){
-			preset = JSON.parse(json);
+			self.loadJSONPreset(json);
+		});
+	}, 
+
+	loadJSONPreset: function(json){
+		var self = this;
+		preset = JSON.parse(json);
 
 			var defaultDataSource = self.libraries.get('default');
 			var boneGroupsLeftToBeLoaded = preset.boneGroups.length;
@@ -230,7 +265,10 @@ SceneModel.prototype = {
 					}
 				});
 			}
-			
-		});
+	},
+
+	loadJSONVariation: function(json){
+		var variation = JSON.parse(json);
+		this.character.loadVariation(variation);
 	}
 };

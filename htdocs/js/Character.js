@@ -31,13 +31,7 @@ Character.prototype = {
 		return Pose.toPose(this.boneGroups);
 	},
 
-	loadPose: function(poseName, jsonString){
-		var pose = Pose.fromJson(jsonString);
-
-		// Find all bones in the character bone groups that have the same name
-		// as a bone in the pose being loaded, and set position/rotation/scale
-		// to match that bone.
-		
+	loadBoneScales: function(pose){
 		for (var i = 0; i < pose.poseBones.length; i++){
 			var poseBone = pose.poseBones[i];
 
@@ -46,7 +40,30 @@ Character.prototype = {
 
 				for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
 					var bone = boneGroup.skeleton.bones[j];
-					if (pose.affectedBones.indexOf(bone.name) == -1){
+					if (pose.affectedBones != undefined && pose.affectedBones.indexOf(bone.name) == -1){
+						continue;
+					}
+
+					if (bone.name === poseBone.name){
+						bone.scale.x = poseBone.scale.x;
+						bone.scale.y = poseBone.scale.y;
+						bone.scale.z = poseBone.scale.z;
+					}
+				}
+			}
+		}
+	},
+
+	loadPose: function(pose){
+		for (var i = 0; i < pose.poseBones.length; i++){
+			var poseBone = pose.poseBones[i];
+
+			for (var boneGroupUid in this.boneGroups.dict){
+				var boneGroup = this.boneGroups.get(boneGroupUid);
+
+				for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
+					var bone = boneGroup.skeleton.bones[j];
+					if (pose.affectedBones != undefined && pose.affectedBones.indexOf(bone.name) == -1){
 						continue;
 					}
 
@@ -58,7 +75,31 @@ Character.prototype = {
 						bone.rotation.x = poseBone.rotation.x;
 						bone.rotation.y = poseBone.rotation.y;
 						bone.rotation.z = poseBone.rotation.z;
+					}
+				}
+			}
+		}
+	},
 
+	loadJSONPose: function(jsonString){
+		var pose = Pose.fromJson(jsonString);
+		this.loadPose(pose);
+	},
+
+	loadVariation: function(variation){
+		for (var i = 0; i < variation.poseBones.length; i++){
+			var poseBone = variation.poseBones[i];
+
+			for (var boneGroupUid in this.boneGroups.dict){
+				var boneGroup = this.boneGroups.get(boneGroupUid);
+
+				for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
+					var bone = boneGroup.skeleton.bones[j];
+					if (variation.affectedBones != undefined && variation.affectedBones.indexOf(bone.name) == -1){
+						continue;
+					}
+
+					if (bone.name === poseBone.name){
 						bone.scale.x = poseBone.scale.x;
 						bone.scale.y = poseBone.scale.y;
 						bone.scale.z = poseBone.scale.z;
@@ -66,7 +107,6 @@ Character.prototype = {
 				}
 			}
 		}
-		this.poseChangedEvent.notify(poseName);
 	},
 
 	getName: function(){
@@ -93,5 +133,11 @@ Character.prototype = {
 			}
 		}
 		return null;
+	}, 
+
+	clear: function(){
+		for (var boneGroupUid in this.boneGroups.dict){
+			this.removeBoneGroup(boneGroupUid);
+		}
 	}
 }

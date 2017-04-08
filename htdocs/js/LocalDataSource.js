@@ -8,6 +8,7 @@ function LocalDataSource(name, directoryURL){
 	this.posesDirectory = directoryURL + '/poses';
 	this.boneGroupsDirectory = directoryURL + '/bone groups';
 	this.presetsDirectory = directoryURL + '/presets';
+	this.variationsDirectory = directoryURL + '/variations';
 	this.meshes = new ObservableDict();
 	this.poses = new ObservableDict();
 	this.boneGroups = new ObservableDict();
@@ -351,6 +352,13 @@ LocalDataSource.prototype = {
 
 	fetchPose: function(name, callback){
 		var filename = this.posesDirectory + '/' + name + '.txt';
+		jQuery.get(filename, function(contents){
+			callback(contents);
+		});
+	},
+
+	fetchVariation: function(name, callback){
+		var filename = this.variationsDirectory + '/' + name + '.txt';
 		jQuery.get(filename, function(contents){
 			callback(contents);
 		});
