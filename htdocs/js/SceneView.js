@@ -189,7 +189,7 @@ SceneView.prototype = {
 		this.render();
 		if (this.mode == 'mesh picking'){
 			this.renderer.render(this.meshPickingView.scene, this.camera);
-		} else if (this.mode == 'mesh' || this.mode == 'bone' || this.mode == 'pose') {
+		} else if (this.mode == 'mesh' || this.mode == 'bone' || this.mode == 'pose' || this.mode == 'preset' || this.mode == 'character') {
 			this.renderer.render(this.scene, this.camera);
 		}
 	},
