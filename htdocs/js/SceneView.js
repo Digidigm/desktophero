@@ -48,7 +48,6 @@ function SceneView(model){
 	this.mode = 'mesh';
 
 	this.addModelListeners();
-
 }
 
 SceneView.prototype = {
@@ -103,11 +102,14 @@ SceneView.prototype = {
 		this.libraryPopulateBoneGroups();
 
 		this.hideLibraries();
-		this.hideInfoPanel();
+		this.hideInfoPanels();
+
+		this.setMode('mesh');
 	},
 
 	initLights: function(){
-		this.scene.add(new THREE.AmbientLight(0x555555));
+		this.ambientLight = new THREE.AmbientLight(0x555555);
+		this.scene.add(this.ambientLight);
 
 		var pointLight = new THREE.SpotLight(0xffffff);
 		pointLight.position.y = 10;
@@ -221,14 +223,15 @@ SceneView.prototype = {
 		this.selectedMesh = mesh;
 
 		if (this.selectedMesh == null){
-			
+			document.getElementById("mesh-help").hidden = false;
 		} else {
+			document.getElementById("mesh-help").hidden = true;
 			this.selectedMesh.material = model.materials['selected'];
 		}
 
 		if (this.selectedMesh == null){
 			// Update mesh info label
-			this.hideInfoPanel();
+			this.hideInfoPanel("mesh");
 		} else {
 			// Update mesh info label
 			this.showInfoPanel('mesh');
@@ -237,11 +240,10 @@ SceneView.prototype = {
 			var boneGroupName = model.character.boneGroups.get(mesh.boneGroupUid).name;
 			document.getElementById("mesh-info-attached-to").innerText = boneGroupName;
 		}
-		
 	},
 
 	showInfoPanel: function(panelName){
-		this.hideInfoPanel();
+		this.hideInfoPanels();
 
 		if (panelName == 'mesh'){
 			var meshInfoPanel = document.getElementById("mesh-info");
@@ -252,16 +254,42 @@ SceneView.prototype = {
 		} else if (panelName == 'preset'){
 			var presetInfoPanel = document.getElementById("preset-info");
 			presetInfoPanel.hidden = false;
+		} else if (panelName == 'character'){
+			var characterInfoPanel = document.getElementById("character-info");
+			characterInfoPanel.hidden = false;
+		} else if (panelName == 'pose'){
+			document.getElementById("pose-info").hidden = false;
 		}
 	},
 
-	hideInfoPanel: function(){
+	hideInfoPanel: function(panelName){
+		if (panelName == 'mesh'){
+			var meshInfoPanel = document.getElementById("mesh-info");
+			meshInfoPanel.hidden = true;
+		} else if (panelName == 'bone'){
+			var boneInfoPanel = document.getElementById("bone-info");
+			boneInfoPanel.hidden = true;
+		} else if (panelName == 'preset'){
+			var presetInfoPanel = document.getElementById("preset-info");
+			presetInfoPanel.hidden = true;
+		} else if (panelName == 'character'){
+			var characterInfoPanel = document.getElementById("character-info");
+			characterInfoPanel.hidden = true;
+		} else if (panelName == 'pose'){
+			document.getElementById("pose-info").hidden = true;
+		}
+	},
+
+	hideInfoPanels: function(){
 		var meshInfoPanel = document.getElementById("mesh-info");
 		meshInfoPanel.hidden = true;
 		var boneInfoPanel = document.getElementById("bone-info");
 		boneInfoPanel.hidden = true;
 		var presetInfoPanel = document.getElementById("preset-info");
 		presetInfoPanel.hidden = true;
+		var characterInfoPanel = document.getElementById("character-info");
+		characterInfoPanel.hidden = true;
+		document.getElementById("pose-info").hidden = true;
 	},
 
 	selectBoneGroup: function(boneGroup){
@@ -281,8 +309,12 @@ SceneView.prototype = {
 		this.selectedBoneGroup = boneGroup;
 
 		if (this.selectedBoneGroup == null){
-			this.hideInfoPanel();
+			if (this.mode == 'bone'){
+				this.hideInfoPanel('bone');
+				document.getElementById("bone-help").hidden = false;
+			}
 		} else {
+			document.getElementById("bone-help").hidden = true;
 			for (var meshId in this.selectedBoneGroup.meshes.dict){
 				var mesh = this.selectedBoneGroup.meshes.get(meshId);
 				mesh.material = model.materials['boneGroupSelected'];
@@ -513,6 +545,9 @@ SceneView.prototype = {
 		this.mode = mode;
 
 		this.hideLibraries();
+		this.hideInfoPanels();
+		document.getElementById("mesh-help").hidden = true;
+		document.getElementById("bone-help").hidden = true;
 
 		// Hide/show bone handles
 		var showBoneHandles = (mode == 'pose');
@@ -525,20 +560,36 @@ SceneView.prototype = {
 		this.boneAxisHelper.visible = showBoneHandles;
 
 		if (mode == 'pose'){
+			this.ambientLight.color = new THREE.Color(.5, .4, .2);
 			this.showLibrary('pose');
+			this.showInfoPanel('pose');
 		}
 		
-		if (mode != 'mesh'){
+		if (mode == 'mesh'){
+			this.ambientLight.color = new THREE.Color(.2, .3, .5);
+			document.getElementById("mesh-help").hidden = false;
+		} else {
 			this.selectMesh(null);
+			document.getElementById("mesh-help").hidden = true;
 		}
 
-		if (mode != 'bone'){
+		if (mode == 'bone'){
+			document.getElementById("bone-help").hidden = false;
+			this.ambientLight.color = new THREE.Color(.6, .2, .2);
+		} else {
+			document.getElementById("bone-help").hidden = true;
 			this.selectBoneGroup(null);
 		}
 
 		if (mode == 'preset'){
+			this.ambientLight.color = new THREE.Color(.3, .4, .2);
 			this.showInfoPanel('preset');
 		} 
+
+		if (mode == 'character'){
+			this.ambientLight.color = new THREE.Color(.3, .3, .3);
+			this.showInfoPanel('character');
+		}
 	},
 
 	startBoneRotate: function(){
@@ -1149,8 +1200,8 @@ function onMouseUp(event){
 		view.onRightMouseUp(event.clientX, event.clientY, event);
 	}
 
-	document.activeElement.blur();
-	document.getElementById("editor").focus();
+	//document.activeElement.blur();
+	//document.getElementById("editor").focus();
 }
 
 function onMouseMove(event){

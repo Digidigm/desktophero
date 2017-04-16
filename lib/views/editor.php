@@ -400,6 +400,31 @@ $(document).ready( function(){
 
 	// ##################################################################
 
+	document.getElementById('loadCharacter').addEventListener('change', readCharacterFile, false);
+
+	document.getElementById('loadPose').addEventListener('change', readPoseFile, false);
+
+	function readCharacterFile (evt) {
+		var files = evt.target.files;
+		var file = files[0];
+		var reader = new FileReader();
+		reader.onload = function() {
+			model.character.clear();
+			model.loadJSONPreset(this.result);
+		}
+		reader.readAsText(file)
+	}
+
+	function readPoseFile (evt) {
+		var files = evt.target.files;
+		var file = files[0];
+		var reader = new FileReader();
+		reader.onload = function() {
+			model.character.loadJSONPose(this.result);
+		}
+		reader.readAsText(file)
+	}
+
 	showSelectDialogBox = function(title, options, inputPlaceholder, onResult){
 		swal({
 		 title: title,
@@ -477,9 +502,7 @@ $(document).ready( function(){
 	};
 
 	clickedCharacterTab = function(){
-		view.hideLibraries();
-		view.selectMesh(null);
-		view.selectBoneGroup(null);
+		view.setMode('character');
 	};
 
 	// Add mesh button
@@ -656,36 +679,48 @@ $(document).ready( function(){
 
 	
 });
+
+jQuery.get('/changelog.txt', function(data) {
+	var arr = data.split('\n');
+	var firstLine = arr[0];
+	var theRest = arr.slice(1);
+	/*sweetAlert({
+		title: firstLine,
+		html: theRest.join('<br>')
+	});*/
+});
 </script>
 
-
-<li ></li>
-
-<div id="body-accordion-container" class="col-md-6" oncontextmenu="return false;">
+<div id="body-accordion-container" class="col-md-6" oncontextmenu="return false;" style="position: absolute; margin-top: 80px; margin-left: 5px; top: 0%; left: 0%;">
 	<div class="btn-group" data-toggle="buttons" id="mode-options" mesh="mode-options">
 	  <label class="btn btn-primary nav-link mesh-btn active">
-	    <input type="radio" name="options" id="option1" autocomplete="off" checked onclick="clickedMeshTab()"> Mesh
-	  </label>
-	  <label class="btn btn-primary bone-btn">
-	    <input type="radio" name="options" id="option2" autocomplete="off" onclick="clickedBoneGroupsTab()">  Bone Groups
+		<input type="radio" name="options" id="option1" autocomplete="off" checked onclick="clickedMeshTab();"> Appearance
 	  </label>
 	  <label class="btn btn-primary pose-btn">
-	    <input type="radio" name="options" id="option3" autocomplete="off" onclick="clickedPoseTab()"> Pose
+		<input type="radio" name="options" id="option3" autocomplete="off" onclick="clickedPoseTab();"> Pose
+	  </label>
+	  <label class="btn btn-primary bone-btn">
+		<input type="radio" name="options" id="option2" autocomplete="off" onclick="clickedBoneGroupsTab();">  Components
 	  </label>
 	  <label class="btn btn-primary preset-btn">
-	    <input type="radio" name="options" id="option4" autocomplete="off" onclick="clickedPresetsTab()"> Presets
+		<input type="radio" name="options" id="option4" autocomplete="off" onclick="clickedPresetsTab();"> Presets
 	  </label>
 	  <label class="btn btn-primary character-btn">
-	    <input type="radio" name="options" id="option5" autocomplete="off" onclick="clickedCharacterTab()"> Character
+		<input type="radio" name="options" id="option5" autocomplete="off" onclick="clickedCharacterTab();"> Character
 	  </label>
+	</div>
+
+	<div class="mesh-info" id="mesh-help">
+		<br>
+		<label id="mesh-help-label">Right-click a mesh to select it.</label>
 	</div>
 
 	<div class="mesh-info" id="mesh-info">
 		<br>
 		<h3><label id="mesh-info-name">Mesh Name</label></h3>
-		<label id="mesh-info-blurb">Here's some great text about the mesh.</label>
+		<label id="mesh-info-blurb">(Mesh info will go here.)</label>
 		<br>
-		<label id="mesh-info-author">Author: stuff</label>
+		<label id="mesh-info-author">Author: (author)</label>
 		<br>
 		<br>
 		<label>Attached to:&nbsp;</label><label id="mesh-info-attached-to">stuff</label>
@@ -693,13 +728,27 @@ $(document).ready( function(){
 		<br>
 
 		<span class="btn-group">
-			<button class="btn btn-primary" type="button" onclick="view.onDeletePressed()">Delete</button>
+			<button class="btn btn-primary" type="button" onclick="view.onDeletePressed()">Delete Mesh</button>
 		</span>
 		<br>
 		<br>
 		<span class="btn-group">
 			<button class="btn btn-primary" type="button" onclick="view.clickedAddMesh()">Add Mesh</button>
 		</span>
+	</div>
+
+	<div class="pose-info" id="pose-info">
+		<br>
+		<button class="btn btn-primary" type="button" onclick="model.saveCurrentPose();">Save Pose</button>
+		<br>
+		<br>
+		<label for="loadPose" class="btn btn-primary">Load Pose</label>
+		<input id="loadPose" style="visibility:hidden;" type="file">
+	</div>
+
+	<div class="bone-info" id="bone-help">
+		<br>
+		<label id="bone-help-label">Right-click a bone group to select it.</label>
 	</div>
 
 	<div class="bone-info" id="bone-info">
@@ -710,7 +759,7 @@ $(document).ready( function(){
 		<label id="bone-info-author">Author: stuff</label>
 		<br>
 		<br>
-		<label>Attached to:&nbsp;</label><label id="bone-info-attached-to">stuff</label>
+		<label>Attached to:&nbsp;</label><label id="bone-info-attached-to">stuff</label
 		<br>
 		<br>
 		<span class="btn-group">
@@ -729,14 +778,35 @@ $(document).ready( function(){
 		</span>
 	</div>
 
-	<div class="preset-info" id="preset-info">
-		<span class="btn-group">
-			<button class="btn btn-primary" type="button" onclick="model.character.clear(); model.loadPreset('default', 'human male');">Human Male</button>
-		</span>
+	<div class="character-info" id="character-info">
+		<br>
+		<button class="btn btn-primary" type="button" onclick="model.saveCharacter();">Save Character</button>
+		<br>
+		<br>
+		<label for="loadCharacter" class="btn btn-primary">Load Character</label>
+		<input id="loadCharacter" style="visibility:hidden;" type="file">
+		<br>
+		<br>
 		<br>
 		<span class="btn-group">
-			<button class="btn btn-primary" type="button" onclick="model.character.clear(); model.loadPreset('default', 'human female');">Human Female</button>
+			<button class="btn btn-secondary" type="button" onclick="view.exportToSTL();">Export to .STL file</button>
 		</span>
+		<br>
+	</div>
+
+	<div class="preset-info" id="preset-info">
+		<br>
+		<span class="btn-group">
+			<button class="btn btn-secondary" type="button" onclick="model.character.clear(); model.loadPreset('default', 'human male');">Human Male</button>
+		</span>
+		<br>
+		<br>
+		<span class="btn-group">
+			<button class="btn btn-secondary" type="button" onclick="model.character.clear(); model.loadPreset('default', 'human female');">Human Female</button>
+		</span>
+		<br>
+		<br>
+		<label>Warning: Loading a preset will reset your character!</label>
 	</div>
 </div>
 
@@ -770,17 +840,6 @@ $(document).ready( function(){
 <div id='loadingDiv'>
 	<img src='/img/loading.gif'>
 </div>
-
-<footer class="footer">
-	<div class="container">
-		<div class="input-group input-group-lg">
-			<input type="text" class="form-control" placeholder="Character Name" aria-describedby="sizing-addon1" data-object="figure" data-bind="figure_name">
-			<span class="input-group-btn">
-				<button class="btn btn-secondary" type="button" onclick="view.exportToSTL()">Export to .STL</button>
-			</span>
-		</div>
-	</div>  	
-</footer>
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
 <script src="/vendor/threejs/build/three.js"></script>

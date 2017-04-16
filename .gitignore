@@ -34,3 +34,6 @@ config
 misc/*.js
 misc/*.zip
 misc/*.obj
+misc/*.blend
+misc/*.blend1
+htdocs/test
