@@ -1,0 +1,5 @@
+DesktopHero v1.1.0 beta
+What's new with this update:
+
+- No more menus on the left. Now you can right click to select meshes and bone groups.
+- New hair models, old hair models have been fixed.
