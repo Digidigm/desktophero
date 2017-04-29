@@ -563,6 +563,10 @@ SceneView.prototype = {
 			this.ambientLight.color = new THREE.Color(.5, .4, .2);
 			this.showLibrary('pose');
 			this.showInfoPanel('pose');
+
+			// Set keyboard focus
+			document.activeElement.blur();
+			document.getElementById("editor").focus();
 		}
 		
 		if (mode == 'mesh'){
@@ -1199,9 +1203,6 @@ function onMouseUp(event){
 	} else if (event.button == 2){
 		view.onRightMouseUp(event.clientX, event.clientY, event);
 	}
-
-	//document.activeElement.blur();
-	//document.getElementById("editor").focus();
 }
 
 function onMouseMove(event){
