@@ -16,6 +16,10 @@ function BoneGroup(name, libraryName, skeleton){
 
 	this.metadata = null;
 
+	this.defaultPositions = this.getPositions();
+	this.defaultRotations = this.getRotations();
+	this.defaultScales = this.getScales();
+
 	for (var i = 0; i < skeleton.bones.length; i++){
 		bone = skeleton.bones[i];
 		if (bone.name.startsWith("#")){
@@ -26,12 +30,10 @@ function BoneGroup(name, libraryName, skeleton){
 
 BoneGroup.prototype = {
 	resetPose: function(){
-		var bones = this.skeleton.bones;
+		this.setPose(this.defaultPositions, this.defaultRotations, this.defaultScales);
+		/*var bones = this.skeleton.bones;
 		for (var i = 0; i < bones.length; i++){
 			var bone = bones[i];
-			/*bone.position.x = 0;
-			bone.position.y = 0;
-			bone.position.z = 0;*/
 
 			bone.rotation.x = 0;
 			bone.rotation.y = 0;
@@ -40,7 +42,7 @@ BoneGroup.prototype = {
 			bone.scale.x = 1;
 			bone.scale.y = 1;
 			bone.scale.z = 1;
-		}
+		}*/
 	},
 
 	setPose: function(positions, rotations, scales){
