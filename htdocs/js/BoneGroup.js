@@ -31,18 +31,6 @@ function BoneGroup(name, libraryName, skeleton){
 BoneGroup.prototype = {
 	resetPose: function(){
 		this.setPose(this.defaultPositions, this.defaultRotations, this.defaultScales);
-		/*var bones = this.skeleton.bones;
-		for (var i = 0; i < bones.length; i++){
-			var bone = bones[i];
-
-			bone.rotation.x = 0;
-			bone.rotation.y = 0;
-			bone.rotation.z = 0;
-
-			bone.scale.x = 1;
-			bone.scale.y = 1;
-			bone.scale.z = 1;
-		}*/
 	},
 
 	setPose: function(positions, rotations, scales){
