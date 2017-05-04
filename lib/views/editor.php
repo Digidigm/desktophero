@@ -691,7 +691,7 @@ jQuery.get('/changelog.txt', function(data) {
 });
 </script>
 
-<div id="body-accordion-container" class="col-md-6" oncontextmenu="return false;" style="position: absolute; margin-top: 80px; margin-left: 5px; top: 0%; left: 0%;">
+<div id="body-accordion-container" class="col-md-12" oncontextmenu="return false;" style="position: absolute; margin-top: 40px; margin-left: 5px; top: 0%; left: 0%;">
 	<div class="btn-group" data-toggle="buttons" id="mode-options" mesh="mode-options">
 	  <label class="btn btn-primary nav-link mesh-btn active">
 		<input type="radio" name="options" id="option1" autocomplete="off" checked onclick="clickedMeshTab();"> Appearance
@@ -709,6 +709,8 @@ jQuery.get('/changelog.txt', function(data) {
 		<input type="radio" name="options" id="option5" autocomplete="off" onclick="clickedCharacterTab();"> Character
 	  </label>
 	</div>
+
+<div id="body-accordion-container2" class="col-md-4" oncontextmenu="return false;" style="position: absolute; margin-top: 80px; margin-left: 5px; top: 0%; left: 0%;">
 
 	<div class="mesh-info" id="mesh-help">
 		<br>
@@ -780,6 +782,13 @@ jQuery.get('/changelog.txt', function(data) {
 
 	<div class="character-info" id="character-info">
 		<br>
+		<button class="btn btn-secondary" type="button" onclick="model.setResolution('low');">Low Res</button>
+		<br>
+		<button class="btn btn-secondary" type="button" onclick="model.setResolution('medium');">Medium Res</button>
+		<br>
+		<button class="btn btn-secondary" type="button" onclick="model.setResolution('high');">High Res</button>
+		<br>
+		<br>
 		<button class="btn btn-primary" type="button" onclick="model.saveCharacter();">Save Character</button>
 		<br>
 		<br>
@@ -823,19 +832,15 @@ jQuery.get('/changelog.txt', function(data) {
 	<h2 class="text-white"> Bone Group Library </h2>
 </div>
 
-<div id='status-box'>
+<!-- <div id='status-box'>
 	<h5 class='text-white float-left'>Console</h5>
-	<!-- Progress Bars to show upload completion percentage -->
 	<div class="progress-bar-area float-right"></div>
 	<form method="POST" enctype="multipart/form-data" class="direct-upload hidden">
-		<!--filled by JS as needed -->
 	</form>
-
-	<!-- This area will be filled with our results (mainly for debugging) -->
 	<div>
 		<textarea id="uiconsole"></textarea>
 	</div>
-</div>
+</div>-->
 
 <div id='loadingDiv'>
 	<img src='/img/loading.gif'>

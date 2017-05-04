@@ -139,7 +139,7 @@ SceneModel.prototype = {
 		});
 	},
 
-	saveCharacter: function(){
+	getCharacterJson: function(){
 		// Must save bone groups, meshes attached to bone groups, 
 		// places meshes are attached, pos/rot/scale of bone groups, pose.
 
@@ -147,30 +147,51 @@ SceneModel.prototype = {
 			character: this.character.toJSON(),
 			pose: this.character.getCurrentPose()
 		};*/
-		thing = {};
-		thing.boneGroups = [];
-		thing.meshes = {};
-		thing.attachments = {};
+		var character = {};
+		character.boneGroups = [];
+		character.meshes = {};
+		character.attachments = {};
 		var boneGroups = this.character.boneGroups;
 		for (var boneGroupUid in boneGroups.dict){
 			var boneGroup = boneGroups.get(boneGroupUid);
-			thing.boneGroups.push(boneGroup.name);
+			character.boneGroups.push(boneGroup.name);
 
 			for (var meshId in boneGroup.meshes.dict){
 				var mesh = boneGroup.meshes.get(meshId);
-				thing.meshes[mesh.name] = boneGroup.name;
+				character.meshes[mesh.name] = boneGroup.name;
 			}
 
 			console.log(boneGroup.parentBone);
 			if (boneGroup.parentBone != null){
 				var parentBoneGroup = this.character.boneGroups.get(boneGroup.parentBoneGroupUid);
-				thing.attachments[boneGroup.name] = [parentBoneGroup.name, boneGroup.parentBoneName];
+				character.attachments[boneGroup.name] = [parentBoneGroup.name, boneGroup.parentBoneName];
 			}
 		}
 
-		thing.pose = this.character.getCurrentPose();
+		character.pose = this.character.getCurrentPose();
 
-		FileSaver.download(JSON.stringify(thing, null, "\t"), this.character.name + ".txt");
+		return JSON.stringify(character, null, "\t");
+	},
+
+	saveCharacter: function(){
+		var characterJson = this.getCharacterJson();
+		FileSaver.download(characterJson, this.character.name + ".txt");
+	},
+
+	setResolution: function(resolution){
+		var defaultLib = this.libraries.get('default');
+		if (resolution == defaultLib.resolution){
+			return;
+		}
+
+		if (resolution == 'high' || resolution == 'low' || resolution == 'medium'){
+			defaultLib.resolution = resolution;
+			var characterJson = this.getCharacterJson();
+			this.character.clear();
+			this.loadJSONPreset(characterJson);
+		} else {
+			console.log("Invalid resolution: " + resolution);
+		}
 	},
 
 	initCharacter: function(){

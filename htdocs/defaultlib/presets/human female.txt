@@ -21,7 +21,7 @@
 		"female torso": "female torso",
 		"breastplate": "female torso",
 		"smooth circular platform": "platform",
-		"female": "head",
+		"female head": "head",
 		"long hair falling to side": "head",
 		"thin neck": "neck",
 		"short spear": "weapon"

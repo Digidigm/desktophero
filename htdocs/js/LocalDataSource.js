@@ -5,6 +5,7 @@ function LocalDataSource(name, directoryURL){
 	this.name = name;
 	this.topDirectory = directoryURL;
 	this.meshesDirectory = directoryURL + '/meshes';
+	this.resolution = "medium"
 	this.posesDirectory = directoryURL + '/poses';
 	this.boneGroupsDirectory = directoryURL + '/bone groups';
 	this.presetsDirectory = directoryURL + '/presets';
@@ -369,7 +370,7 @@ this.meshes['winged helmet'] = new MeshMetadata('winged helmet', 'stockto2', 'de
 
 	fetchMesh: function(name, callback){
 		var self = this;
-		var filename = this.meshesDirectory + '/' + name + '.js';
+		var filename = this.meshesDirectory + '/' + this.resolution + "/" + name + '.js';
 		LocalDataSource.loader.load(filename, function(geometry, materials){
 			//materials[0].skinning = true;
 

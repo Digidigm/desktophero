@@ -22,7 +22,7 @@
 		"smooth circular platform": "platform",
 		"male torso": "male torso",
 		"simple tunic": "male torso",
-		"human male": "head",
+		"male head": "head",
 		"slicked back": "head",
 		"thick neck": "neck",
 		"basic sword": "weapon"
