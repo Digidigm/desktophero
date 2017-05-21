@@ -404,6 +404,8 @@ $(document).ready( function(){
 
 	document.getElementById('loadPose').addEventListener('change', readPoseFile, false);
 
+	document.getElementById('loadAsset').addEventListener('change', readAssetFile, false);
+
 	function readCharacterFile (evt) {
 		var files = evt.target.files;
 		var file = files[0];
@@ -412,7 +414,54 @@ $(document).ready( function(){
 			model.character.clear();
 			model.loadJSONPreset(this.result);
 		}
-		reader.readAsText(file)
+		reader.readAsText(file);
+	}
+
+	function readAssetFile (evt) {
+		var files = evt.target.files;
+		var file = files[0];
+		var filename = file['name'];
+		var match = filename.match(/\.[^/.]+$/);
+		var name = filename.substring(0, match.index);
+		var extension = filename.substring(match.index);
+		var reader = new FileReader();
+
+		reader.onload = function() {
+			var contents = this.result;
+
+			var geometry;
+			if (extension == '.json' || extension == '.js'){
+				var json = JSON.parse(contents);
+				var results = new THREE.JSONLoader().parse(json);
+				geometry = results['geometry'];
+			} else if (extension == '.stl'){
+				geometry = new THREE.STLLoader().parse(contents);
+				geometry = new THREE.Geometry().fromBufferGeometry(geometry);
+				geometry.rotateX(-Math.PI/2);
+			} else {
+				sweetAlert({
+					title: '',
+					html: 'Filetype $(extension) is not supported. Supported filetypes are: .js, .json, .stl'
+				});
+				return;
+			}
+
+			model.libraries.get('default').addMesh(name, '', 'custom', [], geometry);
+			sweetAlert({
+				title: '',
+				html: 'Mesh "' + name + '" has been successfully loaded. <br> Look for it in the mesh library under "custom".'
+			});
+			var uid = view.selectedMesh.boneGroupUid;
+			view.libraryClearMeshes();
+			view.libraryPopulateMeshes(uid);
+			view.showLibrary('mesh');
+		};
+
+		if (extension == '.json' || extension == '.js'){
+			reader.readAsText(file);
+		} else if (extension == '.stl'){
+			reader.readAsBinaryString(file);
+		}
 	}
 
 	function readPoseFile (evt) {
@@ -422,7 +471,7 @@ $(document).ready( function(){
 		reader.onload = function() {
 			model.character.loadJSONPose(this.result);
 		}
-		reader.readAsText(file)
+		reader.readAsText(file);
 	}
 
 	showSelectDialogBox = function(title, options, inputPlaceholder, onResult){
@@ -737,6 +786,11 @@ jQuery.get('/changelog.txt', function(data) {
 		<span class="btn-group">
 			<button class="btn btn-primary" type="button" onclick="view.clickedAddMesh()">Add Mesh</button>
 		</span>
+		<br>
+		<br>
+		<br>
+		<label for="loadAsset" class="btn btn-secondary">Load Mesh</label>
+		<input id="loadAsset" style="visibility:hidden;" type="file">
 	</div>
 
 	<div class="pose-info" id="pose-info">
@@ -850,6 +904,7 @@ jQuery.get('/changelog.txt', function(data) {
 <script src="/vendor/threejs/build/three.js"></script>
 <script src="/vendor/threejs/external/OrbitControls.js"></script>
 <script src="/vendor/threejs/external/STLExporter.js"></script>
+<script src="/vendor/threejs/examples/js/loaders/STLLoader.js"></script>
 
 <script src="/js/bootstrap/tab.js"></script>
 

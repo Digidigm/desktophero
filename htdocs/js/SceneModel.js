@@ -29,9 +29,18 @@ SceneModel.prototype = {
 		var allMeshes = [];
 		for (var libraryName in this.libraries.dict){
 			var library = this.libraries.get(libraryName);
+			// Custom meshes
+			meshes = library.getCustomMeshes();
+			for (var meshName in meshes){
+				var meshMetadata = meshes[meshName]['metadata'];
+				if (types.indexOf(meshMetadata.type) > -1){
+					allMeshes.push(meshMetadata);
+				}
+			}
+			// Regular Meshes
 			var meshes = library.getMeshes();
 			for (var meshName in meshes){
-				meshMetadata = meshes[meshName];
+				var meshMetadata = meshes[meshName];
 				if (types.indexOf(meshMetadata.type) > -1){
 					allMeshes.push(meshMetadata);
 				}
