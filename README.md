@@ -41,6 +41,7 @@ See https://www.kickstarter.com/projects/263291121/desktophero-free-3d-printable
 3.  We'll be doing unit tests for the apis and that's always a wonderful place to contribute if you're looking for something to do
 4.  We'll drop all the example code from three.js and clean up git as soon as we have some working prototypes of everything and it's not needed for quick reference
 
+# License
 This project is licensed under the terms of the MIT License.
 
 Copyright (c) 2017 Andrew Stockton
